@@ -1,0 +1,22 @@
+--cpu Cortex-M0
+".\obj\system_nuc1261.o"
+".\obj\startup_nuc1261.o"
+".\obj\main.o"
+".\obj\ao_ee24c.o"
+".\obj\ao_hostprocess.o"
+".\obj\ao_meterprocess.o"
+".\obj\ao2022_center_1261.o"
+".\obj\ota_manager.o"
+".\obj\fmc_user.o"
+".\obj\clk.o"
+".\obj\crc.o"
+".\obj\fmc.o"
+".\obj\i2c.o"
+".\obj\sys.o"
+".\obj\wdt.o"
+".\obj\uart.o"
+".\obj\retarget.o"
+--library_type=microlib --scatter ".\obj\FW_AO2024_Cpu_MeterSystem_Center1261_v01.sct"
+--map --first='startup_NUC1261.o(RESET)' --datacompressor=off --info=inline --entry Reset_Handler --summary_stderr --info summarysizes --map --load_addr_map_info --xref --callgraph --symbols
+--info sizes --info totals --info unused --info veneers
+--list ".\lst\FW_AO2024_Cpu_MeterSystem_Center1261_v01.map" -o .\obj\FW_AO2024_Cpu_MeterSystem_Center1261_v01.axf

@@ -1,0 +1,24 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "C/C++ Runner: Debug Session",
+      "type": "cppdbg",
+      "request": "launch",
+      "args": [],
+      "stopAtEntry": false,
+      "externalConsole": true,
+      "cwd": "c:/Users/barry/OneDrive/Desktop/FW_AO2024_Cpu_MeterSystem_Center1261_v01/FW_AO2024_Cpu_MeterSystem_Center1261_v01",
+      "program": "c:/Users/barry/OneDrive/Desktop/FW_AO2024_Cpu_MeterSystem_Center1261_v01/FW_AO2024_Cpu_MeterSystem_Center1261_v01/build/Debug/outDebug",
+      "MIMode": "gdb",
+      "miDebuggerPath": "gdb",
+      "setupCommands": [
+        {
+          "description": "Enable pretty-printing for gdb",
+          "text": "-enable-pretty-printing",
+          "ignoreFailures": true
+        }
+      ]
+    }
+  ]
+}
