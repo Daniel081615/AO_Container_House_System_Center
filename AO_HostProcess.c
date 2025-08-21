@@ -20,10 +20,9 @@ uint8_t LastMessDate[3];
 // CTR_SYS_SW ­p®É Reset
 uint8_t system_SW_Flag = 0;
 uint8_t system_SW_Timer = 0;
-uint8_t HostDeviceIndex;
 
 
-void HOST_GetDeviceData(void);
+
 void HostProcess(void);
 void CalChecksumH(void);
 void ClearRespDelayTimer(void);
@@ -31,7 +30,6 @@ void HOST_AliveProcess(void);
 
 void SendHost_Ack(void);
 void SystemSwitchProcess(void);
-void HOST_SetSystemHw(void);
 
 
 void SendHost_SystemInformation(void);
@@ -39,6 +37,11 @@ void SendHost_PowerData(void);
 void SendHost_BmsData(void);
 void SendHost_WMData(void);
 void SendHost_InvData(void);
+
+void Host_PowerMeterDataProcess(void);
+void Host_BmsDataProcess(void);
+void Host_WMDataProcess(void);
+void Host_InvDataProcess(void);
 
 //***** OTA Process *****//
 void Host_OTAMeterProcess(void);
@@ -117,31 +120,26 @@ void HostProcess(void)
                         CmdType = CTR_RSP_SYSTEM_INFO ;
                         ClearRespDelayTimer() ;	
                         break;					                                                                                
-                    case CTR_GET_POWER_DATA :
-                        HOST_GetDeviceData();
+                    case CTR_GET_CMD_POWER_METER :
+                        Host_PowerMeterDataProcess();
                         CmdType = CTR_RSP_POWER_DATA ;
                         ClearRespDelayTimer() ;
                         break;	
-										case CTR_GET_BMS_DATA:
-												HOST_GetDeviceData();
+										case CTR_GET_CMD_BMS:
+												Host_BmsDataProcess();
                         CmdType = CTR_RSP_BMS_DATA ;
                         ClearRespDelayTimer() ;											
 												break;
-										case CTR_GET_WM_DATA:
-												HOST_GetDeviceData();
+										case CTR_GET_CMD_WATER_METER:
+												Host_WMDataProcess();
                         CmdType = CTR_RSP_WM_DATA ;
                         ClearRespDelayTimer() ;
 												break;
-										case CTR_GET_INV_DATA:
-												HOST_GetDeviceData();
+										case CTR_GET_CMD_INV:
+												Host_InvDataProcess();
                         CmdType = CTR_RSP_INV_DATA ;
                         ClearRespDelayTimer() ;												
 												break;
-                     case CTR_SET_SYSYEM_HW :
-                        HOST_SetSystemHw();
-                        CmdType = CTR_RSP_ACK ;
-                        ClearRespDelayTimer() ;
-                        break;
 										 	// CTR	ota commamd
                     case CTR_OTA_UPDATE_CTR:
                         Host_OTACenterProcess();
@@ -266,89 +264,63 @@ void HOST_AliveProcess(void)
 1: MyCenterID
 2: Command
 3: fgHostInformation
-4: Meter Index
-5: Record Type 
-6: Record Index
+4: Meter Cmds
+
 
 49: Checksum
 50: 0x0A (\n)
 */
-void HOST_GetDeviceData(void)
+void Host_PowerMeterDataProcess(void)
 {
     uint8_t i;
 
+		
     HostDeviceIndex = TokenHost[3];
-
-    for (i=0;i<7;i++)
-    {		
-        iSystemTime[i] = TokenHost[HOST_INX_TIME_START+i];
-    }	
-	
+		PwrMeterCmdList[HostDeviceIndex-1] = TokenHost[4];
+ 
+//    for (i=0;i<7;i++)
+//    {
+//        iSystemTime[i] = TokenHost[INX_TIME_START_Y+i];
+//    }  
 }
-void HOST_SetSystemHw(void)
+
+void Host_BmsDataProcess(void)
 {
     uint8_t i;
-    uint8_t u8SetSystemHW_P,u8SetSystemHW_N;
-    uint8_t u8PowerControl;
     
-    HostMeterIndex = TokenHost[3]-1;
-   
-    u8SetSystemHW_P = TokenHost[4];
-    u8SetSystemHW_N = TokenHost[5];
-    u8PowerControl = TokenHost[6];
+    HostDeviceIndex = TokenHost[3];
+		BmsCmdList[HostDeviceIndex-1] = TokenHost[4];
+ 
     for (i=0;i<7;i++)
-    {		
-        iSystemTime[i] = TokenHost[HOST_INX_TIME_START+i];
-    }	
-    
-    if ( u8SetSystemHW_N ==  (255-u8SetSystemHW_P))
     {
-        if ( u8SetSystemHW_P == 0xA0 )
-        {
-            u8tick1S_GPIO_Restart=0;
-            if ( u8PowerControl & (0x01 << 0) )
-            {
-                METER_PW1_Off();
-                //READER_PW2_Off();
-                //READER_PW3_Off();
-                //READER_PW4_Off();
-                //METER_PW_Off();
-            }
-            if ( u8PowerControl & (0x01 << 1) )
-            {
-                //READER_PW1_Off();
-                METER_PW2_Off();
-                //READER_PW3_Off();
-                //READER_PW4_Off();
-                //METER_PW_Off();
-            }
-            if ( u8PowerControl & (0x01 << 2) )
-            {
-                //READER_PW1_Off();
-                //READER_PW2_Off();
-                METER_PW3_Off();
-                //READER_PW4_Off();
-                //METER_PW_Off();
-            }
-            if ( u8PowerControl & (0x01 << 3) )
-            {
-                //READER_PW1_Off();
-                //READER_PW2_Off();
-                //READER_PW3_Off();
-                METER_PW4_Off();
-                //METER_PW_Off();
-            }
-            if ( u8PowerControl & (0x01 << 4) )
-            {
-                //READER_PW1_Off();
-                //READER_PW2_Off();
-                //READER_PW3_Off();
-                //READER_PW4_Off();
-                
-            }
-            
-        }
-    }   
+        iSystemTime[i] = TokenHost[INX_TIME_START_Y+i];
+    }  
+}
+
+void Host_WMDataProcess(void)
+{
+    uint8_t i;
+    
+    HostDeviceIndex = TokenHost[3];
+		WtrMeterCmdList[HostDeviceIndex-1] = TokenHost[4];
+ 
+    for (i=0;i<7;i++)
+    {
+        iSystemTime[i] = TokenHost[INX_TIME_START_Y+i];
+    }  
+}
+
+void Host_InvDataProcess(void)
+{
+    uint8_t i;
+    
+    HostDeviceIndex = TokenHost[3];
+		InvCmdList[HostDeviceIndex-1] = TokenHost[4];
+ 
+    for (i=0;i<7;i++)
+    {
+        iSystemTime[i] = TokenHost[INX_TIME_START_Y+i];
+    }  
 }
 
 /* Process Cenetr OTA Cmd from Host
@@ -734,7 +706,7 @@ void SendHost_FirstReset_Ack(void)
 /* When meter update success, send host Update Success Password
 0:0x55
 1: MyCenterID
-2: Meter_RoomMeterID
+2: MeterRspID
 4: 0x0A
 5: 0xBB
 6: 0xC0
@@ -743,7 +715,7 @@ void SendHost_FirstReset_Ack(void)
 void SendHost_MeterUpdateSuccsess(void)
 {
 		HostTxBuffer[1] = MyCenterID;					//MeterID
-		HostTxBuffer[2] = Meter_RoomMeterID;	//MeterID
+		HostTxBuffer[2] = MeterRspID;	//MeterID
 		HostTxBuffer[4] = 0x0A;		HostTxBuffer[5] = 0xBB;
 		HostTxBuffer[6] = 0xC0;		HostTxBuffer[7] = 0xDD;
 		

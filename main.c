@@ -38,7 +38,6 @@ const uint8_t RoomMaxTable[SMART_ROOM_MAX]={1,30,23,29,31,29,31,29,31};
 
 #endif
 
-#define MeterMax 2
 
 uint8_t RoomMax;
 uint8_t MeterDeviceMax;
@@ -119,7 +118,7 @@ _Bool 	fgDIR485_NODE1_In,fgDIR485_NODE2_In ;
 uint8_t TickHost, TickMeter;
 uint16_t  TickTestDelayTime;
 
-uint8_t Meter_RoomMeterID;
+uint8_t MeterRspID, HostDeviceIndex;
 
 uint8_t NowPollingMeterBoard;
 uint8_t NowPollingPowerMeter, NowPollingBms, NowPollingWM, NowPollingInv;
@@ -148,8 +147,13 @@ uint8_t Tick20mS_ReaderReset;
 uint8_t tick_CalBalance;
 uint32_t MeterValueTest;
 
-// meter ota variables
-uint8_t MeterOtaCmdList[MeterMax];
+
+//Host to meter devices & Ota Cmd List
+uint8_t MeterOtaCmdList[MtrBoardMax];
+uint8_t PwrMeterCmdList[PwrMeterMax];
+uint8_t BmsCmdList[BmsMax];
+uint8_t WtrMeterCmdList[WtrMeterMax];
+uint8_t InvCmdList[InvMax];
 
 /*---------------------------------------------------------------------------------------------------------*/
 /* Global variables                                                                                        */
@@ -254,7 +258,7 @@ _Bool bRecoverSystem;
 _Bool fgMeterAckOK;
 uint8_t TickHost, TickMeter;
 uint16_t  TickTestDelayTime;
-uint8_t Meter_RoomMeterID;
+uint8_t MeterRspID;
 
 uint8_t NowPollingMeterBoard;
 uint8_t TickPollingInterval_Meter;

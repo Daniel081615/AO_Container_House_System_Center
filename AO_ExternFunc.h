@@ -118,18 +118,23 @@ extern uint8_t NowPollingMeterBoard;
 extern uint8_t MeterMode,MeterUser,AlivePacketIndex;
 extern uint16_t MeterBalance;
 extern uint8_t NodeTestAck;
-extern const uint8_t DefineMeterMax[3];
+extern const uint8_t DefinePwrMeterMax[3];
 
 extern uint8_t MeterBoardError;
-extern uint8_t PollingCounter,HostRoomIndex,Meter_RoomMeterID;
+extern uint8_t PollingCounter,HostRoomIndex,MeterRspID, HostDeviceIndex;
 extern uint8_t ReaderState,ReaderTick,bSendReaderCommand,ReaderCommandType;
 
 extern _Bool fgMeterAckOK;
 extern uint32_t MeterButtonStatus,MeterRelayStatus,MeterDeviceError;
 
-
+//	Host Cmds devices List
 extern _Bool flagMeterOTAUpdate;
-extern uint8_t MeterOtaCmdList[2];
+extern uint8_t MeterOtaCmdList[MtrBoardMax];
+extern uint8_t PwrMeterCmdList[PwrMeterMax];
+extern uint8_t BmsCmdList[BmsMax];
+extern uint8_t WtrMeterCmdList[WtrMeterMax];
+extern uint8_t InvCmdList[InvMax];
+
 
 extern _Bool bResetUARTQ;
 

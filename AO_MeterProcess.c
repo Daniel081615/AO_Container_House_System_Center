@@ -18,7 +18,6 @@ void CalChecksumM(void);
 void SendMeter_AliveToken(void);
 void Meter_AckProcess(void);
 
-void M2C_FlagProcess(uint8_t u8Flag, uint8_t u8RoomIndex);
 void Meter_RSP_SysInformation(void);
 void Meter_RSP_PowerData(void);
 void Meter_RSP_BmsData(void);
@@ -68,14 +67,16 @@ _Bool EnPollPowerMeterFlag, EnPollBmsFlag, EnPollWMFlag, EnPollInvFlag;
 
 /***	
 	@note 		When finish all devices polling process, poll the consecutive meter board
-	@brief 		Meter Polling States: 
+	@brief 		i.	Meter Polling States: 
 							1. Power meter, 
 							2. Bms, 
 							3. Water meter, 
 							4. Inverter, 
 							5. MeterBoard OTA
+						ii.	Send host Cmds to meter devices, by using subcmd.
+						
 	@note			Timeout logic process
-	@revise 	2025.08.19	
+	@revise 	2025.08.21
 ***/
 void MeterBoardPolling(void)
 {
@@ -121,7 +122,7 @@ void MeterBoardPolling(void)
 						}
             if ( MeterWaitTick > 2 )
             {							
-                Meter_RoomMeterID = 0xFF ;
+                MeterRspID = 0xFF ;
                 ResetMeterUART();
                 SendMeter_AliveToken();
                 TickPollingInterval_Meter = 0 ;
@@ -130,7 +131,7 @@ void MeterBoardPolling(void)
             break;
 						
         case PL_METER_POLL2 :
-            if (Meter_RoomMeterID == NowPollingMeterBoard)
+            if (MeterRspID == NowPollingMeterBoard)
             {
 								PollSuccess_Handler(PL_METER_POLL3);
             } else {
@@ -149,7 +150,7 @@ void MeterBoardPolling(void)
         case PL_METER_POLL3 :	
             if ( MeterWaitTick > 2 )
             {							
-                Meter_RoomMeterID = 0xFF ;
+                MeterRspID = 0xFF ;
                 ResetMeterUART();
                 SendMeter_GetPowerData();                           
                 TickPollingInterval_Meter = 0 ;
@@ -158,8 +159,9 @@ void MeterBoardPolling(void)
             break;
 						
         case PL_METER_POLL4 :
-            if (Meter_RoomMeterID == NowPollingMeterBoard)
-            {			    	
+            if (MeterRspID == NowPollingMeterBoard)
+            {		
+								PwrMeterCmdList[NowPollingPowerMeter-1] = 0;
 								PollSuccess_Handler(PL_METER_POLL5);
 								//	Poll next power meter, or stop polling
 								NowPollingPowerMeter++;
@@ -187,7 +189,7 @@ void MeterBoardPolling(void)
 						}
             if ( MeterWaitTick > 2 )
             {							
-                Meter_RoomMeterID = 0xFF ;
+                MeterRspID = 0xFF ;
                 ResetMeterUART();
                 SendMeter_GetBmsData();
                 TickPollingInterval_Meter = 0 ;
@@ -196,8 +198,9 @@ void MeterBoardPolling(void)
             break;
 						
         case PL_METER_POLL6 :
-            if (Meter_RoomMeterID == NowPollingMeterBoard)
+            if (MeterRspID == NowPollingMeterBoard)
             {
+								BmsCmdList[NowPollingBms-1] = 0;
 								PollSuccess_Handler(PL_METER_POLL7);
 								//	Poll next Bms, or stop polling
 								NowPollingBms++;
@@ -224,7 +227,7 @@ void MeterBoardPolling(void)
 						}
             if ( MeterWaitTick > 2 )
             {							
-                Meter_RoomMeterID = 0xFF ;
+                MeterRspID = 0xFF ;
                 ResetMeterUART();
                 SendMeter_GetWMData();
                 TickPollingInterval_Meter = 0 ;
@@ -232,8 +235,9 @@ void MeterBoardPolling(void)
             }
             break;
         case PL_METER_POLL8 :
-            if (Meter_RoomMeterID == NowPollingMeterBoard)
+            if (MeterRspID == NowPollingMeterBoard)
             {
+								WtrMeterCmdList[NowPollingWM-1] = 0;
 								PollSuccess_Handler(PL_METER_POLL9);
 								//	Poll next WM, or stop polling
 								NowPollingWM++;
@@ -261,7 +265,7 @@ void MeterBoardPolling(void)
 						}
             if ( MeterWaitTick > 2 )
             {							
-                Meter_RoomMeterID = 0xFF ;
+                MeterRspID = 0xFF ;
                 ResetMeterUART();
                 SendMeter_GetInvData();
                 TickPollingInterval_Meter = 0 ;
@@ -269,8 +273,9 @@ void MeterBoardPolling(void)
             }
             break;
         case PL_METER_POLL10 :
-            if (Meter_RoomMeterID == NowPollingMeterBoard)
+            if (MeterRspID == NowPollingMeterBoard)
             {
+								InvCmdList[NowPollingInv-1] = 0;
 								PollSuccess_Handler(PL_METER_POLL11);
 								//	Poll next Bms, or stop polling
 								NowPollingInv++;
@@ -296,7 +301,7 @@ void MeterBoardPolling(void)
         case PL_METER_POLL11 :				
             if ( MeterWaitTick > 2 )
             {							
-                Meter_RoomMeterID = 0xFF ;
+                MeterRspID = 0xFF ;
                 ResetMeterUART();
 								if (MeterOtaCmd != 0){
 										SendMeter_MeterOTACmd(MeterOtaCmd);
@@ -309,7 +314,7 @@ void MeterBoardPolling(void)
             }
             break;
 				case PL_METER_POLL12:
-						if (Meter_RoomMeterID == NowPollingMeterBoard)
+						if (MeterRspID == NowPollingMeterBoard)
 						{
 								SendHost_MeterFWInfo();
 								MeterOtaCmdList[OTAMeterID-1] = 0;
@@ -340,7 +345,7 @@ void MeterBoardPolling(void)
 				case PL_MTR_CMD_CONNECT:
 				
 						if (MeterWaitTick > 2){
-								Meter_RoomMeterID = 0xFF ;	/* make sure Center recevied meter Rsp */
+								MeterRspID = 0xFF ;	/* make sure Center recevied meter Rsp */
 								ResetMeterUART();
 								SendMeterBootloader_ConnectCmd();
 								MeterPollingState = PL_MTR_WAIT_CONNECT_RSP;
@@ -349,7 +354,7 @@ void MeterBoardPolling(void)
 				
 				//	Wait for Meter Rsp
 				case PL_MTR_WAIT_CONNECT_RSP:
-						if (Meter_RoomMeterID == NowPollingMeterBoard)
+						if (MeterRspID == NowPollingMeterBoard)
 						{
 								RoomIndexReal = NowPollingMeterBoard - 1;
 								PollRetryCounter_Meter = 0;
@@ -366,7 +371,7 @@ void MeterBoardPolling(void)
 							
 				case PL_MTR_CMD_METADATA:
 						if (MeterWaitTick > 2){
-								Meter_RoomMeterID = 0xFF ;	/* make sure Center recevied meter Rsp */
+								MeterRspID = 0xFF ;	/* make sure Center recevied meter Rsp */
 								ResetMeterUART();
 								SendMeterBootloader_UpdateMetadata();
 								MeterPollingState = PL_MTR_WAIT_METADATA_RSP;
@@ -374,7 +379,7 @@ void MeterBoardPolling(void)
 						break;
 						
 				case PL_MTR_WAIT_METADATA_RSP:
-						if (Meter_RoomMeterID == NowPollingMeterBoard)
+						if (MeterRspID == NowPollingMeterBoard)
 						{
 								RoomIndexReal = NowPollingMeterBoard - 1;
 								PollRetryCounter_Meter = 0;
@@ -392,7 +397,7 @@ void MeterBoardPolling(void)
 				case PL_MTR_CMD_ERASE_APROM:
 						if (MeterWaitTick > 2)
 						{
-								Meter_RoomMeterID = 0xFF ;	/* make sure Center recevied meter Rsp */
+								MeterRspID = 0xFF ;	/* make sure Center recevied meter Rsp */
 								ResetMeterUART();
 								SendMeterBootloader_CmdEraseAPROM ();
 								MeterPollingState = PL_MTR_WAIT_ERASE_APROM_RSP;
@@ -400,7 +405,7 @@ void MeterBoardPolling(void)
 						break;
 						
 				case PL_MTR_WAIT_ERASE_APROM_RSP:
-						if (Meter_RoomMeterID == NowPollingMeterBoard)
+						if (MeterRspID == NowPollingMeterBoard)
 						{
 								RoomIndexReal = NowPollingMeterBoard - 1;
 								PollRetryCounter_Meter = 0;
@@ -418,7 +423,7 @@ void MeterBoardPolling(void)
 				case PL_MTR_CMD_UPDATE_APROM:
 							if (MeterWaitTick > 2)
 							{
-									Meter_RoomMeterID = 0xFF ;	/* make sure Center recevied meter Rsp */
+									MeterRspID = 0xFF ;	/* make sure Center recevied meter Rsp */
 									ResetMeterUART();
 									SendMeterBootloader_CmdUpdateAPROM ();
 									MeterPollingState = PL_MTR_WAIT_UPDATE_APROM_RSP;
@@ -426,7 +431,7 @@ void MeterBoardPolling(void)
 						break;
 							
 				case 	PL_MTR_WAIT_UPDATE_APROM_RSP:
-						if (Meter_RoomMeterID == NowPollingMeterBoard)
+						if (MeterRspID == NowPollingMeterBoard)
 						{
 								RoomIndexReal = NowPollingMeterBoard - 1;
 								PollRetryCounter_Meter = 0;
@@ -454,7 +459,7 @@ void MeterBoardPolling(void)
 						break;
 				case	PL_MTR_WAIT_MTR_BOOT_RSP:
 						
-						if (Meter_RoomMeterID == NowPollingMeterBoard)
+						if (MeterRspID == NowPollingMeterBoard)
 						{
 								RoomIndexReal = NowPollingMeterBoard - 1;
 								PollRetryCounter_Meter = 0;
@@ -558,7 +563,7 @@ void MeterProcess(void)
 				{
 						LED_TGL_G();
 						
-						Meter_RoomMeterID = TokenMeter[1];
+						MeterRspID = TokenMeter[1];
 
 						if (MeterOtaFlag) 
 						{
@@ -905,12 +910,21 @@ void SendMeter_AliveToken(void)
 	
 }
 
+
+
 void SendMeter_GetPowerData(void)
 {
         
     MeterTxBuffer[1] = NowPollingMeterBoard;	
-    MeterTxBuffer[2] = METER_CMD_GET_POWER_DATA;
+    MeterTxBuffer[2] = METER_CMD_POWER_METER;
     MeterTxBuffer[3] = NowPollingPowerMeter ;
+		//	Host cmd Device 
+		MeterTxBuffer[4] = PwrMeterCmdList[NowPollingPowerMeter-1];
+ 
+//    for (i=0;i<7;i++)
+//    {
+//        iSystemTime[i] = TokenHost[INX_TIME_START_Y+i];
+//    }  
 
     CalChecksumM();	
 }
@@ -918,8 +932,9 @@ void SendMeter_GetPowerData(void)
 void SendMeter_GetBmsData(void)
 {
     MeterTxBuffer[1] = NowPollingMeterBoard;	
-    MeterTxBuffer[2] = METER_CMD_GET_BMS_DATA;
+    MeterTxBuffer[2] = METER_CMD_BMS;
     MeterTxBuffer[3] = NowPollingBms ;		
+		MeterTxBuffer[4] = BmsCmdList[NowPollingBms-1];
 	    
 		CalChecksumM();	
 }
@@ -927,18 +942,19 @@ void SendMeter_GetBmsData(void)
 void SendMeter_GetWMData(void)
 {
     MeterTxBuffer[1] = NowPollingMeterBoard;	
-    MeterTxBuffer[2] = METER_CMD_GET_WM_DATA;
+    MeterTxBuffer[2] = METER_CMD_WATER_METER;
     MeterTxBuffer[3] = NowPollingWM ;		
-		
+		MeterTxBuffer[4] = WtrMeterCmdList[NowPollingWM-1];
+	
 		CalChecksumM();	
 }
 
 void SendMeter_GetInvData(void)
 {
     MeterTxBuffer[1] = NowPollingMeterBoard;	
-    MeterTxBuffer[2] = METER_CMD_GET_INV_DATA;
+    MeterTxBuffer[2] = METER_CMD_INV;
     MeterTxBuffer[3] = NowPollingInv ;		
-		
+		MeterTxBuffer[4] = InvCmdList[NowPollingInv-1];
 		CalChecksumM();	
 }
 
