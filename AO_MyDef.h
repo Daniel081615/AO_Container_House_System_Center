@@ -444,19 +444,10 @@ typedef struct strRoomInfo {
 } STR_RoomInfo;
 
 typedef struct STR_METER_DATA {    
-uint8_t MeterRelay;
-uint32_t MeterPower;
-uint32_t MeterValtage;
-uint32_t MeterCurrent;
-uint32_t MeterVA;
-uint32_t MeterActPower;
-uint16_t MeterFreq;
-uint16_t MeterPowerFactor;
-uint32_t MeterBalance;
-uint8_t PayMode;
-uint8_t UserStatus;
-uint32_t UserUID;
-} STR_METER_D;
+		uint8_t ErrorRate;
+		uint8_t RelayStatus;
+		uint32_t TotalWatt;
+} MeterData_t;
 
 /***	Bms, WM, INV Data		***/
 typedef struct STR_BMS_DATA{

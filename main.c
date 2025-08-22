@@ -67,8 +67,7 @@ volatile uint32_t   u32TimeTick2;
 volatile uint8_t Tick_10mSec;
 uint16_t     SystemTick;
 
-STR_RoomInfo RoomData[ROOM_MAX];
-STR_METER_D MeterData[ROOM_MAX];
+MeterData_t MeterData[PwrMeterMax];
 uint8_t ErrorRate[ROOM_MAX];
 
 uint8_t iSystemTime[7]={0,0,0,0,0,0,0};		// Year,Month,Day,Hour,Min,Sec,Week
@@ -172,7 +171,6 @@ volatile uint8_t g_u8IsWDTWakeupINT;
 
 //uint8_t PWRMeterData[ROOM_MAX];
 //uint8_t PWRMeterError[ROOM_MAX];
-STR_RoomInfo RoomData[ROOM_MAX];
 
 uint32_t ManagerData[10];
 
@@ -971,12 +969,7 @@ int main()
     ReadMyCenterID();    
     DIR_HOST_RS485_In();
     MeterDeviceMax = MeterDeviceMaxTable[MyCenterID] ;
-    for(i=0;i<ROOM_MAX;i++)
-    {
-        RoomData[i].RoomStatus = 0x3F;
-        RoomData[i].RoomMode = RM_POWER_OFF_READY ;
-        
-    }	
+
     //RoomData[0].RoomMode = RM_FREE_MODE_READY ;
     //RoomData[i].RoomMode = RM_POWER_OFF_READY ;
     u32TimeTick2=0; 	

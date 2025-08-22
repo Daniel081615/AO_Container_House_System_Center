@@ -644,80 +644,24 @@ void Meter_RSP_SysInformation(void)
 }
 
 uint8_t DeviceIndexReal;
+
 void Meter_RSP_PowerData(void)
 {
     
     uint8_t fnPacketIndex;
-    uint32_t tmpMeterPower;
+    uint32_t u32temp;
     DeviceIndexReal  = TokenMeter[4];
     fnPacketIndex = 5 ;
-    
-    MeterData[DeviceIndexReal].PayMode = TokenMeter[fnPacketIndex++] ;
-    RoomData[DeviceIndexReal].ErrorRate = TokenMeter[fnPacketIndex++] ;
-    MeterData[DeviceIndexReal].MeterRelay = TokenMeter[fnPacketIndex++] ;
-    MeterData[DeviceIndexReal].UserStatus = TokenMeter[fnPacketIndex++] ;
-    // 更新電錶電量	
-    
+	
+    MeterData[DeviceIndexReal-1].ErrorRate = TokenMeter[5];    
+    MeterData[DeviceIndexReal-1].RelayStatus = TokenMeter[6];
+    	
     // Total 
-    tmpMeterPower = (uint32_t) TokenMeter[fnPacketIndex++] << 24 ;
-    tmpMeterPower |= (uint32_t) TokenMeter[fnPacketIndex++] << 16 ;
-    tmpMeterPower |= (uint32_t) TokenMeter[fnPacketIndex++] << 8 ;
-    tmpMeterPower |= (uint32_t) TokenMeter[fnPacketIndex++] << 0 ;
-    //if ( tmpMeterPower > 0 )
-		MeterData[DeviceIndexReal].MeterPower = tmpMeterPower;
-    
-    // Power Meter : Voltage
-    tmpMeterPower = (uint32_t) TokenMeter[fnPacketIndex++] << 24 ;
-    tmpMeterPower |= (uint32_t) TokenMeter[fnPacketIndex++] << 16 ;
-    tmpMeterPower |= (uint32_t) TokenMeter[fnPacketIndex++] << 8 ;
-    tmpMeterPower |= (uint32_t) TokenMeter[fnPacketIndex++] << 0 ;
-    //if ( tmpMeterPower > 0 )
-		MeterData[DeviceIndexReal].MeterValtage = tmpMeterPower;
-    // Power Meter : Current	
-    tmpMeterPower = (uint32_t) TokenMeter[fnPacketIndex++] << 24 ;
-    tmpMeterPower |= (uint32_t) TokenMeter[fnPacketIndex++] << 16 ;
-    tmpMeterPower |= (uint32_t) TokenMeter[fnPacketIndex++] << 8 ;
-    tmpMeterPower |= (uint32_t) TokenMeter[fnPacketIndex++] << 0 ;
-    //if ( tmpMeterPower > 0 )
-		MeterData[DeviceIndexReal].MeterCurrent = tmpMeterPower;
-    // Power Meter : Freq. 	
-    tmpMeterPower = (uint32_t) TokenMeter[fnPacketIndex++] << 8 ;
-    tmpMeterPower |= (uint32_t) TokenMeter[fnPacketIndex++] << 0 ;
-    //if ( tmpMeterPower > 0 )
-		MeterData[DeviceIndexReal].MeterFreq = (uint16_t) (tmpMeterPower & 0x0000FFFF);
-    // Power Meter : Power Factor	 	
-    tmpMeterPower = (uint32_t) TokenMeter[fnPacketIndex++] << 8 ;
-    tmpMeterPower |= (uint32_t) TokenMeter[fnPacketIndex++] << 0 ;
-    //if ( tmpMeterPower > 0 )
-		MeterData[DeviceIndexReal].MeterPowerFactor = (uint16_t) (tmpMeterPower & 0x0000FFFF);
-    // Power Meter : Active Power	
-    tmpMeterPower = (uint32_t) TokenMeter[fnPacketIndex++] << 24 ;
-    tmpMeterPower |= (uint32_t) TokenMeter[fnPacketIndex++] << 16 ;
-    tmpMeterPower |= (uint32_t) TokenMeter[fnPacketIndex++] << 8 ;
-    tmpMeterPower |= (uint32_t) TokenMeter[fnPacketIndex++] << 0 ;
-    //if ( tmpMeterPower > 0 )
-		MeterData[DeviceIndexReal].MeterActPower = tmpMeterPower;
-    // Power Meter : VA		
-    tmpMeterPower = (uint32_t) TokenMeter[fnPacketIndex++] << 24 ;
-    tmpMeterPower |= (uint32_t) TokenMeter[fnPacketIndex++] << 16 ;
-    tmpMeterPower |= (uint32_t) TokenMeter[fnPacketIndex++] << 8 ;
-    tmpMeterPower |= (uint32_t) TokenMeter[fnPacketIndex++] << 0 ;
-    //if ( tmpMeterPower > 0 )
-		MeterData[DeviceIndexReal].MeterVA = tmpMeterPower;
-    // Power Meter : Balance
-    tmpMeterPower = (uint32_t) TokenMeter[fnPacketIndex++] << 24 ;
-    tmpMeterPower |= (uint32_t) TokenMeter[fnPacketIndex++] << 16 ;
-    tmpMeterPower |= (uint32_t) TokenMeter[fnPacketIndex++] << 8 ;
-    tmpMeterPower |= (uint32_t) TokenMeter[fnPacketIndex++] << 0 ;
-    //if ( tmpMeterPower > 0 )
-		MeterData[DeviceIndexReal].MeterBalance = tmpMeterPower;    
-    // Power Meter : User UID
-    tmpMeterPower = (uint32_t) TokenMeter[fnPacketIndex++] << 24 ;
-    tmpMeterPower |= (uint32_t) TokenMeter[fnPacketIndex++] << 16 ;
-    tmpMeterPower |= (uint32_t) TokenMeter[fnPacketIndex++] << 8 ;
-    tmpMeterPower |= (uint32_t) TokenMeter[fnPacketIndex++] << 0 ;
-    MeterData[DeviceIndexReal].UserUID = tmpMeterPower;  
-    
+    u32temp = (uint32_t) TokenMeter[fnPacketIndex++] << 24 ;
+    u32temp |= (uint32_t) TokenMeter[fnPacketIndex++] << 16 ;
+    u32temp |= (uint32_t) TokenMeter[fnPacketIndex++] << 8 ;
+    u32temp |= (uint32_t) TokenMeter[fnPacketIndex++] << 0 ;
+
 }
 
 /***	Process Meter Bms Data	***/
@@ -902,10 +846,7 @@ void SendMeter_AliveToken(void)
     MeterTxBuffer[8] =  (255-0x30) ;
     
     u8PackageIndex = 9 ;
-    for (i=0;i<ROOM_MAX;i++)
-    {
-        MeterTxBuffer[u8PackageIndex++] = RoomData[i].RoomMode;
-    }
+
     CalChecksumM();	
 	
 }
@@ -931,9 +872,9 @@ void SendMeter_GetPowerData(void)
 
 void SendMeter_GetBmsData(void)
 {
-    MeterTxBuffer[1] = NowPollingMeterBoard;	
+    MeterTxBuffer[1] = NowPollingMeterBoard;
     MeterTxBuffer[2] = METER_CMD_BMS;
-    MeterTxBuffer[3] = NowPollingBms ;		
+    MeterTxBuffer[3] = NowPollingBms ;
 		MeterTxBuffer[4] = BmsCmdList[NowPollingBms-1];
 	    
 		CalChecksumM();	

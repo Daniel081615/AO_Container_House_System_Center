@@ -3,9 +3,9 @@
 <title>Static Call Graph - [.\obj\FW_AO2024_Cpu_MeterSystem_Center1261_v01.axf]</title></head>
 <body><HR>
 <H1>Static Call Graph for image .\obj\FW_AO2024_Cpu_MeterSystem_Center1261_v01.axf</H1><HR>
-<BR><P>#&#060CALLGRAPH&#062# ARM Linker, 6230001: Last Updated: Thu Aug 21 16:36:24 2025
+<BR><P>#&#060CALLGRAPH&#062# ARM Linker, 6230001: Last Updated: Fri Aug 22 16:38:56 2025
 <BR><P>
-<H3>Maximum Stack Usage =        272 bytes + Unknown(Cycles, Untraceable Function Pointers)</H3><H3>
+<H3>Maximum Stack Usage =        280 bytes + Unknown(Cycles, Untraceable Function Pointers)</H3><H3>
 Call chain for Maximum Stack Depth:</H3>
 main &rArr; HostProcess &rArr; Host_OTACenterProcess &rArr; MarkFwAsActive &rArr; WRITE_FW_STATUS_FLAG &rArr; WriteFWstatus &rArr; WriteToFlash &rArr; CRC32_Calc &rArr; CRC_Open
 <P>
@@ -320,7 +320,8 @@ Global Symbols
 <P><STRONG><a name="[39]"></a>AO2022_Center_1261_init</STRONG> (Thumb, 48 bytes, Stack size 8 bytes, ao2022_center_1261.o(.text.AO2022_Center_1261_init))
 <BR><BR>[Stack]<UL><LI>Max Depth = 8<LI>Call Chain = AO2022_Center_1261_init
 </UL>
-<BR>[Calls]<UL><LI><a href="#[44]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;AO2022_Center_1261_init_x32
+<BR>[Calls]<UL><LI><a href="#[3a]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;AO2022_Center_1261_init_ice
+<LI><a href="#[44]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;AO2022_Center_1261_init_x32
 <LI><a href="#[43]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;AO2022_Center_1261_init_uart2
 <LI><a href="#[42]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;AO2022_Center_1261_init_uart1
 <LI><a href="#[41]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;AO2022_Center_1261_init_uart0
@@ -330,7 +331,6 @@ Global Symbols
 <LI><a href="#[3d]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;AO2022_Center_1261_init_pc
 <LI><a href="#[3c]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;AO2022_Center_1261_init_pb
 <LI><a href="#[3b]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;AO2022_Center_1261_init_pa
-<LI><a href="#[3a]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;AO2022_Center_1261_init_ice
 </UL>
 <BR>[Called By]<UL><LI><a href="#[22]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;main
 </UL>
@@ -535,8 +535,8 @@ Global Symbols
 <BR>[Called By]<UL><LI><a href="#[22]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;main
 </UL>
 
-<P><STRONG><a name="[59]"></a>HOST_AliveProcess</STRONG> (Thumb, 184 bytes, Stack size 20 bytes, ao_hostprocess.o(.text.HOST_AliveProcess))
-<BR><BR>[Stack]<UL><LI>Max Depth = 20<LI>Call Chain = HOST_AliveProcess
+<P><STRONG><a name="[59]"></a>HOST_AliveProcess</STRONG> (Thumb, 52 bytes, Stack size 8 bytes, ao_hostprocess.o(.text.HOST_AliveProcess))
+<BR><BR>[Stack]<UL><LI>Max Depth = 8<LI>Call Chain = HOST_AliveProcess
 </UL>
 <BR>[Called By]<UL><LI><a href="#[56]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;HostProcess
 </UL>
@@ -564,13 +564,13 @@ Global Symbols
 <BR>[Called By]<UL><LI><a href="#[22]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;main
 </UL>
 
-<P><STRONG><a name="[5c]"></a>Host_BmsDataProcess</STRONG> (Thumb, 28 bytes, Stack size 4 bytes, ao_hostprocess.o(.text.Host_BmsDataProcess))
+<P><STRONG><a name="[5c]"></a>Host_BmsDataProcess</STRONG> (Thumb, 72 bytes, Stack size 4 bytes, ao_hostprocess.o(.text.Host_BmsDataProcess))
 <BR><BR>[Stack]<UL><LI>Max Depth = 4<LI>Call Chain = Host_BmsDataProcess
 </UL>
 <BR>[Called By]<UL><LI><a href="#[56]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;HostProcess
 </UL>
 
-<P><STRONG><a name="[5e]"></a>Host_InvDataProcess</STRONG> (Thumb, 28 bytes, Stack size 4 bytes, ao_hostprocess.o(.text.Host_InvDataProcess))
+<P><STRONG><a name="[5e]"></a>Host_InvDataProcess</STRONG> (Thumb, 72 bytes, Stack size 4 bytes, ao_hostprocess.o(.text.Host_InvDataProcess))
 <BR><BR>[Stack]<UL><LI>Max Depth = 4<LI>Call Chain = Host_InvDataProcess
 </UL>
 <BR>[Called By]<UL><LI><a href="#[56]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;HostProcess
@@ -608,7 +608,7 @@ Global Symbols
 <BR>[Called By]<UL><LI><a href="#[56]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;HostProcess
 </UL>
 
-<P><STRONG><a name="[5d]"></a>Host_WMDataProcess</STRONG> (Thumb, 28 bytes, Stack size 4 bytes, ao_hostprocess.o(.text.Host_WMDataProcess))
+<P><STRONG><a name="[5d]"></a>Host_WMDataProcess</STRONG> (Thumb, 72 bytes, Stack size 4 bytes, ao_hostprocess.o(.text.Host_WMDataProcess))
 <BR><BR>[Stack]<UL><LI>Max Depth = 4<LI>Call Chain = Host_WMDataProcess
 </UL>
 <BR>[Called By]<UL><LI><a href="#[56]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;HostProcess
@@ -636,8 +636,8 @@ Global Symbols
 <BR>[Called By]<UL><LI><a href="#[5f]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;Host_OTACenterProcess
 </UL>
 
-<P><STRONG><a name="[73]"></a>MeterBoardPolling</STRONG> (Thumb, 2152 bytes, Stack size 24 bytes, ao_meterprocess.o(.text.MeterBoardPolling))
-<BR><BR>[Stack]<UL><LI>Max Depth = 116<LI>Call Chain = MeterBoardPolling &rArr; SendHost_MeterFWInfo &rArr; CalChecksumH &rArr; _SendStringToHOST &rArr; UART_EnableInt &rArr; NVIC_EnableIRQ
+<P><STRONG><a name="[73]"></a>MeterBoardPolling</STRONG> (Thumb, 2156 bytes, Stack size 40 bytes, ao_meterprocess.o(.text.MeterBoardPolling))
+<BR><BR>[Stack]<UL><LI>Max Depth = 132<LI>Call Chain = MeterBoardPolling &rArr; SendHost_MeterFWInfo &rArr; CalChecksumH &rArr; _SendStringToHOST &rArr; UART_EnableInt &rArr; NVIC_EnableIRQ
 </UL>
 <BR>[Calls]<UL><LI><a href="#[81]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;SendMeterBootloader_CmdUpdateAPROM
 <LI><a href="#[80]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;SendMeterBootloader_CmdEraseAPROM
@@ -698,8 +698,8 @@ Global Symbols
 <BR>[Called By]<UL><LI><a href="#[82]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;MeterProcess
 </UL>
 
-<P><STRONG><a name="[85]"></a>Meter_RSP_PowerData</STRONG> (Thumb, 668 bytes, Stack size 28 bytes, ao_meterprocess.o(.text.Meter_RSP_PowerData))
-<BR><BR>[Stack]<UL><LI>Max Depth = 28<LI>Call Chain = Meter_RSP_PowerData
+<P><STRONG><a name="[85]"></a>Meter_RSP_PowerData</STRONG> (Thumb, 108 bytes, Stack size 24 bytes, ao_meterprocess.o(.text.Meter_RSP_PowerData))
+<BR><BR>[Stack]<UL><LI>Max Depth = 24<LI>Call Chain = Meter_RSP_PowerData
 </UL>
 <BR>[Called By]<UL><LI><a href="#[82]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;MeterProcess
 </UL>
@@ -810,7 +810,7 @@ Global Symbols
 <BR>[Called By]<UL><LI><a href="#[93]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;SendChar
 </UL>
 
-<P><STRONG><a name="[62]"></a>SendHost_Ack</STRONG> (Thumb, 136 bytes, Stack size 16 bytes, ao_hostprocess.o(.text.SendHost_Ack))
+<P><STRONG><a name="[62]"></a>SendHost_Ack</STRONG> (Thumb, 24 bytes, Stack size 16 bytes, ao_hostprocess.o(.text.SendHost_Ack))
 <BR><BR>[Stack]<UL><LI>Max Depth = 84<LI>Call Chain = SendHost_Ack &rArr; CalChecksumH &rArr; _SendStringToHOST &rArr; UART_EnableInt &rArr; NVIC_EnableIRQ
 </UL>
 <BR>[Calls]<UL><LI><a href="#[52]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;CalChecksumH
@@ -845,7 +845,7 @@ Global Symbols
 <BR>[Called By]<UL><LI><a href="#[22]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;main
 </UL>
 
-<P><STRONG><a name="[58]"></a>SendHost_FirstReset_Ack</STRONG> (Thumb, 136 bytes, Stack size 16 bytes, ao_hostprocess.o(.text.SendHost_FirstReset_Ack))
+<P><STRONG><a name="[58]"></a>SendHost_FirstReset_Ack</STRONG> (Thumb, 24 bytes, Stack size 16 bytes, ao_hostprocess.o(.text.SendHost_FirstReset_Ack))
 <BR><BR>[Stack]<UL><LI>Max Depth = 84<LI>Call Chain = SendHost_FirstReset_Ack &rArr; CalChecksumH &rArr; _SendStringToHOST &rArr; UART_EnableInt &rArr; NVIC_EnableIRQ
 </UL>
 <BR>[Calls]<UL><LI><a href="#[52]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;CalChecksumH
@@ -870,8 +870,8 @@ Global Symbols
 <BR>[Called By]<UL><LI><a href="#[73]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;MeterBoardPolling
 </UL>
 
-<P><STRONG><a name="[63]"></a>SendHost_PowerData</STRONG> (Thumb, 720 bytes, Stack size 32 bytes, ao_hostprocess.o(.text.SendHost_PowerData))
-<BR><BR>[Stack]<UL><LI>Max Depth = 100<LI>Call Chain = SendHost_PowerData &rArr; CalChecksumH &rArr; _SendStringToHOST &rArr; UART_EnableInt &rArr; NVIC_EnableIRQ
+<P><STRONG><a name="[63]"></a>SendHost_PowerData</STRONG> (Thumb, 128 bytes, Stack size 24 bytes, ao_hostprocess.o(.text.SendHost_PowerData))
+<BR><BR>[Stack]<UL><LI>Max Depth = 92<LI>Call Chain = SendHost_PowerData &rArr; CalChecksumH &rArr; _SendStringToHOST &rArr; UART_EnableInt &rArr; NVIC_EnableIRQ
 </UL>
 <BR>[Calls]<UL><LI><a href="#[52]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;CalChecksumH
 </UL>
@@ -928,7 +928,7 @@ Global Symbols
 <BR>[Called By]<UL><LI><a href="#[73]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;MeterBoardPolling
 </UL>
 
-<P><STRONG><a name="[75]"></a>SendMeter_AliveToken</STRONG> (Thumb, 160 bytes, Stack size 16 bytes, ao_meterprocess.o(.text.SendMeter_AliveToken))
+<P><STRONG><a name="[75]"></a>SendMeter_AliveToken</STRONG> (Thumb, 104 bytes, Stack size 16 bytes, ao_meterprocess.o(.text.SendMeter_AliveToken))
 <BR><BR>[Stack]<UL><LI>Max Depth = 84<LI>Call Chain = SendMeter_AliveToken &rArr; CalChecksumM &rArr; _SendStringToMETER &rArr; UART_EnableInt &rArr; NVIC_EnableIRQ
 </UL>
 <BR>[Calls]<UL><LI><a href="#[54]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;CalChecksumM
@@ -1162,8 +1162,8 @@ Global Symbols
 </UL>
 <BR>[Address Reference Count : 1]<UL><LI> printfa.o(i.__0printf)
 </UL>
-<P><STRONG><a name="[22]"></a>main</STRONG> (Thumb, 412 bytes, Stack size 48 bytes, main.o(.text.main))
-<BR><BR>[Stack]<UL><LI>Max Depth = 272<LI>Call Chain = main &rArr; HostProcess &rArr; Host_OTACenterProcess &rArr; MarkFwAsActive &rArr; WRITE_FW_STATUS_FLAG &rArr; WriteFWstatus &rArr; WriteToFlash &rArr; CRC32_Calc &rArr; CRC_Open
+<P><STRONG><a name="[22]"></a>main</STRONG> (Thumb, 360 bytes, Stack size 56 bytes, main.o(.text.main))
+<BR><BR>[Stack]<UL><LI>Max Depth = 280<LI>Call Chain = main &rArr; HostProcess &rArr; Host_OTACenterProcess &rArr; MarkFwAsActive &rArr; WRITE_FW_STATUS_FLAG &rArr; WriteFWstatus &rArr; WriteToFlash &rArr; CRC32_Calc &rArr; CRC_Open
 </UL>
 <BR>[Calls]<UL><LI><a href="#[73]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;MeterBoardPolling
 <LI><a href="#[82]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;MeterProcess

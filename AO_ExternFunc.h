@@ -53,9 +53,7 @@ extern void SendMeter_SystemSW(void);
 extern void CalChecksumM(void);
 
 extern uint8_t fgTestInitOK;
-extern STR_METER_D MeterData[ROOM_MAX];
-extern STR_RoomInfo RoomData[ROOM_MAX];
-
+extern MeterData_t MeterData[PwrMeterMax];
 
 extern uint8_t MyCenterID;
 extern uint8_t iSystemTime[7];
