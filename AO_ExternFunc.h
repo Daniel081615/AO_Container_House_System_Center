@@ -53,7 +53,7 @@ extern void SendMeter_SystemSW(void);
 extern void CalChecksumM(void);
 
 extern uint8_t fgTestInitOK;
-extern MeterData_t MeterData[PwrMeterMax];
+extern volatile MeterData_t MeterData[PwrMeterMax];
 
 extern uint8_t MyCenterID;
 extern uint8_t iSystemTime[7];

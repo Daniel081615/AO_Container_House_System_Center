@@ -67,7 +67,7 @@ volatile uint32_t   u32TimeTick2;
 volatile uint8_t Tick_10mSec;
 uint16_t     SystemTick;
 
-MeterData_t MeterData[PwrMeterMax];
+volatile MeterData_t MeterData[PwrMeterMax];
 uint8_t ErrorRate[ROOM_MAX];
 
 uint8_t iSystemTime[7]={0,0,0,0,0,0,0};		// Year,Month,Day,Hour,Min,Sec,Week
@@ -889,7 +889,6 @@ void DefaultValue(void)
  |															|	=> Size: 0x2000 ~= 8kb
  +------------------------------+	=> Bank1 base addr: 0x00000000
 
-
  @concern : Beacuse Host will send " @FIXED base " meter Fw, so it will be more, difficult when update thru center bank.	** 2025.08.05 **
  ***/
 
@@ -905,7 +904,7 @@ int main()
 	
 		WDT_Init();
 	
-		FMC_Open();      // 早一點開 ISP
+		FMC_Open();
 
     GPIO_Mode_Init();
 

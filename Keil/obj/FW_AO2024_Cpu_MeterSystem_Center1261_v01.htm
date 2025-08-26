@@ -3,7 +3,7 @@
 <title>Static Call Graph - [.\obj\FW_AO2024_Cpu_MeterSystem_Center1261_v01.axf]</title></head>
 <body><HR>
 <H1>Static Call Graph for image .\obj\FW_AO2024_Cpu_MeterSystem_Center1261_v01.axf</H1><HR>
-<BR><P>#&#060CALLGRAPH&#062# ARM Linker, 6230001: Last Updated: Fri Aug 22 16:38:56 2025
+<BR><P>#&#060CALLGRAPH&#062# ARM Linker, 6230001: Last Updated: Tue Aug 26 18:13:55 2025
 <BR><P>
 <H3>Maximum Stack Usage =        280 bytes + Unknown(Cycles, Untraceable Function Pointers)</H3><H3>
 Call chain for Maximum Stack Depth:</H3>
@@ -698,7 +698,7 @@ Global Symbols
 <BR>[Called By]<UL><LI><a href="#[82]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;MeterProcess
 </UL>
 
-<P><STRONG><a name="[85]"></a>Meter_RSP_PowerData</STRONG> (Thumb, 108 bytes, Stack size 24 bytes, ao_meterprocess.o(.text.Meter_RSP_PowerData))
+<P><STRONG><a name="[85]"></a>Meter_RSP_PowerData</STRONG> (Thumb, 128 bytes, Stack size 24 bytes, ao_meterprocess.o(.text.Meter_RSP_PowerData))
 <BR><BR>[Stack]<UL><LI>Max Depth = 24<LI>Call Chain = Meter_RSP_PowerData
 </UL>
 <BR>[Called By]<UL><LI><a href="#[82]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;MeterProcess
@@ -818,8 +818,8 @@ Global Symbols
 <BR>[Called By]<UL><LI><a href="#[56]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;HostProcess
 </UL>
 
-<P><STRONG><a name="[64]"></a>SendHost_BmsData</STRONG> (Thumb, 552 bytes, Stack size 56 bytes, ao_hostprocess.o(.text.SendHost_BmsData))
-<BR><BR>[Stack]<UL><LI>Max Depth = 124<LI>Call Chain = SendHost_BmsData &rArr; CalChecksumH &rArr; _SendStringToHOST &rArr; UART_EnableInt &rArr; NVIC_EnableIRQ
+<P><STRONG><a name="[64]"></a>SendHost_BmsData</STRONG> (Thumb, 688 bytes, Stack size 80 bytes, ao_hostprocess.o(.text.SendHost_BmsData))
+<BR><BR>[Stack]<UL><LI>Max Depth = 148<LI>Call Chain = SendHost_BmsData &rArr; CalChecksumH &rArr; _SendStringToHOST &rArr; UART_EnableInt &rArr; NVIC_EnableIRQ
 </UL>
 <BR>[Calls]<UL><LI><a href="#[52]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;CalChecksumH
 </UL>
@@ -870,7 +870,7 @@ Global Symbols
 <BR>[Called By]<UL><LI><a href="#[73]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;MeterBoardPolling
 </UL>
 
-<P><STRONG><a name="[63]"></a>SendHost_PowerData</STRONG> (Thumb, 128 bytes, Stack size 24 bytes, ao_hostprocess.o(.text.SendHost_PowerData))
+<P><STRONG><a name="[63]"></a>SendHost_PowerData</STRONG> (Thumb, 156 bytes, Stack size 24 bytes, ao_hostprocess.o(.text.SendHost_PowerData))
 <BR><BR>[Stack]<UL><LI>Max Depth = 92<LI>Call Chain = SendHost_PowerData &rArr; CalChecksumH &rArr; _SendStringToHOST &rArr; UART_EnableInt &rArr; NVIC_EnableIRQ
 </UL>
 <BR>[Calls]<UL><LI><a href="#[52]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;CalChecksumH
@@ -928,7 +928,7 @@ Global Symbols
 <BR>[Called By]<UL><LI><a href="#[73]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;MeterBoardPolling
 </UL>
 
-<P><STRONG><a name="[75]"></a>SendMeter_AliveToken</STRONG> (Thumb, 104 bytes, Stack size 16 bytes, ao_meterprocess.o(.text.SendMeter_AliveToken))
+<P><STRONG><a name="[75]"></a>SendMeter_AliveToken</STRONG> (Thumb, 76 bytes, Stack size 16 bytes, ao_meterprocess.o(.text.SendMeter_AliveToken))
 <BR><BR>[Stack]<UL><LI>Max Depth = 84<LI>Call Chain = SendMeter_AliveToken &rArr; CalChecksumM &rArr; _SendStringToMETER &rArr; UART_EnableInt &rArr; NVIC_EnableIRQ
 </UL>
 <BR>[Calls]<UL><LI><a href="#[54]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;CalChecksumM

@@ -637,30 +637,35 @@ void Meter_RSP_SysInformation(void)
     u32tmp |= (uint32_t) TokenMeter[fnPacketIndex++] << 0;  
     PowerMeterError = u32tmp;
 	
+	
+	
 
 	
 		
 	
 }
 
-uint8_t DeviceIndexReal;
+uint8_t DeviceArrayIdx;
 
 void Meter_RSP_PowerData(void)
 {
     
     uint8_t fnPacketIndex;
     uint32_t u32temp;
-    DeviceIndexReal  = TokenMeter[4];
+    DeviceArrayIdx  = TokenMeter[4];
     fnPacketIndex = 5 ;
 	
-    MeterData[DeviceIndexReal-1].ErrorRate = TokenMeter[5];    
-    MeterData[DeviceIndexReal-1].RelayStatus = TokenMeter[6];
+    MeterData[DeviceArrayIdx].ErrorRate = TokenMeter[fnPacketIndex++];    
+    MeterData[DeviceArrayIdx].RelayStatus = TokenMeter[fnPacketIndex++];
     	
+		u32temp = 0;
     // Total 
     u32temp = (uint32_t) TokenMeter[fnPacketIndex++] << 24 ;
     u32temp |= (uint32_t) TokenMeter[fnPacketIndex++] << 16 ;
     u32temp |= (uint32_t) TokenMeter[fnPacketIndex++] << 8 ;
     u32temp |= (uint32_t) TokenMeter[fnPacketIndex++] << 0 ;
+	
+		MeterData[DeviceArrayIdx].TotalWatt = u32temp;
 
 }
 
@@ -671,51 +676,51 @@ void Meter_RSP_BmsData(void)
     uint8_t fnPacketIndex;
     uint32_t u32temp;
     
-    DeviceIndexReal  = TokenMeter[4];
+    DeviceArrayIdx  = TokenMeter[4];
     fnPacketIndex = 5 ;
     
-    BmsData[DeviceIndexReal].ErrorRate 		 = TokenMeter[fnPacketIndex++] ;
-    BmsData[DeviceIndexReal].BalanceStatus = TokenMeter[fnPacketIndex++] ;
-    BmsData[DeviceIndexReal].StateOfCharge = TokenMeter[fnPacketIndex++] ;
-    BmsData[DeviceIndexReal].StateOfHealth = TokenMeter[fnPacketIndex++] ;
+    BmsData[DeviceArrayIdx].ErrorRate 		 = TokenMeter[fnPacketIndex++] ;
+    BmsData[DeviceArrayIdx].BalanceStatus = TokenMeter[fnPacketIndex++] ;
+    BmsData[DeviceArrayIdx].StateOfCharge = TokenMeter[fnPacketIndex++] ;
+    BmsData[DeviceArrayIdx].StateOfHealth = TokenMeter[fnPacketIndex++] ;
 	
     u32temp  = (uint32_t) TokenMeter[fnPacketIndex++] << 24 ;
     u32temp |= (uint32_t) TokenMeter[fnPacketIndex++] << 16 ;
     u32temp |= (uint32_t) TokenMeter[fnPacketIndex++] << 8 ;
     u32temp |= (uint32_t) TokenMeter[fnPacketIndex++] << 0 ;	
-		BmsData[DeviceIndexReal].CellStatus = u32temp;
+		BmsData[DeviceArrayIdx].CellStatus = u32temp;
 	
 		for (uint8_t i = 0; i < 16; i++) {
-				BmsData[DeviceIndexReal].CellVolt[i]= TokenMeter[fnPacketIndex++] << 8 ;
-				BmsData[DeviceIndexReal].CellVolt[i]= TokenMeter[fnPacketIndex++];
+				BmsData[DeviceArrayIdx].CellVolt[i]= TokenMeter[fnPacketIndex++] << 8 ;
+				BmsData[DeviceArrayIdx].CellVolt[i]= TokenMeter[fnPacketIndex++];
 		}
 		
     u32temp  = (uint32_t) TokenMeter[fnPacketIndex++] << 24 ;
     u32temp |= (uint32_t) TokenMeter[fnPacketIndex++] << 16 ;
     u32temp |= (uint32_t) TokenMeter[fnPacketIndex++] << 8 ;
     u32temp |= (uint32_t) TokenMeter[fnPacketIndex++] << 0 ;	
-		BmsData[DeviceIndexReal].BatWatt = u32temp;
+		BmsData[DeviceArrayIdx].BatWatt = u32temp;
 		
     u32temp  = (uint32_t) TokenMeter[fnPacketIndex++] << 24 ;
     u32temp |= (uint32_t) TokenMeter[fnPacketIndex++] << 16 ;
     u32temp |= (uint32_t) TokenMeter[fnPacketIndex++] << 8 ;
     u32temp |= (uint32_t) TokenMeter[fnPacketIndex++] << 0 ;	
-		BmsData[DeviceIndexReal].BatVolt = u32temp;		
+		BmsData[DeviceArrayIdx].BatVolt = u32temp;		
 		
     u32temp  = (uint32_t) TokenMeter[fnPacketIndex++] << 24 ;
     u32temp |= (uint32_t) TokenMeter[fnPacketIndex++] << 16 ;
     u32temp |= (uint32_t) TokenMeter[fnPacketIndex++] << 8 ;
     u32temp |= (uint32_t) TokenMeter[fnPacketIndex++] << 0 ;	
-		BmsData[DeviceIndexReal].BatCurrent = u32temp;
+		BmsData[DeviceArrayIdx].BatCurrent = u32temp;
 
 		for (uint8_t i = 0; i<5; i++)
 		{		
-				BmsData[DeviceIndexReal].CellVolt[i]= TokenMeter[fnPacketIndex++] << 8 ;
-				BmsData[DeviceIndexReal].CellVolt[i]= TokenMeter[fnPacketIndex++];
+				BmsData[DeviceArrayIdx].CellVolt[i]= TokenMeter[fnPacketIndex++] << 8 ;
+				BmsData[DeviceArrayIdx].CellVolt[i]= TokenMeter[fnPacketIndex++];
 		}		
 		
-		BmsData[DeviceIndexReal].MosTemp = TokenMeter[fnPacketIndex++] << 8 ;
-		BmsData[DeviceIndexReal].MosTemp = TokenMeter[fnPacketIndex++];
+		BmsData[DeviceArrayIdx].MosTemp = TokenMeter[fnPacketIndex++] << 8 ;
+		BmsData[DeviceArrayIdx].MosTemp = TokenMeter[fnPacketIndex++];
 
 }
 
@@ -726,16 +731,16 @@ void Meter_RSP_WMData(void)
 	  uint8_t fnPacketIndex;
     uint32_t u32temp;
     
-    DeviceIndexReal  = TokenMeter[4];
+    DeviceArrayIdx  = TokenMeter[4];
     fnPacketIndex = 5 ;
-		WMData[DeviceIndexReal].ErrorRate = TokenMeter[fnPacketIndex++];
-		WMData[DeviceIndexReal].ValveState = TokenMeter[fnPacketIndex++];
+		WMData[DeviceArrayIdx].ErrorRate = TokenMeter[fnPacketIndex++];
+		WMData[DeviceArrayIdx].ValveState = TokenMeter[fnPacketIndex++];
 
     u32temp  = (uint32_t) TokenMeter[fnPacketIndex++] << 24 ;
     u32temp |= (uint32_t) TokenMeter[fnPacketIndex++] << 16 ;
     u32temp |= (uint32_t) TokenMeter[fnPacketIndex++] << 8 ;
     u32temp |= (uint32_t) TokenMeter[fnPacketIndex++] << 0 ;	
-		WMData[DeviceIndexReal].TotalVolume = u32temp;	
+		WMData[DeviceArrayIdx].TotalVolume = u32temp;	
 	
 }
 
@@ -746,49 +751,49 @@ void Meter_RSP_InvData(void)
 	  uint8_t fnPacketIndex;
     uint32_t u32temp;
     
-    DeviceIndexReal  = TokenMeter[4];
+    DeviceArrayIdx  = TokenMeter[4];
     fnPacketIndex = 5 ;		
 		//	communication rate
-		InvData[DeviceIndexReal].ErrorRate = TokenMeter[fnPacketIndex++];
+		InvData[DeviceArrayIdx].ErrorRate = TokenMeter[fnPacketIndex++];
 	
 		// 	inverter controller status flags
-		CtrlData[DeviceIndexReal].ConnectFlag 	= TokenMeter[fnPacketIndex++];
-		CtrlData[DeviceIndexReal].ChargingFlag 	= TokenMeter[fnPacketIndex++];
-		CtrlData[DeviceIndexReal].FaultFlag 		= TokenMeter[fnPacketIndex++];
-		CtrlData[DeviceIndexReal].WarnFlag 			= TokenMeter[fnPacketIndex++];
+		CtrlData[DeviceArrayIdx].ConnectFlag 	= TokenMeter[fnPacketIndex++];
+		CtrlData[DeviceArrayIdx].ChargingFlag 	= TokenMeter[fnPacketIndex++];
+		CtrlData[DeviceArrayIdx].FaultFlag 		= TokenMeter[fnPacketIndex++];
+		CtrlData[DeviceArrayIdx].WarnFlag 			= TokenMeter[fnPacketIndex++];
 	
 		//	inverter status flags
-		InvData[DeviceIndexReal].ChargingFlag 	= TokenMeter[fnPacketIndex++];
-		InvData[DeviceIndexReal].FaultFlag 			= TokenMeter[fnPacketIndex++];
-		InvData[DeviceIndexReal].WarnFlag			 	= TokenMeter[fnPacketIndex++];
+		InvData[DeviceArrayIdx].ChargingFlag 	= TokenMeter[fnPacketIndex++];
+		InvData[DeviceArrayIdx].FaultFlag 			= TokenMeter[fnPacketIndex++];
+		InvData[DeviceArrayIdx].WarnFlag			 	= TokenMeter[fnPacketIndex++];
 
 		//	inverter battery status flags
-		BatData[DeviceIndexReal].Full									= TokenMeter[fnPacketIndex++];
-		BatData[DeviceIndexReal].LoadWarnFlag					= TokenMeter[fnPacketIndex++];
-		BatData[DeviceIndexReal].TempWarnFlag				 	= TokenMeter[fnPacketIndex++];
-		BatData[DeviceIndexReal].LoadTimeoutWarnFlag 	= TokenMeter[fnPacketIndex++];
-		BatData[DeviceIndexReal].LoadOverWarnFlag			= TokenMeter[fnPacketIndex++];	
-		BatData[DeviceIndexReal].BatHighVoltWarnFlag	= TokenMeter[fnPacketIndex++];
-		BatData[DeviceIndexReal].BatLowVoltWarnFlag		= TokenMeter[fnPacketIndex++];
-		BatData[DeviceIndexReal].StoreDataErrWarnFlag = TokenMeter[fnPacketIndex++];
-		BatData[DeviceIndexReal].StoreOpFailWarnFlag	= TokenMeter[fnPacketIndex++];		
+		BatData[DeviceArrayIdx].Full									= TokenMeter[fnPacketIndex++];
+		BatData[DeviceArrayIdx].LoadWarnFlag					= TokenMeter[fnPacketIndex++];
+		BatData[DeviceArrayIdx].TempWarnFlag				 	= TokenMeter[fnPacketIndex++];
+		BatData[DeviceArrayIdx].LoadTimeoutWarnFlag 	= TokenMeter[fnPacketIndex++];
+		BatData[DeviceArrayIdx].LoadOverWarnFlag			= TokenMeter[fnPacketIndex++];	
+		BatData[DeviceArrayIdx].BatHighVoltWarnFlag	= TokenMeter[fnPacketIndex++];
+		BatData[DeviceArrayIdx].BatLowVoltWarnFlag		= TokenMeter[fnPacketIndex++];
+		BatData[DeviceArrayIdx].StoreDataErrWarnFlag = TokenMeter[fnPacketIndex++];
+		BatData[DeviceArrayIdx].StoreOpFailWarnFlag	= TokenMeter[fnPacketIndex++];		
 
-		BatData[DeviceIndexReal].InvFuncErrWarnFlag		= TokenMeter[fnPacketIndex++];
-		BatData[DeviceIndexReal].PlanShutdownWarnFlag = TokenMeter[fnPacketIndex++];
-		BatData[DeviceIndexReal].OutputWarnFlag				= TokenMeter[fnPacketIndex++];	
+		BatData[DeviceArrayIdx].InvFuncErrWarnFlag		= TokenMeter[fnPacketIndex++];
+		BatData[DeviceArrayIdx].PlanShutdownWarnFlag = TokenMeter[fnPacketIndex++];
+		BatData[DeviceArrayIdx].OutputWarnFlag				= TokenMeter[fnPacketIndex++];	
 		
-		BatData[DeviceIndexReal].InvErrFaultFlag				= TokenMeter[fnPacketIndex++];
-		BatData[DeviceIndexReal].TempOverFaultFlag			= TokenMeter[fnPacketIndex++];
-		BatData[DeviceIndexReal].TempSensorFaultFlag		= TokenMeter[fnPacketIndex++];
-		BatData[DeviceIndexReal].LoadTimeoutFaultFlag 	= TokenMeter[fnPacketIndex++];
-		BatData[DeviceIndexReal].LoadErrFaultFlag				= TokenMeter[fnPacketIndex++];	
-		BatData[DeviceIndexReal].LoadOverFaultFlag			= TokenMeter[fnPacketIndex++];
-		BatData[DeviceIndexReal].BatHighVoltFaultFlag		= TokenMeter[fnPacketIndex++];
-		BatData[DeviceIndexReal].BatLowVoltFaultFlag 		= TokenMeter[fnPacketIndex++];
-		BatData[DeviceIndexReal].PlanShutdownFaultFlag	= TokenMeter[fnPacketIndex++];		
-		BatData[DeviceIndexReal].OutputErrFaultFlag			= TokenMeter[fnPacketIndex++];
-		BatData[DeviceIndexReal].ChipStartFailFaultFlag = TokenMeter[fnPacketIndex++];
-		BatData[DeviceIndexReal].CurrentSensorFaultFlag	= TokenMeter[fnPacketIndex++];			
+		BatData[DeviceArrayIdx].InvErrFaultFlag				= TokenMeter[fnPacketIndex++];
+		BatData[DeviceArrayIdx].TempOverFaultFlag			= TokenMeter[fnPacketIndex++];
+		BatData[DeviceArrayIdx].TempSensorFaultFlag		= TokenMeter[fnPacketIndex++];
+		BatData[DeviceArrayIdx].LoadTimeoutFaultFlag 	= TokenMeter[fnPacketIndex++];
+		BatData[DeviceArrayIdx].LoadErrFaultFlag				= TokenMeter[fnPacketIndex++];	
+		BatData[DeviceArrayIdx].LoadOverFaultFlag			= TokenMeter[fnPacketIndex++];
+		BatData[DeviceArrayIdx].BatHighVoltFaultFlag		= TokenMeter[fnPacketIndex++];
+		BatData[DeviceArrayIdx].BatLowVoltFaultFlag 		= TokenMeter[fnPacketIndex++];
+		BatData[DeviceArrayIdx].PlanShutdownFaultFlag	= TokenMeter[fnPacketIndex++];		
+		BatData[DeviceArrayIdx].OutputErrFaultFlag			= TokenMeter[fnPacketIndex++];
+		BatData[DeviceArrayIdx].ChipStartFailFaultFlag = TokenMeter[fnPacketIndex++];
+		BatData[DeviceArrayIdx].CurrentSensorFaultFlag	= TokenMeter[fnPacketIndex++];			
 		
 }
 
@@ -833,20 +838,13 @@ void SendMeter_AliveToken(void)
     for (i=0;i<7;i++)
     {		
         MeterTxBuffer[INX_TIME_START_Y+i] = iSystemTime[i];
-    }	         		
-    //NowPollingMeterBoard = 1 ;
+    }
     
     MeterTxBuffer[1] = NowPollingMeterBoard;	
     MeterTxBuffer[2] = METER_CMD_ALIVE ;	
     MeterTxBuffer[3] = NowPollingPowerMeter ;
     //RoomIndexReal = NowPollingPowerMeter - 1 ;
-    MeterTxBuffer[5] =  RoomMax;  
-    MeterTxBuffer[6] =  (255-RoomMax) ;        
-    MeterTxBuffer[7] =  0x30 ;  
-    MeterTxBuffer[8] =  (255-0x30) ;
-    
-    u8PackageIndex = 9 ;
-
+		
     CalChecksumM();	
 	
 }

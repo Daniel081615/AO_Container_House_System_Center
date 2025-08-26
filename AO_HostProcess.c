@@ -117,36 +117,36 @@ void HostProcess(void)
                 {
                     case CTR_ALIVE :						
                         HOST_AliveProcess();
-                        CmdType = CTR_RSP_SYSTEM_INFO ;
+                        CmdType = CTR_RSP_SYSTEM_INFO ;		// 0x31
                         ClearRespDelayTimer() ;	
                         break;					                                                                                
-                    case CTR_GET_CMD_POWER_METER :
+                    case CTR_GET_CMD_POWER_METER :				// 0x11
                         Host_PowerMeterDataProcess();
                         CmdType = CTR_RSP_POWER_DATA ;
                         ClearRespDelayTimer() ;
                         break;	
-										case CTR_GET_CMD_BMS:
+										case CTR_GET_CMD_BMS:									// 0x12
 												Host_BmsDataProcess();
                         CmdType = CTR_RSP_BMS_DATA ;
                         ClearRespDelayTimer() ;											
 												break;
-										case CTR_GET_CMD_WATER_METER:
+										case CTR_GET_CMD_WATER_METER:					// 0x13
 												Host_WMDataProcess();
                         CmdType = CTR_RSP_WM_DATA ;
                         ClearRespDelayTimer() ;
 												break;
-										case CTR_GET_CMD_INV:
+										case CTR_GET_CMD_INV:									// 0x14
 												Host_InvDataProcess();
                         CmdType = CTR_RSP_INV_DATA ;
                         ClearRespDelayTimer() ;												
 												break;
 										 	// CTR	ota commamd
-                    case CTR_OTA_UPDATE_CTR:
+                    case CTR_OTA_UPDATE_CTR:							// 0x15
                         Host_OTACenterProcess();
                         ClearRespDelayTimer();
                         break;
 											// MTR	ota command
-										case CTR_OTA_UPDATE_MTR:	//	0x14
+										case CTR_OTA_UPDATE_MTR:							// 0x16
 												Host_OTAMeterProcess();
 												break;
 										
@@ -430,9 +430,9 @@ void SendHost_PowerData(void)
     HostTxBuffer[fnPacketIndex++] = MeterData[fnPowerMeterIndex].RelayStatus;
 
 		HostTxBuffer[fnPacketIndex++] = (MeterData[fnPowerMeterIndex].TotalWatt & 0xFF000000) >> 24 ;
-		HostTxBuffer[fnPacketIndex++] = (MeterData[fnPowerMeterIndex].TotalWatt & 0xFF000000) >> 16 ;
-		HostTxBuffer[fnPacketIndex++] = (MeterData[fnPowerMeterIndex].TotalWatt & 0xFF000000) >> 8 ;
-		HostTxBuffer[fnPacketIndex++] =  MeterData[fnPowerMeterIndex].TotalWatt & 0xFF000000;	
+		HostTxBuffer[fnPacketIndex++] = (MeterData[fnPowerMeterIndex].TotalWatt & 0x00FF0000) >> 16 ;
+		HostTxBuffer[fnPacketIndex++] = (MeterData[fnPowerMeterIndex].TotalWatt & 0x0000FF00) >> 8 ;
+		HostTxBuffer[fnPacketIndex++] =  MeterData[fnPowerMeterIndex].TotalWatt & 0x000000FF;	
      
     CalChecksumH();		
 }
@@ -455,9 +455,9 @@ void SendHost_BmsData(void)
 		HostTxBuffer[fnPacketIndex++] = BmsData[fnBmsIndex].StateOfHealth;	//	SOH
 		//idx:9	Cell ststus 
 		HostTxBuffer[fnPacketIndex++] = (BmsData[fnBmsIndex].CellStatus & 0xFF000000) >> 24 ;
-		HostTxBuffer[fnPacketIndex++] = (BmsData[fnBmsIndex].CellStatus & 0xFF000000) >> 16 ;
-		HostTxBuffer[fnPacketIndex++] = (BmsData[fnBmsIndex].CellStatus & 0xFF000000) >> 8 ;
-		HostTxBuffer[fnPacketIndex++] =  BmsData[fnBmsIndex].CellStatus & 0xFF000000;	
+		HostTxBuffer[fnPacketIndex++] = (BmsData[fnBmsIndex].CellStatus & 0x00FF0000) >> 16 ;
+		HostTxBuffer[fnPacketIndex++] = (BmsData[fnBmsIndex].CellStatus & 0x0000FF00) >> 8 ;
+		HostTxBuffer[fnPacketIndex++] =  BmsData[fnBmsIndex].CellStatus & 0x000000FF;	
 		//idx:13	Cell volt
 		for (uint8_t i = 0; i < 16; i++) {
 				HostTxBuffer[fnPacketIndex++] = (BmsData[fnBmsIndex].CellVolt[i] >> 8);
@@ -465,19 +465,19 @@ void SendHost_BmsData(void)
 		}
 		//idx:45	Battery watt 
 		HostTxBuffer[fnPacketIndex++] = (BmsData[fnBmsIndex].BatWatt & 0xFF000000) >> 24 ;
-		HostTxBuffer[fnPacketIndex++] = (BmsData[fnBmsIndex].BatWatt & 0xFF000000) >> 16 ;
-		HostTxBuffer[fnPacketIndex++] = (BmsData[fnBmsIndex].BatWatt & 0xFF000000) >> 8 ;
-		HostTxBuffer[fnPacketIndex++] =  BmsData[fnBmsIndex].BatWatt & 0xFF000000;	
+		HostTxBuffer[fnPacketIndex++] = (BmsData[fnBmsIndex].BatWatt & 0x00FF0000) >> 16 ;
+		HostTxBuffer[fnPacketIndex++] = (BmsData[fnBmsIndex].BatWatt & 0x0000FF00) >> 8 ;
+		HostTxBuffer[fnPacketIndex++] =  BmsData[fnBmsIndex].BatWatt & 0x000000FF;	
 		//idx:49	Battery voltage 
 		HostTxBuffer[fnPacketIndex++] = (BmsData[fnBmsIndex].BatVolt & 0xFF000000) >> 24 ;
-		HostTxBuffer[fnPacketIndex++] = (BmsData[fnBmsIndex].BatVolt & 0xFF000000) >> 16 ;
-		HostTxBuffer[fnPacketIndex++] = (BmsData[fnBmsIndex].BatVolt & 0xFF000000) >> 8 ;
-		HostTxBuffer[fnPacketIndex++] =  BmsData[fnBmsIndex].BatVolt & 0xFF000000;	
+		HostTxBuffer[fnPacketIndex++] = (BmsData[fnBmsIndex].BatVolt & 0x00FF0000) >> 16 ;
+		HostTxBuffer[fnPacketIndex++] = (BmsData[fnBmsIndex].BatVolt & 0x0000FF00) >> 8 ;
+		HostTxBuffer[fnPacketIndex++] =  BmsData[fnBmsIndex].BatVolt & 0x000000FF;	
 		//idx:53	Battery current 
 		HostTxBuffer[fnPacketIndex++] = (BmsData[fnBmsIndex].BatCurrent & 0xFF000000) >> 24 ;
-		HostTxBuffer[fnPacketIndex++] = (BmsData[fnBmsIndex].BatCurrent & 0xFF000000) >> 16 ;
-		HostTxBuffer[fnPacketIndex++] = (BmsData[fnBmsIndex].BatCurrent & 0xFF000000) >> 8 ;
-		HostTxBuffer[fnPacketIndex++] =  BmsData[fnBmsIndex].BatCurrent & 0xFF000000;			
+		HostTxBuffer[fnPacketIndex++] = (BmsData[fnBmsIndex].BatCurrent & 0x00FF0000) >> 16 ;
+		HostTxBuffer[fnPacketIndex++] = (BmsData[fnBmsIndex].BatCurrent & 0x0000FF00) >> 8 ;
+		HostTxBuffer[fnPacketIndex++] =  BmsData[fnBmsIndex].BatCurrent & 0x000000FF;			
 		//idx:63	Battery temperature [1-5]	
 		for (uint8_t i = 0; i<5; i++)
 		{		
