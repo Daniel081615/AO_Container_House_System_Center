@@ -31,6 +31,7 @@ void SendMeter_GetWMData(void);
 void SendMeter_GetInvData(void);
 
 void SendMeter_MeterOTACmd(uint8_t cmd);
+void SendMeterRTC(void);
 
 void PollSuccess_Handler(uint8_t NextPollingState);
 void PollingTimeout_Handler(uint8_t nextStateOnRetry, uint8_t nextStateOnMaxRetry);
@@ -614,7 +615,6 @@ void Meter_AckProcess(void)
 {
     uint8_t fnPacketIndex;
     uint32_t u32tmp;
-     
 
     fnPacketIndex  = 5 ;
     u32tmp = (uint32_t) TokenMeter[fnPacketIndex++] << 24 ;
@@ -636,12 +636,6 @@ void Meter_RSP_SysInformation(void)
     u32tmp |= (uint32_t) TokenMeter[fnPacketIndex++] << 8;
     u32tmp |= (uint32_t) TokenMeter[fnPacketIndex++] << 0;  
     PowerMeterError = u32tmp;
-	
-	
-	
-
-	
-		
 	
 }
 
@@ -833,20 +827,14 @@ void Meter_RSP_InvData(void)
 */
 void SendMeter_AliveToken(void)
 {
-    uint8_t i,u8PackageIndex;
-
-    for (i=0;i<7;i++)
-    {		
-        MeterTxBuffer[INX_TIME_START_Y+i] = iSystemTime[i];
-    }
-    
+	
     MeterTxBuffer[1] = NowPollingMeterBoard;	
     MeterTxBuffer[2] = METER_CMD_ALIVE ;	
     MeterTxBuffer[3] = NowPollingPowerMeter ;
-    //RoomIndexReal = NowPollingPowerMeter - 1 ;
-		
-    CalChecksumM();	
+
+		SendMeterRTC();
 	
+    CalChecksumM();	
 }
 
 
@@ -860,10 +848,7 @@ void SendMeter_GetPowerData(void)
 		//	Host cmd Device 
 		MeterTxBuffer[4] = PwrMeterCmdList[NowPollingPowerMeter-1];
  
-//    for (i=0;i<7;i++)
-//    {
-//        iSystemTime[i] = TokenHost[INX_TIME_START_Y+i];
-//    }  
+		SendMeterRTC();
 
     CalChecksumM();	
 }
@@ -874,7 +859,9 @@ void SendMeter_GetBmsData(void)
     MeterTxBuffer[2] = METER_CMD_BMS;
     MeterTxBuffer[3] = NowPollingBms ;
 		MeterTxBuffer[4] = BmsCmdList[NowPollingBms-1];
-	    
+	  
+		SendMeterRTC();
+	
 		CalChecksumM();	
 }
 
@@ -884,6 +871,8 @@ void SendMeter_GetWMData(void)
     MeterTxBuffer[2] = METER_CMD_WATER_METER;
     MeterTxBuffer[3] = NowPollingWM ;		
 		MeterTxBuffer[4] = WtrMeterCmdList[NowPollingWM-1];
+
+		SendMeterRTC();
 	
 		CalChecksumM();	
 }
@@ -892,8 +881,13 @@ void SendMeter_GetInvData(void)
 {
     MeterTxBuffer[1] = NowPollingMeterBoard;	
     MeterTxBuffer[2] = METER_CMD_INV;
-    MeterTxBuffer[3] = NowPollingInv ;		
+    MeterTxBuffer[3] = NowPollingInv ;
+		
+		//	Maybe no need
 		MeterTxBuffer[4] = InvCmdList[NowPollingInv-1];
+	
+		SendMeterRTC();
+	
 		CalChecksumM();	
 }
 
@@ -909,16 +903,13 @@ void SendMeter_GetInvData(void)
 	0x1A : CMD_MTR_FW_REBOOT
 */
 void SendMeter_MeterOTACmd(uint8_t cmd)
-{
-		uint8_t i;
-    for (i=0;i<7;i++)
-    {		
-        MeterTxBuffer[INX_TIME_START_Y+i] = iSystemTime[i];
-    }	         		
+{         		
     
     MeterTxBuffer[1] = OTAMeterID;
 		MeterTxBuffer[2] = CMD_MTR_OTA_UPDATE;
 		MeterTxBuffer[3] = cmd;
+		
+		SendMeterRTC();
 		
 		CalChecksumM();	
 }
@@ -938,6 +929,7 @@ void SendMeterBootloader_ConnectCmd (void)
 		//	Package number: Get from host, inital value set to 0;
 		MeterTxBuffer[3] = 0;
 		
+		SendMeterRTC();
 		CalChecksumM();	
 }
 
@@ -1011,6 +1003,18 @@ void SendMeterBootloader_CmdUpdateAPROM (void)
 //		lcmd = TokenMeter[2];
 //		g_packno = TokenMeter[3];
 //}
+
+/***
+ *	@brief	Send Real Time Clock to Meter system	
+ ***/
+void SendMeterRTC(void)
+{
+    for (uint8_t i=0;i<7;i++)
+    {		
+        MeterTxBuffer[INX_TIME_START_Y+i] = CtrSystemTime[i];
+    }
+}
+
 
 void CalChecksumM(void)
 {

@@ -70,7 +70,8 @@ uint16_t     SystemTick;
 volatile MeterData_t MeterData[PwrMeterMax];
 uint8_t ErrorRate[ROOM_MAX];
 
-uint8_t iSystemTime[7]={0,0,0,0,0,0,0};		// Year,Month,Day,Hour,Min,Sec,Week
+uint8_t CtrSystemTime[7]={0,0,0,0,0,0,0};		// Year,Month,Day,Hour,Min,Sec,Week
+uint8_t HostSystemTime[7] = {0,0,0,0,0,0,0};
 uint8_t HostTxBuffer[HOST_TOKEN_LENGTH];
 uint8_t MeterTxBuffer[METER_TOKEN_LENGTH];
 uint8_t TokenHost[HOST_TOKEN_LENGTH];
@@ -158,7 +159,7 @@ uint8_t InvCmdList[InvMax];
 /* Global variables                                                                                        */
 /*---------------------------------------------------------------------------------------------------------*/
 uint16_t SystemTick;
-
+RTC_Data_t RTC_Data;
 /*---------------------------------------------------------------------------------------------------------*/
 /* Global variables                                                                                        */
 /*---------------------------------------------------------------------------------------------------------*/
@@ -303,8 +304,8 @@ void ChangeRS485Direct(void);
 void ReadMyCenterID(void);
 
 void RecoverSystemMoniter(void);
-
 void ChangeDirHostRS485(void);
+void WaTeRingDeTecT(void);
 
 uint8_t MT_Tick_1Sec;
 uint8_t LED_Tick_10mSec;
@@ -386,16 +387,6 @@ void SysTick_Handler(void)
 		system_SW_Timer++;
 	}
 	
-	
-    
-	// LED 計時 10ms 秒數
-	//LED_Tick_10mSec++;
-	//if(LED_Tick_10mSec >= 50)
-	//{
-	//	LED_Tick_10mSec = 0;		
-		//LED_G1_TOGGLE();		
-	//}
-	// 100mSec
 	if(Tick_10mSec >= 10)
 	{
 		Tick_10mSec = 0 ;	
@@ -406,8 +397,6 @@ void SysTick_Handler(void)
 	SystemTick++;
 	if ( SystemTick > SYSTEM_ERROR_TIMEOUT ) 
 	{
-		//NVIC_SystemReset(); 
-		//	這邊會讓 MCU 強制進入 WDT
 		bRecoverSystem = 1 ;
 		RecoverSystemMoniter();
 	}		
@@ -443,18 +432,18 @@ void SysTick_Handler(void)
 
 		
 		Tick_20mSec = 0 ;		
-		iSystemTime[INX_SEC]++;
-		if(iSystemTime[INX_SEC]>=60) 
+		CtrSystemTime[INX_SEC]++;
+		if(CtrSystemTime[INX_SEC]>=60) 
 		{
-			iSystemTime[INX_SEC] =0 ;						
-			iSystemTime[INX_MIN]++;
-			if(iSystemTime[INX_MIN] >= 60)
+			CtrSystemTime[INX_SEC] =0 ;						
+			CtrSystemTime[INX_MIN]++;
+			if(CtrSystemTime[INX_MIN] >= 60)
 			{
-				iSystemTime[INX_MIN]=0;						
-				iSystemTime[INX_HOUR]++;
-				if(iSystemTime[INX_HOUR] >= 24)
+				CtrSystemTime[INX_MIN]=0;						
+				CtrSystemTime[INX_HOUR]++;
+				if(CtrSystemTime[INX_HOUR] >= 24)
 				{
-					iSystemTime[INX_HOUR] = 0 ;
+					CtrSystemTime[INX_HOUR] = 0 ;
 					bValueUpdated |= 0x02 ;
 				}		
 			}	
@@ -998,9 +987,6 @@ int main()
     NowPollingMeterBoard = 1 ;	    
     fgTestInitOK = 0 ;	
 
-		/***
-		 *	@brief	Revise the architecture from meter polling drivern to Deivce polling(PM, Bms, WM, Inv)
-		 ***/
     do
     {
 				WDT_RESET_COUNTER();	// Feed Dog
@@ -1010,7 +996,7 @@ int main()
         MeterProcess();
         SystemTick = 0 ;
         MeterBoardPolling();		               					
-        RecoverSystemMoniter();  	
+        RecoverSystemMoniter();
     }
     while(1);
 }
@@ -1067,6 +1053,37 @@ void ResetMeterUART(void)
 	METERTxQ_wp = 0 ; 
 	METERTxQ_rp = 0 ;
 	METERTxQ_cnt = 0 ;
+}
+
+/***	
+ *	@brief	According to RTC setting, schedule watering task
+ *	@REMINDER		Need to add Host watering sheduled time process
+ ***/
+//	Maybe add set watering time
+// Year,Month,Day,Hour,Min,Sec,Week
+void 	WaTeRingDeTecT(void)
+{
+		uint8_t *p_rtc_data = (uint8_t*) &RTC_Data;
+		for (uint8_t i = 0; i < 7; i++){
+		
+				*(p_rtc_data + i) =  CtrSystemTime[i];
+		}
+		
+		//	Watering according to time period
+		if ( ((RTC_Data.hour == 0x0C) && (RTC_Data.min >= 0x00)) && ((RTC_Data.hour == 0x0C) && (RTC_Data.min <= 0x05)) )
+		{
+				LED_G1_On();
+				// Set GPIO on
+		} else {
+				LED_G1_Off();
+		}
+		//	Time Triggered Watering
+		if ((RTC_Data.hour == 0x0C) && (RTC_Data.min >= 0x00))
+		{
+				LED_G1_On();
+		} else {
+				LED_G1_Off();
+		}		
 }
 
 /*** (C) COPYRIGHT 2016 Nuvoton Technology Corp. ***/

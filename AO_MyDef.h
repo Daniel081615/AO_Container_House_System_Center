@@ -219,13 +219,13 @@
 #define INX_SEC		5
 
 #define HOST_INX_TIME_START 		(HOST_TOKEN_LENGTH-9)
-#define HOST_INX_TIME_SEC		(HOST_TOKEN_LENGTH-4)
+#define HOST_INX_TIME_SEC				(HOST_TOKEN_LENGTH-4)
 
 #define INX_TIME_START_Y	    (METER_TOKEN_LENGTH-9)
 #define INX_TIME_START_M	    (METER_TOKEN_LENGTH-8)
 #define INX_TIME_START_D	    (METER_TOKEN_LENGTH-7)
 #define INX_TIME_START_H	    (METER_TOKEN_LENGTH-6)
-#define INX_TIME_START_MN   (METER_TOKEN_LENGTH-5)
+#define INX_TIME_START_MN   	(METER_TOKEN_LENGTH-5)
 #define INX_TIME_START_S	    (METER_TOKEN_LENGTH-4)
 #define INX_TIME_START_W	    (METER_TOKEN_LENGTH-3)
 
@@ -364,9 +364,9 @@ CTR_RSP_SYSTEM_INFO,		//0x31
 CTR_RSP_POWER_DATA,			//0x32
 CTR_FIRST_RESET_STATUS,	//0x33
 CTR_RSP_FW_INFO,				//0x34
-CTR_RSP_BMS_DATA,
-CTR_RSP_WM_DATA,
-CTR_RSP_INV_DATA,
+CTR_RSP_BMS_DATA,				//0x35
+CTR_RSP_WM_DATA,				//0x36
+CTR_RSP_INV_DATA,				//0x37
 
 	//------Cenetr  OTA-------//
 //CMD_CTR_OTA_UPDATE=0x40,		
@@ -522,6 +522,17 @@ typedef struct STR_BAT_DATA{
 	_Bool CurrentSensorFaultFlag;
 
 } BatData_t;
+
+typedef struct RealTimeClock_Data{
+	// Year,Month,Day,Hour,Min,Sec,Week
+	uint8_t year;
+	uint8_t month;
+	uint8_t day;
+	uint8_t hour;
+	uint8_t min;
+	uint8_t sec;
+	uint8_t week;
+} RTC_Data_t;
 
 
 #define SHOW_WAIT_DELAY		0x00

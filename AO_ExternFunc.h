@@ -56,7 +56,11 @@ extern uint8_t fgTestInitOK;
 extern volatile MeterData_t MeterData[PwrMeterMax];
 
 extern uint8_t MyCenterID;
-extern uint8_t iSystemTime[7];
+
+/***	Time func & variable	***/
+extern uint8_t CtrSystemTime[7], HostSystemTime[7];
+extern void GetHostRTC(void);
+
 extern uint8_t fgHostFlag;
 extern uint8_t u8tick1S_GPIO_Restart;
 extern uint8_t PackageIndex1;
@@ -155,10 +159,11 @@ extern volatile uint8_t MeterOtaFlag;
 
 extern uint8_t _SendStringToMETER(uint8_t *Str, uint8_t len);
 
+extern RTC_Data_t RTC_Data;
+
 /* Host OTA meter Cmd */
 extern uint8_t OTAMeterID;
 extern void CalChecksumH(void);
-
 
 extern BmsData_t 	BmsData[BmsDeviceMax];
 extern WMData_t		WMData[WMDeviceMax];

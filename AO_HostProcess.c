@@ -6,6 +6,7 @@
  * C Compiler : Keil C
  * --------------------------------------------------------------------------*/
 #include <stdio.h>
+#include <stdlib.h>
 #include "NUC1261.h"
 #include "AO_MyDef.h"
 #include "AO_ExternFunc.h"
@@ -22,7 +23,7 @@ uint8_t system_SW_Flag = 0;
 uint8_t system_SW_Timer = 0;
 
 
-
+void GetHostRTC(void);
 void HostProcess(void);
 void CalChecksumH(void);
 void ClearRespDelayTimer(void);
@@ -95,10 +96,7 @@ void HostProcess(void)
             // System Time updated 
             if ( TokenHost[2] == CTR_ALIVE)
             {
-                for (i=0;i<7;i++)
-                {		
-                    iSystemTime[i] = TokenHost[HOST_INX_TIME_START+i];
-                }
+								GetHostRTC();
                 SystemSetting |= FLAG_SYSTEM_TIME_READY ;
             }
             CenterID = TokenHost[1] ;
@@ -232,15 +230,8 @@ Checksum
 */
 void HOST_AliveProcess(void)
 {	
-    uint8_t i;	
-    uint8_t HostData_P,HostData_N,u8BuferIndex,u8tmp;
-    //uint8_t u8RoomIndex,CmdOpenDoor1,CmdOpenDoor2;
-    
 
-    for (i=0;i<7;i++)
-    {		
-        iSystemTime[i] = TokenHost[HOST_INX_TIME_START+i];
-    }	
+		GetHostRTC();
 }
 
 /************************************
@@ -256,55 +247,38 @@ void HOST_AliveProcess(void)
 */
 void Host_PowerMeterDataProcess(void)
 {
-    uint8_t i;
-
 		
     HostDeviceIndex = TokenHost[3];
 		PwrMeterCmdList[HostDeviceIndex-1] = TokenHost[4];
  
-//    for (i=0;i<7;i++)
-//    {
-//        iSystemTime[i] = TokenHost[INX_TIME_START_Y+i];
-//    }  
+		GetHostRTC();
 }
 
 void Host_BmsDataProcess(void)
 {
-    uint8_t i;
     
     HostDeviceIndex = TokenHost[3];
 		BmsCmdList[HostDeviceIndex-1] = TokenHost[4];
  
-    for (i=0;i<7;i++)
-    {
-        iSystemTime[i] = TokenHost[INX_TIME_START_Y+i];
-    }  
+		GetHostRTC();
 }
 
 void Host_WMDataProcess(void)
 {
-    uint8_t i;
     
     HostDeviceIndex = TokenHost[3];
 		WtrMeterCmdList[HostDeviceIndex-1] = TokenHost[4];
  
-    for (i=0;i<7;i++)
-    {
-        iSystemTime[i] = TokenHost[INX_TIME_START_Y+i];
-    }  
+		GetHostRTC();
 }
 
 void Host_InvDataProcess(void)
 {
-    uint8_t i;
     
     HostDeviceIndex = TokenHost[3];
 		InvCmdList[HostDeviceIndex-1] = TokenHost[4];
  
-    for (i=0;i<7;i++)
-    {
-        iSystemTime[i] = TokenHost[INX_TIME_START_Y+i];
-    }  
+		GetHostRTC();
 }
 
 /* Process Cenetr OTA Cmd from Host
@@ -318,13 +292,11 @@ void Host_InvDataProcess(void)
 */
 void Host_OTACenterProcess(void)
 {
-    uint8_t i;
 		SYS_UnlockReg();
 		FMC_Open();
 	
-		for (i = 0; i < 7; i++) {
-        iSystemTime[i] = TokenHost[HOST_INX_TIME_START + i];
-    }
+		GetHostRTC();
+	
 		switch(TokenHost[3])
     {
 			
@@ -368,13 +340,11 @@ void Host_OTACenterProcess(void)
 99: 0x0A
 ***/
 void Host_OTAMeterProcess(void){
-		uint8_t i;
+
 		SYS_UnlockReg();
 		FMC_Open();
 	
-		for (i = 0; i < 7; i++) {
-        iSystemTime[i] = TokenHost[HOST_INX_TIME_START + i];
-    }
+		GetHostRTC();
 		
 		MeterOtaCmdList[OTAMeterID-1] = TokenHost[3];		
 		OTAMeterID = TokenHost[4];
@@ -433,6 +403,7 @@ void SendHost_PowerData(void)
 		HostTxBuffer[fnPacketIndex++] = (MeterData[fnPowerMeterIndex].TotalWatt & 0x00FF0000) >> 16 ;
 		HostTxBuffer[fnPacketIndex++] = (MeterData[fnPowerMeterIndex].TotalWatt & 0x0000FF00) >> 8 ;
 		HostTxBuffer[fnPacketIndex++] =  MeterData[fnPowerMeterIndex].TotalWatt & 0x000000FF;	
+	
      
     CalChecksumH();		
 }
@@ -708,6 +679,27 @@ void WriteMeterOtaCmdList(void)
 		WriteData(FW_Status_Base + sizeof(FWstatus),FW_Status_Base + sizeof(FWstatus) + sizeof(MeterOtaCmdList) , (uint32_t*)MeterOtaCmdList);
 		
 		SYS_LockReg();
+}
+
+void GetHostRTC(void)
+{
+		uint16_t u16tempH, u16tempC;
+		
+		// Year,Month,Day,Hour,Min,Sec,Week
+		for (uint8_t i = 0; i < 7; i++) {
+				HostSystemTime[i] = TokenHost[HOST_INX_TIME_START + i];
+    }
+		
+		// Hour, Min
+		u16tempH = (HostSystemTime[3] * 60) + HostSystemTime[4];
+		u16tempC = (CtrSystemTime[3] * 60)  + CtrSystemTime[4];
+		
+		if (abs(u16tempH - u16tempC) > 3)
+		{
+				for (uint8_t i = 0; i < 7; i++) {
+						CtrSystemTime[i] = HostSystemTime[i];
+				}
+		}
 }
 
 
