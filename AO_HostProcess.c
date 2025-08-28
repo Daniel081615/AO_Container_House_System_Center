@@ -6,7 +6,6 @@
  * C Compiler : Keil C
  * --------------------------------------------------------------------------*/
 #include <stdio.h>
-#include <stdlib.h>
 #include "NUC1261.h"
 #include "AO_MyDef.h"
 #include "AO_ExternFunc.h"
@@ -38,11 +37,19 @@ void SendHost_PowerData(void);
 void SendHost_BmsData(void);
 void SendHost_WMData(void);
 void SendHost_InvData(void);
+void SendHost_CenterFWinfo(void);
+void SendHost_MeterFWInfo(void);
+void SendHost_CenterUpdateSuccsess(void);
+void SendHost_MeterUpdateSuccsess(void);
+
+
 
 void Host_PowerMeterDataProcess(void);
 void Host_BmsDataProcess(void);
 void Host_WMDataProcess(void);
 void Host_InvDataProcess(void);
+
+
 
 //***** OTA Process *****//
 void Host_OTAMeterProcess(void);
@@ -138,28 +145,25 @@ void HostProcess(void)
                         CmdType = CTR_RSP_INV_DATA ;
                         ClearRespDelayTimer() ;												
 												break;
-										 	// CTR	ota commamd
                     case CTR_OTA_UPDATE_CTR:							// 0x15
                         Host_OTACenterProcess();
                         ClearRespDelayTimer();
                         break;
-											// MTR	ota command
 										case CTR_OTA_UPDATE_MTR:							// 0x16
 												Host_OTAMeterProcess();
 												break;
-										
+										case CTR_SET_WTR_TIME:
+												
+												ClearRespDelayTimer();
                     default:
                         break;
                 }
-            } else {
-
             }
 			
         } else {
             ResetHostUART();
         }
-			}
-//		}
+		}
 
     if ( bDelaySendHostCMD )
     {
@@ -205,91 +209,70 @@ void ClearRespDelayTimer(void)
 }
 
 
-/*
-0: 0x55
-1: MyCenterID
-2: Command
-3: fgHostInformation
-4: MeterIndex
-5: Member Counter 
-6: Package Index n
+/***	@CenterProcessHostCmdsFunctions	***
+*
+*	HOST_AliveProcess()
+*	Host_PowerMeterDataProcess() 	:	Get power meter Cmd
+*	Host_BmsDataProcess() 			 	:	Get Bms Cmd
+*	Host_WMDataProcess() 					:	Get water meter Cmd
+*	Host_InvDataProcess() 				:	Get inverter Cmd
+*	Host_OTACenterProcess()				:	Get center board OTA Cmd
+*	Host_OTAMeterProcess()				:	Get meter board OTA Cmd
+*	Host_WateringSetupProcess			:	Get	watering time setup
+*	@note	"Meter index id is replaced by device ID... Need to be revise"
+*
+*	Cmd form 
+0 : 0x55
+1 : CenterID
+2 : Center CMD
+3 : Meter Idx
+4 : Device Idx
+5 : Device CMD
+ ***																	***/
 
-Member 1 - mode (1)
-Member 1 - SID (4)
-Member 1 - UID (4)
-Member 1 - Balance (4)
-Member 1 - PWD (8)
-Member 2 - mode (1)
-Member 2 - SID (4)
-Member 2 - UID (4)
-Member 2 - Balance (4)
-Member 2 - PWD (8)
-
-Checksum
-0x0A (\n)
-*/
 void HOST_AliveProcess(void)
 {	
 
 		GetHostRTC();
 }
 
-/************************************
-0: 0x55
-1: MyCenterID
-2: Command
-3: fgHostInformation
-4: Meter Cmds
-
-
-49: Checksum
-50: 0x0A (\n)
-*/
 void Host_PowerMeterDataProcess(void)
 {
-		
-    HostDeviceIndex = TokenHost[3];
-		PwrMeterCmdList[HostDeviceIndex-1] = TokenHost[4];
+		HostMeterIndex = TokenHost[3];
+    HostDeviceIndex = TokenHost[4];
+		PwrMeterCmdList[HostMeterIndex-1][HostDeviceIndex-1] = TokenHost[5];
  
 		GetHostRTC();
 }
 
 void Host_BmsDataProcess(void)
 {
-    
-    HostDeviceIndex = TokenHost[3];
-		BmsCmdList[HostDeviceIndex-1] = TokenHost[4];
+    HostMeterIndex = TokenHost[3];
+    HostDeviceIndex = TokenHost[4];
+		BmsCmdList[HostMeterIndex-1][HostDeviceIndex-1] = TokenHost[5];
  
 		GetHostRTC();
 }
 
 void Host_WMDataProcess(void)
 {
-    
-    HostDeviceIndex = TokenHost[3];
-		WtrMeterCmdList[HostDeviceIndex-1] = TokenHost[4];
+	
+    HostMeterIndex = TokenHost[3];
+    HostDeviceIndex = TokenHost[4];
+		WtrMeterCmdList[HostMeterIndex-1][HostDeviceIndex-1] = TokenHost[5];
  
 		GetHostRTC();
 }
 
 void Host_InvDataProcess(void)
 {
-    
-    HostDeviceIndex = TokenHost[3];
-		InvCmdList[HostDeviceIndex-1] = TokenHost[4];
+		HostMeterIndex = TokenHost[3];
+    HostDeviceIndex = TokenHost[4];
+		InvCmdList[HostMeterIndex-1][HostDeviceIndex-1] = TokenHost[5];
  
 		GetHostRTC();
 }
 
-/* Process Cenetr OTA Cmd from Host
-0: 0x55
-1: MyCenterID
-2: Center OTA Command (0x13)
-3: Sub command
-4: Meter Index 
-98: Checksum
-99: 0x0A
-*/
 void Host_OTACenterProcess(void)
 {
 		SYS_UnlockReg();
@@ -329,27 +312,17 @@ void Host_OTACenterProcess(void)
 		}
 }
 
-/*** Process & store Meter OTA Cmd form Host
-	*	@brief	Check if Meter fw in another bank, if not, download it
-0: 0x55
-1: MyCenterID
-2: Meter OTA Command (0x14)
-3: Sub command
-4: MeterID
-98: Checksum
-99: 0x0A
-***/
 void Host_OTAMeterProcess(void){
 
 		SYS_UnlockReg();
 		FMC_Open();
 	
 		GetHostRTC();
+	
+		OTAMeterID = TokenHost[3];
+		MeterOtaCmdList[OTAMeterID-1] = TokenHost[4];	
 		
-		MeterOtaCmdList[OTAMeterID-1] = TokenHost[3];		
-		OTAMeterID = TokenHost[4];
-		
-		if (TokenHost[3] == CMD_MTR_OTA_UPDATE)
+		if (TokenHost[4] == CMD_MTR_OTA_UPDATE)
 		{
 				if (other.flags != THIS_IS_METER_FW_FLAG) {
 						//	Download Meter FW in Center Bank
@@ -363,23 +336,41 @@ void Host_OTAMeterProcess(void){
 		}  
 }
 
+void Host_WateringSetupProcess(void)
+{
+		uint8_t fnPacketIndex;
+		GetHostRTC();
+		HostMeterIndex = TokenHost[3];	//	MeterID
+	
+		fnPacketIndex = 6;
+		
+		Watering_SetUp.Hour 			= TokenHost[fnPacketIndex++];
+		Watering_SetUp.Min				= TokenHost[fnPacketIndex++];
+	  Watering_SetUp.Period_min = TokenHost[fnPacketIndex++];
+}
 
+/***
+ *	@brief	Send System Error information to Host
+ *	@note		Need to add Error status detect for each device
+ ***/
 void SendHost_SystemInformation(void)
 {
-    uint8_t i;
+    uint8_t i, fnPacketIndex;
     
     HostTxBuffer[2] = CTR_RSP_SYSTEM_INFO ; 
-    HostTxBuffer[3] = (PowerMeterError & 0xFF000000) >> 24 ;
-    HostTxBuffer[4] = (PowerMeterError & 0x00FF0000) >> 16 ;
-    HostTxBuffer[5] = (PowerMeterError & 0x0000FF00) >> 8 ;
-    HostTxBuffer[6] = (PowerMeterError & 0x000000FF) >> 0 ;   
-    HostTxBuffer[7] = (MeterDeviceError & 0x000000FF)  ;
-    HostTxBuffer[8] = NowPollingMeterBoard ;
-    for ( i=0 ; i<7;i++)
-    {
-        //HostTxBuffer[fnPacketIndex++] = CenterRecord[tmpRecordIndex].Status  ;
-    }
-
+    HostTxBuffer[3] = (DevicesNG.PowerMeterNG & 0xFF000000) >> 24 ;
+    HostTxBuffer[4] = (DevicesNG.PowerMeterNG & 0x00FF0000) >> 16 ;
+    HostTxBuffer[5] = (DevicesNG.PowerMeterNG & 0x0000FF00) >> 8 ;
+    HostTxBuffer[6] = (DevicesNG.PowerMeterNG & 0x000000FF) >> 0 ;
+	
+		fnPacketIndex = 7 ;
+    HostTxBuffer[fnPacketIndex++] = (DevicesNG.PowerMeterNG & 0xFF000000) >> 24 ;
+    HostTxBuffer[fnPacketIndex++] = (DevicesNG.PowerMeterNG & 0x00FF0000) >> 16 ;
+    HostTxBuffer[fnPacketIndex++] = (DevicesNG.PowerMeterNG & 0x0000FF00) >> 8 ;
+    HostTxBuffer[fnPacketIndex++] = (DevicesNG.PowerMeterNG & 0x000000FF) >> 0 ;		
+	
+    HostTxBuffer[fnPacketIndex++] = (MeterDeviceError & 0x000000FF)  ;
+    HostTxBuffer[fnPacketIndex++] = NowPollingMeterBoard ;
     	
     CalChecksumH();	
 	
@@ -387,22 +378,22 @@ void SendHost_SystemInformation(void)
 void SendHost_PowerData(void)
 {
     uint8_t fnPacketIndex;
-    uint8_t fnPowerMeterIndex;
+    uint8_t fnMeterBoardIndex;
     
     HostTxBuffer[1] = MyCenterID ;
     HostTxBuffer[2] = CTR_RSP_POWER_DATA ;
-    HostTxBuffer[3] = HostMeterIndex+1 ; 
+    HostTxBuffer[3] = HostMeterIndex ; 
     HostTxBuffer[4] = HostDeviceIndex ; 
-    fnPowerMeterIndex = HostDeviceIndex-1 ; 
+    fnMeterBoardIndex = HostDeviceIndex-1 ; 
     fnPacketIndex = 5 ; 
     // Byte 5.
-    HostTxBuffer[fnPacketIndex++] = MeterData[fnPowerMeterIndex].ErrorRate;        
-    HostTxBuffer[fnPacketIndex++] = MeterData[fnPowerMeterIndex].RelayStatus;
+    HostTxBuffer[fnPacketIndex++] = MeterData[fnMeterBoardIndex].ErrorRate;        
+    HostTxBuffer[fnPacketIndex++] = MeterData[fnMeterBoardIndex].RelayStatus;
 
-		HostTxBuffer[fnPacketIndex++] = (MeterData[fnPowerMeterIndex].TotalWatt & 0xFF000000) >> 24 ;
-		HostTxBuffer[fnPacketIndex++] = (MeterData[fnPowerMeterIndex].TotalWatt & 0x00FF0000) >> 16 ;
-		HostTxBuffer[fnPacketIndex++] = (MeterData[fnPowerMeterIndex].TotalWatt & 0x0000FF00) >> 8 ;
-		HostTxBuffer[fnPacketIndex++] =  MeterData[fnPowerMeterIndex].TotalWatt & 0x000000FF;	
+		HostTxBuffer[fnPacketIndex++] = (MeterData[fnMeterBoardIndex].TotalWatt & 0xFF000000) >> 24 ;
+		HostTxBuffer[fnPacketIndex++] = (MeterData[fnMeterBoardIndex].TotalWatt & 0x00FF0000) >> 16 ;
+		HostTxBuffer[fnPacketIndex++] = (MeterData[fnMeterBoardIndex].TotalWatt & 0x0000FF00) >> 8 ;
+		HostTxBuffer[fnPacketIndex++] =  MeterData[fnMeterBoardIndex].TotalWatt & 0x000000FF;	
 	
      
     CalChecksumH();		
@@ -415,7 +406,7 @@ void SendHost_BmsData(void)
     
     HostTxBuffer[1] = MyCenterID ;
     HostTxBuffer[2] = CTR_RSP_BMS_DATA ;
-    HostTxBuffer[3] = HostMeterIndex+1 ; 
+    HostTxBuffer[3] = HostMeterIndex ; 
     HostTxBuffer[4] = HostDeviceIndex ; 
     fnBmsIndex = HostDeviceIndex-1 ; 
     fnPacketIndex = 5 ; 
@@ -469,7 +460,7 @@ void SendHost_WMData(void)
     
     HostTxBuffer[1] = MyCenterID ;
     HostTxBuffer[2] = CTR_RSP_WM_DATA ;
-    HostTxBuffer[3] = HostMeterIndex+1 ; 
+    HostTxBuffer[3] = HostMeterIndex ; 
     HostTxBuffer[4] = HostDeviceIndex ; 
     fnWMIndex = HostDeviceIndex-1 ; 
     fnPacketIndex = 5 ; 
@@ -492,7 +483,7 @@ void SendHost_InvData(void)
     
     HostTxBuffer[1] = MyCenterID ;
     HostTxBuffer[2] = CTR_RSP_BMS_DATA ;
-    HostTxBuffer[3] = HostMeterIndex+1 ; 
+    HostTxBuffer[3] = HostMeterIndex ; 
     HostTxBuffer[4] = HostDeviceIndex ; 
     fnInvIndex = HostDeviceIndex-1 ; 
     fnPacketIndex = 5 ; 
@@ -571,17 +562,17 @@ void SendHost_FirstReset_Ack(void)
 20-51: FWMetadata1 	(32 bytes)
 52-83: FWMetadata2 	(32 bytes)
 */
-//void SendHost_CenterFWinfo(void)
-//{
-//		uint8_t i;
-//		HostTxBuffer[2] = CmdType;
+void SendHost_CenterFWinfo(void)
+{
+		uint8_t i;
+		HostTxBuffer[2] = CmdType;
 
-//		memcpy(&HostTxBuffer[4], &g_fw_ctx, sizeof(FWstatus));
-//    memcpy(&HostTxBuffer[20], &meta, sizeof(FWMetadata));
-//		memcpy(&HostTxBuffer[52], &other, sizeof(FWMetadata));
+		memcpy(&HostTxBuffer[4], &g_fw_ctx, sizeof(FWstatus));
+    memcpy(&HostTxBuffer[20], &meta, sizeof(FWMetadata));
+		memcpy(&HostTxBuffer[52], &other, sizeof(FWMetadata));
 
-//		CalChecksumH();
-//}
+		CalChecksumH();
+}
 
 
 /* Send meter fw info to host 
@@ -592,18 +583,18 @@ void SendHost_FirstReset_Ack(void)
 20-51: FWMetadata1 	(32 bytes)
 52-83: FWMetadata2 	(32 bytes)
 */
-//void SendHost_MeterFWInfo(void){
-//	
-//		uint8_t i;
-//		HostTxBuffer[2] = CmdType;
+void SendHost_MeterFWInfo(void){
+	
+		uint8_t i;
+		HostTxBuffer[2] = CmdType;
 
-//		memcpy(&HostTxBuffer[4], &MeterMetaStatus, sizeof(FWstatus));
-//    memcpy(&HostTxBuffer[20], &MeterMetaActive, sizeof(FWMetadata));
-//		memcpy(&HostTxBuffer[52], &MeterMetaBackup, sizeof(FWMetadata));
-//	
-//		CalChecksumH();
-//	
-//}
+		memcpy(&HostTxBuffer[4], &MeterMetaStatus, sizeof(FWstatus));
+    memcpy(&HostTxBuffer[20], &MeterMetaActive, sizeof(FWMetadata));
+		memcpy(&HostTxBuffer[52], &MeterMetaBackup, sizeof(FWMetadata));
+	
+		CalChecksumH();
+	
+}
 
 /* When meter update success, send host Update Success Password
 0:0x55
@@ -633,15 +624,15 @@ void SendHost_MeterUpdateSuccsess(void)
 6: 0x5A
 7: 0xA5
 */
-//void SendHost_CenterUpdateSuccsess(void)
-//{
-//		HostTxBuffer[1] = MyCenterID;
-//		HostTxBuffer[4] = 0xEE;		HostTxBuffer[5] = 0xFF;
-//		HostTxBuffer[6] = 0x5A;		HostTxBuffer[7] = 0xA5;
-//		
-//		memcpy(&HostTxBuffer[8], &meta, sizeof(FWstatus));
-//		CalChecksumH();
-//}
+void SendHost_CenterUpdateSuccsess(void)
+{
+		HostTxBuffer[1] = MyCenterID;
+		HostTxBuffer[4] = 0xEE;		HostTxBuffer[5] = 0xFF;
+		HostTxBuffer[6] = 0x5A;		HostTxBuffer[7] = 0xA5;
+		
+		memcpy(&HostTxBuffer[8], &meta, sizeof(FWstatus));
+		CalChecksumH();
+}
 
 /***
  *	@breif	Read Meter Ota List from flash, to make sure update meter
@@ -681,9 +672,13 @@ void WriteMeterOtaCmdList(void)
 		SYS_LockReg();
 }
 
+/***
+ *	@brief	Get Real-Time from Host, and store RTC in data flash
+ *	(HEX)YY_H, YY_L, MM, DD, Hr, Min, Sec, Week
+ ***/
 void GetHostRTC(void)
 {
-		uint16_t u16tempH, u16tempC;
+		uint16_t u16tempH, u16tempC, TimeGap;
 		
 		// Year,Month,Day,Hour,Min,Sec,Week
 		for (uint8_t i = 0; i < 7; i++) {
@@ -694,12 +689,34 @@ void GetHostRTC(void)
 		u16tempH = (HostSystemTime[3] * 60) + HostSystemTime[4];
 		u16tempC = (CtrSystemTime[3] * 60)  + CtrSystemTime[4];
 		
-		if (abs(u16tempH - u16tempC) > 3)
+		TimeGap = abs(u16tempH - u16tempC);
+		
+		if (TimeGap > 3)
 		{
-				for (uint8_t i = 0; i < 7; i++) {
+				for (uint8_t i = 0; i < 7; i++) 
+				{
 						CtrSystemTime[i] = HostSystemTime[i];
 				}
+				
+				uint32_t address_rtc_base;
+				uint32_t data_buffer[2]; 
+				FWstatus Status1;
+				address_rtc_base = FW_Status_Base + sizeof(FWstatus);
+				memcpy(data_buffer, CtrSystemTime, sizeof(CtrSystemTime));
+				
+				SYS_UnlockReg();
+				FMC_Open();
+
+				ReadData(FW_Status_Base, address_rtc_base, (uint32_t*)&Status1);
+				FMC_Erase_User(FW_Status_Base);
+				
+				WriteData(FW_Status_Base, FW_Status_Base + sizeof(Status1), (uint32_t*)&Status1);
+				WriteData(address_rtc_base, address_rtc_base + sizeof(data_buffer), (uint32_t*)&data_buffer);
+
+				SYS_LockReg();
 		}
+		
+		
 }
 
 

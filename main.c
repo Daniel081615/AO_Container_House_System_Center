@@ -70,8 +70,8 @@ uint16_t     SystemTick;
 volatile MeterData_t MeterData[PwrMeterMax];
 uint8_t ErrorRate[ROOM_MAX];
 
-uint8_t CtrSystemTime[7]={0,0,0,0,0,0,0};		// Year,Month,Day,Hour,Min,Sec,Week
-uint8_t HostSystemTime[7] = {0,0,0,0,0,0,0};
+uint8_t CtrSystemTime[8]={0,0,0,0,0,0,0,0};		// Year,Month,Day,Hour,Min,Sec,Week
+uint8_t HostSystemTime[8] = {0,0,0,0,0,0,0,0};
 uint8_t HostTxBuffer[HOST_TOKEN_LENGTH];
 uint8_t MeterTxBuffer[METER_TOKEN_LENGTH];
 uint8_t TokenHost[HOST_TOKEN_LENGTH];
@@ -133,7 +133,7 @@ uint8_t MeterDeviceMax;
 uint8_t MeterWaitTick;
 _Bool bResetUARTQ;
 uint8_t PackageIndex1;
-uint32_t ReaderDeviceError,PowerMeterError,PowerMeterError110,MeterButtonStatus,MeterRelayStatus;
+uint32_t ReaderDeviceError,MeterButtonStatus,MeterRelayStatus;
 
 _Bool fgFirstTimeCheckAC;
 _Bool bACPowerStatus;
@@ -150,16 +150,19 @@ uint32_t MeterValueTest;
 
 //Host to meter devices & Ota Cmd List
 uint8_t MeterOtaCmdList[MtrBoardMax];
-uint8_t PwrMeterCmdList[PwrMeterMax];
-uint8_t BmsCmdList[BmsMax];
-uint8_t WtrMeterCmdList[WtrMeterMax];
-uint8_t InvCmdList[InvMax];
+uint8_t PwrMeterCmdList[MtrBoardMax][PwrMeterMax];
+uint8_t BmsCmdList[MtrBoardMax][BmsMax];
+uint8_t WtrMeterCmdList[MtrBoardMax][WtrMeterMax];
+uint8_t InvCmdList[MtrBoardMax][InvMax];
 
 /*---------------------------------------------------------------------------------------------------------*/
 /* Global variables                                                                                        */
 /*---------------------------------------------------------------------------------------------------------*/
 uint16_t SystemTick;
 RTC_Data_t RTC_Data;
+TotErrorRate_t TotErrorRate;
+DeviceStatus_t DevicesNG;
+Watering_Setup_t Watering_SetUp;
 /*---------------------------------------------------------------------------------------------------------*/
 /* Global variables                                                                                        */
 /*---------------------------------------------------------------------------------------------------------*/
@@ -187,11 +190,6 @@ uint8_t METERTxQ[MAX_METER_TXQ_LENGTH];
 uint8_t RoomNumberMax;
 uint8_t MyCenterID;
 uint8_t NowPollingRoom;
-// From Meter Board 
-uint32_t u32PowerMeterRelayStatus_110V;
-uint32_t u32PowerMeterRelayStatus_220V;
-uint32_t u32PowerMeterError_110V;
-uint32_t u32PowerMeterError_220V;
 uint8_t Tick1S_CheckMeterBoards;
 
 /*
@@ -268,8 +266,7 @@ uint8_t RoomNumberMax;
 uint8_t MeterWaitTick;
 _Bool bResetUARTQ;
 uint8_t PackageIndex1;
-uint32_t ReaderDeviceError,PowerMeterError,MeterButtonStatus,MeterRelayStatus;
-uint32_t PowerMeterError110V;
+uint32_t ReaderDeviceError,MeterButtonStatus,MeterRelayStatus;
 uint8_t TickFromHostUpdates;
 _Bool fgInitOK;  
 
@@ -306,6 +303,7 @@ void ReadMyCenterID(void);
 void RecoverSystemMoniter(void);
 void ChangeDirHostRS485(void);
 void WaTeRingDeTecT(void);
+void RaedFlashRTC(void);
 
 uint8_t MT_Tick_1Sec;
 uint8_t LED_Tick_10mSec;
@@ -944,8 +942,6 @@ int main()
     /* Lock protected registers */
     SYS_LockReg();
     
-    PowerMeterError110 = 0x00000000 ;
-    PowerMeterError = 0xFFFFFFFF ;
     ReaderDeviceError = 0xFFFFFFFF ;
     MeterDeviceError = 0xFFFFFFFF ;
     MeterRelayStatus = 0xFFFFFFFF ;
@@ -958,15 +954,11 @@ int main()
     DIR_HOST_RS485_In();
     MeterDeviceMax = MeterDeviceMaxTable[MyCenterID] ;
 
-    //RoomData[0].RoomMode = RM_FREE_MODE_READY ;
-    //RoomData[i].RoomMode = RM_POWER_OFF_READY ;
     u32TimeTick2=0; 	
     // Delay for System stable
     do {
         SystemTick = 0 ;
-				WDT_RESET_COUNTER();
-        //HostProcess();
-        //ChangeRS485Direct();		
+				WDT_RESET_COUNTER();	
     } while( u32TimeTick2 < 250 ); 
 
     SoftI2cMasterInit();	
@@ -975,7 +967,8 @@ int main()
     u32TimeTick2=0;  
     // Delay for System stable
     do {
-    	SystemTick = 0 ;		
+    	SystemTick = 0;
+			WDT_RESET_COUNTER();
     } while( u32TimeTick2 < 75 ); 
 
     SystemTick = 0 ;			
@@ -986,6 +979,8 @@ int main()
     MeterPollingState = PL_METER_NORM ;		
     NowPollingMeterBoard = 1 ;	    
     fgTestInitOK = 0 ;	
+		
+		RaedFlashRTC();
 
     do
     {
@@ -997,6 +992,7 @@ int main()
         SystemTick = 0 ;
         MeterBoardPolling();		               					
         RecoverSystemMoniter();
+				WaTeRingDeTecT();
     }
     while(1);
 }
@@ -1060,31 +1056,57 @@ void ResetMeterUART(void)
  *	@REMINDER		Need to add Host watering sheduled time process
  ***/
 //	Maybe add set watering time
-// Year,Month,Day,Hour,Min,Sec,Week
 void 	WaTeRingDeTecT(void)
 {
 		uint8_t *p_rtc_data = (uint8_t*) &RTC_Data;
-		for (uint8_t i = 0; i < 7; i++){
+		for (uint8_t i = 0; i < 8; i++){
 		
 				*(p_rtc_data + i) =  CtrSystemTime[i];
 		}
 		
 		//	Watering according to time period
-		if ( ((RTC_Data.hour == 0x0C) && (RTC_Data.min >= 0x00)) && ((RTC_Data.hour == 0x0C) && (RTC_Data.min <= 0x05)) )
+		//	Set Watering Period 12:00-12:05
+		if (RTC_Data.hour == Watering_SetUp.Hour)
 		{
-				LED_G1_On();
-				// Set GPIO on
-		} else {
-				LED_G1_Off();
-		}
-		//	Time Triggered Watering
-		if ((RTC_Data.hour == 0x0C) && (RTC_Data.min >= 0x00))
-		{
-				LED_G1_On();
-		} else {
-				LED_G1_Off();
-		}		
+				if ((RTC_Data.min >= Watering_SetUp.Min) && 
+						(RTC_Data.min <= (Watering_SetUp.Min + Watering_SetUp.Period_min)))
+				{
+						//	SendMeter_WateringCmd();
+						LED_G1_On();
+				} else{
+						LED_G1_Off();
+				}
+		} 
+		
+		//	Ask for RTC, in a period of time
+//		uint16_t u16tempH, u16tempC, TimeGap;
+//		
+//		u16tempH = (HostSystemTime[3] * 60) + HostSystemTime[4];
+//		u16tempC = (CtrSystemTime[3] * 60)  + CtrSystemTime[4];
+//		
+//		TimeGap = abs(u16tempH - u16tempC);
+//		if (TimeGap > 0x05)
+//		{
+//				
+//		}
+
+}
+
+/***	
+ *	@brief	Read flash RTC, Use when MCU initializing
+ *	@note		Need to open data flash
+ ***/
+void RaedFlashRTC(void)
+{
+		SYS_UnlockReg();
+		FMC_Open();
+		uint32_t RTC_Base, Data[2];
+	
+		RTC_Base = FW_Status_Base + sizeof(FWstatus);
+		ReadData(RTC_Base, RTC_Base + sizeof(RTC_Data), (uint32_t*)&Data);
+		memcpy(CtrSystemTime, Data, sizeof(RTC_Data));
+		
+		SYS_LockReg();
 }
 
 /*** (C) COPYRIGHT 2016 Nuvoton Technology Corp. ***/
-

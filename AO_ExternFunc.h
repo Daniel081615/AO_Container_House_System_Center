@@ -58,7 +58,7 @@ extern volatile MeterData_t MeterData[PwrMeterMax];
 extern uint8_t MyCenterID;
 
 /***	Time func & variable	***/
-extern uint8_t CtrSystemTime[7], HostSystemTime[7];
+extern uint8_t CtrSystemTime[8], HostSystemTime[8];
 extern void GetHostRTC(void);
 
 extern uint8_t fgHostFlag;
@@ -102,7 +102,6 @@ extern uint8_t TickHost,TickMeter;
 extern uint8_t iTickDelaySendHostCMD,bDelaySendHostCMD,bValueUpdated,bSystemTimeReady;
 extern uint8_t CenterRecord_WP,CenterRecord_RP,CenterNewRecordCounter,TickRecord;
 extern uint32_t ReaderDeviceError;
-extern uint32_t PowerMeterError,PowerMeterError110;
 extern uint8_t ControlState;
 extern uint8_t HostPackageIndex;
 extern uint8_t AutoLockTime;			// �۰ʤW�굥�ݮɶ�
@@ -132,10 +131,10 @@ extern uint32_t MeterButtonStatus,MeterRelayStatus,MeterDeviceError;
 //	Host Cmds devices List
 extern _Bool flagMeterOTAUpdate;
 extern uint8_t MeterOtaCmdList[MtrBoardMax];
-extern uint8_t PwrMeterCmdList[PwrMeterMax];
-extern uint8_t BmsCmdList[BmsMax];
-extern uint8_t WtrMeterCmdList[WtrMeterMax];
-extern uint8_t InvCmdList[InvMax];
+extern uint8_t PwrMeterCmdList[MtrBoardMax][PwrMeterMax];
+extern uint8_t BmsCmdList[MtrBoardMax][BmsMax];
+extern uint8_t WtrMeterCmdList[MtrBoardMax][WtrMeterMax];
+extern uint8_t InvCmdList[MtrBoardMax][InvMax];
 
 
 extern _Bool bResetUARTQ;
@@ -159,7 +158,12 @@ extern volatile uint8_t MeterOtaFlag;
 
 extern uint8_t _SendStringToMETER(uint8_t *Str, uint8_t len);
 
+
+/***	Devices Data structures	***/
 extern RTC_Data_t RTC_Data;
+extern TotErrorRate_t TotErrorRate;
+extern DeviceStatus_t DevicesNG;
+extern Watering_Setup_t Watering_SetUp;
 
 /* Host OTA meter Cmd */
 extern uint8_t OTAMeterID;

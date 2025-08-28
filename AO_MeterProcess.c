@@ -23,6 +23,7 @@ void Meter_RSP_PowerData(void);
 void Meter_RSP_BmsData(void);
 void Meter_RSP_WMData(void);
 void Meter_RSP_InvData(void);
+void Meter_RSP_FWInfo(void);
 
 //	Meter Polling Cmds
 void SendMeter_GetPowerData(void);
@@ -35,6 +36,7 @@ void SendMeterRTC(void);
 
 void PollSuccess_Handler(uint8_t NextPollingState);
 void PollingTimeout_Handler(uint8_t nextStateOnRetry, uint8_t nextStateOnMaxRetry);
+
 
 /*** MeterBootloader ***/
 void SendMeterBootloader_ConnectCmd(void);
@@ -76,8 +78,8 @@ _Bool EnPollPowerMeterFlag, EnPollBmsFlag, EnPollWMFlag, EnPollInvFlag;
 							5. MeterBoard OTA
 						ii.	Send host Cmds to meter devices, by using subcmd.
 						
-	@note			Timeout logic process
-	@revise 	2025.08.21
+	@note			Add ack process
+	@revise 	2025.08.28
 ***/
 void MeterBoardPolling(void)
 {
@@ -97,7 +99,7 @@ void MeterBoardPolling(void)
 				NowPollingBms = 1;
 				NowPollingWM 	= 1;
 				NowPollingInv = 1;	
-				//	
+
 				EnPollPowerMeterFlag = 1;
 				EnPollBmsFlag = 1;
 				EnPollWMFlag 	= 1;
@@ -107,6 +109,8 @@ void MeterBoardPolling(void)
         if (NowPollingMeterBoard > MeterDeviceMax) {
             NowPollingMeterBoard = 1;
         }
+				//	Polling all over again
+				MeterPollingState = PL_METER_NORM;
 		}
 
     switch ( MeterPollingState )
@@ -162,7 +166,7 @@ void MeterBoardPolling(void)
         case PL_METER_POLL4 :
             if (MeterRspID == NowPollingMeterBoard)
             {		
-								PwrMeterCmdList[NowPollingPowerMeter-1] = 0;
+								PwrMeterCmdList[RoomIndexReal][NowPollingPowerMeter-1] = 0;
 								PollSuccess_Handler(PL_METER_POLL5);
 								//	Poll next power meter, or stop polling
 								NowPollingPowerMeter++;
@@ -201,7 +205,7 @@ void MeterBoardPolling(void)
         case PL_METER_POLL6 :
             if (MeterRspID == NowPollingMeterBoard)
             {
-								BmsCmdList[NowPollingBms-1] = 0;
+								BmsCmdList[RoomIndexReal][NowPollingBms-1] = 0;
 								PollSuccess_Handler(PL_METER_POLL7);
 								//	Poll next Bms, or stop polling
 								NowPollingBms++;
@@ -238,7 +242,7 @@ void MeterBoardPolling(void)
         case PL_METER_POLL8 :
             if (MeterRspID == NowPollingMeterBoard)
             {
-								WtrMeterCmdList[NowPollingWM-1] = 0;
+								WtrMeterCmdList[RoomIndexReal][NowPollingWM-1] = 0;
 								PollSuccess_Handler(PL_METER_POLL9);
 								//	Poll next WM, or stop polling
 								NowPollingWM++;
@@ -276,7 +280,7 @@ void MeterBoardPolling(void)
         case PL_METER_POLL10 :
             if (MeterRspID == NowPollingMeterBoard)
             {
-								InvCmdList[NowPollingInv-1] = 0;
+								InvCmdList[RoomIndexReal][NowPollingInv-1] = 0;
 								PollSuccess_Handler(PL_METER_POLL11);
 								//	Poll next Bms, or stop polling
 								NowPollingInv++;
@@ -621,22 +625,47 @@ void Meter_AckProcess(void)
     u32tmp |= (uint32_t) TokenMeter[fnPacketIndex++] << 16 ;
     u32tmp |= (uint32_t) TokenMeter[fnPacketIndex++] << 8 ;
     u32tmp |= (uint32_t) TokenMeter[fnPacketIndex++] << 0 ;    
-    PowerMeterError = u32tmp;
+    DevicesNG.PowerMeterNG = u32tmp;
 	
 }
 
 void Meter_RSP_SysInformation(void)
 {    
-    uint8_t fnPacketIndex;
+    uint8_t fnPacketIndex, u8tmp;
     uint32_t u32tmp;
     
     fnPacketIndex  = 5 ;
+		
+		//	PowerMeter Error Status
     u32tmp = (uint32_t)  TokenMeter[fnPacketIndex++] << 24;
     u32tmp |= (uint32_t) TokenMeter[fnPacketIndex++] << 16;
     u32tmp |= (uint32_t) TokenMeter[fnPacketIndex++] << 8;
     u32tmp |= (uint32_t) TokenMeter[fnPacketIndex++] << 0;  
-    PowerMeterError = u32tmp;
+		DevicesNG.PowerMeterNG = u32tmp;
 	
+		//	BMS Error Status
+    u32tmp = (uint32_t)  TokenMeter[fnPacketIndex++] << 24;
+    u32tmp |= (uint32_t) TokenMeter[fnPacketIndex++] << 16;
+    u32tmp |= (uint32_t) TokenMeter[fnPacketIndex++] << 8;
+    u32tmp |= (uint32_t) TokenMeter[fnPacketIndex++] << 0;
+		DevicesNG.BmsDeviceNG = u32tmp;
+	
+		//	water meter Error Status
+    u32tmp = (uint32_t)  TokenMeter[fnPacketIndex++] << 24;
+    u32tmp |= (uint32_t) TokenMeter[fnPacketIndex++] << 16;
+    u32tmp |= (uint32_t) TokenMeter[fnPacketIndex++] << 8;
+    u32tmp |= (uint32_t) TokenMeter[fnPacketIndex++] << 0;
+		DevicesNG.WMDeviceNG = u32tmp;
+		
+		//	Inv Error Status
+    u8tmp = TokenMeter[fnPacketIndex++] ;  		
+		DevicesNG.InvDeviceNG = u8tmp;
+		
+		//	Device Total Error rate
+		TotErrorRate.PowerMeter = TokenMeter[fnPacketIndex++];
+		TotErrorRate.Bms				= TokenMeter[fnPacketIndex++];
+		TotErrorRate.WaterMeter = TokenMeter[fnPacketIndex++];
+		TotErrorRate.Inverter		= TokenMeter[fnPacketIndex++];
 }
 
 uint8_t DeviceArrayIdx;
@@ -741,7 +770,6 @@ void Meter_RSP_WMData(void)
 /***	Process Meter WM Data	***/
 void Meter_RSP_InvData(void)
 {
-	
 	  uint8_t fnPacketIndex;
     uint32_t u32temp;
     
@@ -797,34 +825,23 @@ void Meter_RSP_InvData(void)
 20-51: FWMetadata1 	(32 bytes)
 52-83: FWMetadata2 	(32 bytes)
 */
-//void Meter_RSP_FWInfo(void)
-//{
-//		memcpy(&MeterMetaStatus, &TokenMeter[4], sizeof(FWstatus));
-//    memcpy(&MeterMetaActive, &TokenMeter[20], sizeof(FWMetadata));
-//		memcpy(&MeterMetaBackup, &TokenMeter[52], sizeof(FWMetadata));
-//}
+void Meter_RSP_FWInfo(void)
+{
+		memcpy(&MeterMetaStatus, &TokenMeter[4], sizeof(FWstatus));
+    memcpy(&MeterMetaActive, &TokenMeter[20], sizeof(FWMetadata));
+		memcpy(&MeterMetaBackup, &TokenMeter[52], sizeof(FWMetadata));
+}
 
-/************************************
-0: 0x55
-1: Meter ID
-2: Command
-3: fgToMeterFlag
-4: fgMeterRSPFlag
-5: Member Index
-6: Room Mode
-7: Room Unit Price
-8: Add/Dec Balance Value(H)
-9: Add/Dec Balance Value(L)
-10: Open Room Door Double Check Value
-11~14: User UID (0) ~ (3)
-15: User Mode 
-16: Message Type
-17: Member Counter
-18~18+n: Member1~n Data Checksum
-41~47: System Time
-48: Checksum
-49: 0x0A (\n)
-*/
+/***
+*	@brief	Send meter device Polling Cmds and Host device Cmds 
+0 : 0x55
+1 : NowPollingMeterBoard
+2 : Meter Cmds
+3 : Polling device ID
+90 - 97: RTC
+98 : Checksum(1-97)
+99 : 0x0A
+ ***/
 void SendMeter_AliveToken(void)
 {
 	
@@ -837,8 +854,6 @@ void SendMeter_AliveToken(void)
     CalChecksumM();	
 }
 
-
-
 void SendMeter_GetPowerData(void)
 {
         
@@ -846,7 +861,7 @@ void SendMeter_GetPowerData(void)
     MeterTxBuffer[2] = METER_CMD_POWER_METER;
     MeterTxBuffer[3] = NowPollingPowerMeter ;
 		//	Host cmd Device 
-		MeterTxBuffer[4] = PwrMeterCmdList[NowPollingPowerMeter-1];
+		MeterTxBuffer[4] = PwrMeterCmdList[NowPollingMeterBoard][NowPollingPowerMeter-1];
  
 		SendMeterRTC();
 
@@ -858,7 +873,7 @@ void SendMeter_GetBmsData(void)
     MeterTxBuffer[1] = NowPollingMeterBoard;
     MeterTxBuffer[2] = METER_CMD_BMS;
     MeterTxBuffer[3] = NowPollingBms ;
-		MeterTxBuffer[4] = BmsCmdList[NowPollingBms-1];
+		MeterTxBuffer[4] = BmsCmdList[NowPollingMeterBoard][NowPollingBms-1];
 	  
 		SendMeterRTC();
 	
@@ -870,7 +885,7 @@ void SendMeter_GetWMData(void)
     MeterTxBuffer[1] = NowPollingMeterBoard;	
     MeterTxBuffer[2] = METER_CMD_WATER_METER;
     MeterTxBuffer[3] = NowPollingWM ;		
-		MeterTxBuffer[4] = WtrMeterCmdList[NowPollingWM-1];
+		MeterTxBuffer[4] = WtrMeterCmdList[NowPollingMeterBoard][NowPollingWM-1];
 
 		SendMeterRTC();
 	
@@ -884,7 +899,7 @@ void SendMeter_GetInvData(void)
     MeterTxBuffer[3] = NowPollingInv ;
 		
 		//	Maybe no need
-		MeterTxBuffer[4] = InvCmdList[NowPollingInv-1];
+		MeterTxBuffer[4] = InvCmdList[NowPollingMeterBoard][NowPollingInv-1];
 	
 		SendMeterRTC();
 	
@@ -1009,9 +1024,9 @@ void SendMeterBootloader_CmdUpdateAPROM (void)
  ***/
 void SendMeterRTC(void)
 {
-    for (uint8_t i=0;i<7;i++)
+    for (uint8_t i=0;i<8;i++)
     {		
-        MeterTxBuffer[INX_TIME_START_Y+i] = CtrSystemTime[i];
+        MeterTxBuffer[INX_TIME_START_YY_H+i] = CtrSystemTime[i];
     }
 }
 

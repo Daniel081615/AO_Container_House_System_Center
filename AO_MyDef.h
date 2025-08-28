@@ -27,6 +27,7 @@
 //#define METER_TEST
 
 #include "stdint.h"
+#include <stdlib.h>
 #include "ota_manager.h"
 
 //	Per Meter Board
@@ -211,17 +212,19 @@
 #define RM_ERROR				6
 
 // Time Index
-#define INX_YEAR	    0
-#define INX_MON		1
-#define INX_DAY		2
-#define INX_HOUR	    3
-#define INX_MIN		4
-#define INX_SEC		5
+#define INX_YEAR_H	    0
+#define INX_YEAR_L	    1
+#define INX_MON		2
+#define INX_DAY		3
+#define INX_HOUR	4
+#define INX_MIN		5
+#define INX_SEC		6
 
-#define HOST_INX_TIME_START 		(HOST_TOKEN_LENGTH-9)
+#define HOST_INX_TIME_START 		(HOST_TOKEN_LENGTH-10)
 #define HOST_INX_TIME_SEC				(HOST_TOKEN_LENGTH-4)
 
-#define INX_TIME_START_Y	    (METER_TOKEN_LENGTH-9)
+#define INX_TIME_START_YY_H	  (METER_TOKEN_LENGTH-10)
+#define INX_TIME_START_YY_L	  (METER_TOKEN_LENGTH-9)
 #define INX_TIME_START_M	    (METER_TOKEN_LENGTH-8)
 #define INX_TIME_START_D	    (METER_TOKEN_LENGTH-7)
 #define INX_TIME_START_H	    (METER_TOKEN_LENGTH-6)
@@ -353,6 +356,8 @@ CTR_GET_CMD_INV,					//0x14
 CTR_OTA_UPDATE_CTR,				//0x15
 CTR_OTA_UPDATE_MTR,				//0x16
 	
+CTR_SET_WTR_TIME,					//0x17
+	
 //	Meter OTA
 CMD_MTR_OTA_UPDATE 		  = 0x20,
 CMD_MTR_SWITCH_FWVER,
@@ -367,12 +372,13 @@ CTR_RSP_FW_INFO,				//0x34
 CTR_RSP_BMS_DATA,				//0x35
 CTR_RSP_WM_DATA,				//0x36
 CTR_RSP_INV_DATA,				//0x37
+CTR_RSP_WTR_TIME_SETUP,
 
 	//------Cenetr  OTA-------//
-//CMD_CTR_OTA_UPDATE=0x40,		
-//CMD_CTR_SWITCH_FWVER,
-//CMD_GET_CTR_FW_STATUS,
-//CMD_CTR_FW_REBOOT,
+CMD_CTR_OTA_UPDATE=0x40,		
+CMD_CTR_SWITCH_FWVER,
+CMD_GET_CTR_FW_STATUS,
+CMD_CTR_FW_REBOOT,
 
 };
 
@@ -412,32 +418,11 @@ PL_INV_STATE,
 PL_METER_BOARD_OTA_STATE,
 };
 
-typedef struct strUserInfo {
-	uint8_t mode;				//  0x01 :  計費中
-	uint8_t SID[4];				//學號
-	uint8_t UID[4];				// 卡號	
-	float  Balance;				//餘額			
-} STR_UserInfo;
-
-typedef struct STR_CTR_RECORD {
-    uint8_t Status;                 // bit 7 :  0-Door(In) / 1-Power(Out) + bit 0~4 Meter ID 
-    uint8_t UID[4];
-    uint8_t DateTime[6];    
-} STR_CENTER_RECORD ;
-
-
-typedef struct STR_TAG_RECORD {		
-	uint8_t TimeTag[6];
-	uint8_t NumInCHG;	
-} STR_TAG_CHG ;
-
-
-typedef struct strRoomInfo {
-    uint8_t RoomStatus;    	    
-    uint8_t RoomMode;				// 目前計費模式(免費/停用/計費關電/計費開電)
-    uint8_t ErrorRate;			
-    
-} STR_RoomInfo;
+typedef struct Watering_Setup{
+	uint8_t Hour;
+	uint8_t Min;
+	uint8_t Period_min;
+} Watering_Setup_t ;
 
 typedef struct  {    
 		uint8_t ErrorRate;
@@ -449,7 +434,6 @@ typedef struct  {
 typedef struct STR_BMS_DATA{
 	
 		uint8_t	 ErrorRate;
-		uint32_t BmsDeviceNG;
 		uint32_t CellStatus;
 		uint16_t CellVolt[16];
 		
@@ -471,14 +455,12 @@ typedef struct STR_BMS_DATA{
 
 typedef struct STR_WM_DATA{
 		uint8_t ErrorRate;
-		uint32_t WMDeviceNG;
 		uint8_t ValveState;		
 		uint32_t TotalVolume;
 } WMData_t;
 
 typedef struct STR_INV_DATA{
 	uint8_t ErrorRate;
-	uint32_t InvDeviceNG;
 	_Bool ChargingFlag;	// 0: not charging, 1: charging
 	_Bool FaultFlag;		// 0: no,	1: yes
 	_Bool WarnFlag;			// 0: No, 1: Yes
@@ -525,7 +507,8 @@ typedef struct STR_BAT_DATA{
 
 typedef struct RealTimeClock_Data{
 	// Year,Month,Day,Hour,Min,Sec,Week
-	uint8_t year;
+	uint8_t yy_h;
+	uint8_t yy_l;
 	uint8_t month;
 	uint8_t day;
 	uint8_t hour;
@@ -534,6 +517,23 @@ typedef struct RealTimeClock_Data{
 	uint8_t week;
 } RTC_Data_t;
 
+typedef struct TotDeviceErrorRate
+{
+	uint8_t PowerMeter;	
+	uint8_t Bms;
+	uint8_t WaterMeter;
+	uint8_t Inverter;
+	
+}TotErrorRate_t;
+
+typedef struct DeviceStatus
+{
+	uint32_t PowerMeterNG;
+	uint32_t BmsDeviceNG;
+	uint32_t WMDeviceNG;	
+	uint8_t  InvDeviceNG;
+	
+}DeviceStatus_t;
 
 #define SHOW_WAIT_DELAY		0x00
 #define SHOW_USER_INFO			0x01

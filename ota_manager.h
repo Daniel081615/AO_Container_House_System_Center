@@ -86,24 +86,6 @@ extern FWstatus MeterMetaStatus;
 extern FWMetadata MeterMetaActive;
 extern FWMetadata MeterMetaBackup;
 
-/***********************************************/
-/******		OTA Host Functions and defines	******/
-/***********************************************/
 
-/* Center OTA Cmds */
-enum CenterTokenOTA{
-	CMD_CTR_OTA_UPDATE=0x40,			//Jump to Bootloader Cmd
-	CMD_CTR_SWITCH_FWVER,
-	CMD_GET_CTR_FW_STATUS,
-	CMD_CTR_FW_REBOOT,
-};
 
-/*OTA Center Functions*/
-void SendHost_CenterFWinfo(void);
-void SendHost_MeterFWInfo(void);
-void SendHost_CenterUpdateSuccsess(void);
-
-/*OTA Meter Functions*/
-void CTR_UPDATE_MTR_Process(void);
-void Meter_RSP_FWInfo(void);
 #endif

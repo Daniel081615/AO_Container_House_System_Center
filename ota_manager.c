@@ -31,8 +31,8 @@ void VerifyFW(bool ResetStatus)
 		if (ResetStatus){
         bool bfwcheckresult = boolFwcheck();
         MarkFwAsActive(bfwcheckresult);
-//        if (!bfwcheckresult)
-//					JumpToBootloader();
+        if (!bfwcheckresult)
+					JumpToBootloader();
     }
 }
 
@@ -172,87 +172,4 @@ uint32_t CRC32_Calc(const uint8_t *pData, uint32_t len) {
 
     crc_result = CRC_GetChecksum();
     return crc_result;
-}
-
-/***************************************************************/
-/****************				OTA Host Functions 			****************/
-/***************************************************************/
-
-/* Send Center FW info to Host 
-0:0x55
-1: MyCenterID
-2: Command
-4-19 : FWststatus 	(16 bytes)
-20-51: FWMetadata1 	(32 bytes)
-52-83: FWMetadata2 	(32 bytes)
-*/
-void SendHost_CenterFWinfo(void)
-{
-		uint8_t i;
-		HostTxBuffer[2] = CMD_CTR_OTA_UPDATE;
-
-		memcpy(&HostTxBuffer[4], &g_fw_ctx, sizeof(FWstatus));
-    memcpy(&HostTxBuffer[20], &meta, sizeof(FWMetadata));
-		memcpy(&HostTxBuffer[52], &other, sizeof(FWMetadata));
-
-		CalChecksumH();
-}
-
-
-
-/* Send meter fw info to host 
-	0:0x55
-	1: MyCenterID
-	2: Command
-	4-19 : FWststatus 	(16 bytes)
-	20-51: FWMetadata1 	(32 bytes)
-	52-83: FWMetadata2 	(32 bytes)
-*/
-void SendHost_MeterFWInfo(void){
-	
-		uint8_t i;
-		HostTxBuffer[2] = CMD_MTR_OTA_UPDATE;
-
-		memcpy(&HostTxBuffer[4], &MeterMetaStatus, sizeof(FWstatus));
-    memcpy(&HostTxBuffer[20], &MeterMetaActive, sizeof(FWMetadata));
-		memcpy(&HostTxBuffer[52], &MeterMetaBackup, sizeof(FWMetadata));
-	
-		CalChecksumH();
-	
-}
-
-/* When Center update success, send host Update Success Password 
-0:0x55
-1: MyCenterID
-4: 0xEE
-5: 0xFF
-6: 0x5A
-7: 0xA5
-*/
-void SendHost_CenterUpdateSuccsess(void)
-{
-		HostTxBuffer[1] = MyCenterID;
-		HostTxBuffer[4] = 0xEE;		HostTxBuffer[5] = 0xFF;
-		HostTxBuffer[6] = 0x5A;		HostTxBuffer[7] = 0xA5;
-		
-		memcpy(&HostTxBuffer[8], &meta, sizeof(FWstatus));
-		CalChecksumH();
-}
-
-/***************************************************************/
-/****************				OTA Meter Functions 			**************/
-/***************************************************************/
-
-
-/* Get FW info From Meter
-
-4-19 : FWststatus 	(16 bytes)
-20-51: FWMetadata1 	(32 bytes)
-52-83: FWMetadata2 	(32 bytes)
-*/
-void Meter_RSP_FWInfo(void)
-{
-		memcpy(&MeterMetaStatus, &TokenMeter[4], sizeof(FWstatus));
-    memcpy(&MeterMetaActive, &TokenMeter[20], sizeof(FWMetadata));
-		memcpy(&MeterMetaBackup, &TokenMeter[52], sizeof(FWMetadata));
 }
