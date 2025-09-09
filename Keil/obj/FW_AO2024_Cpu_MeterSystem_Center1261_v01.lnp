@@ -16,7 +16,7 @@
 ".\obj\wdt.o"
 ".\obj\uart.o"
 ".\obj\retarget.o"
---library_type=microlib --scatter ".\obj\FW_AO2024_Cpu_MeterSystem_Center1261_v01.sct"
+--library_type=microlib --strict --scatter ".\obj\FW_AO2024_Cpu_MeterSystem_Center1261_v01.sct"
 --map --first='startup_NUC1261.o(RESET)' --datacompressor=off --info=inline --entry Reset_Handler --summary_stderr --info summarysizes --map --load_addr_map_info --xref --callgraph --symbols
 --info sizes --info totals --info unused --info veneers
 --list ".\lst\FW_AO2024_Cpu_MeterSystem_Center1261_v01.map" -o .\obj\FW_AO2024_Cpu_MeterSystem_Center1261_v01.axf

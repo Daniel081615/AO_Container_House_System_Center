@@ -53,16 +53,14 @@ extern void SendMeter_SystemSW(void);
 extern void CalChecksumM(void);
 
 extern uint8_t fgTestInitOK;
-extern volatile MeterData_t MeterData[PwrMeterMax];
 
 extern uint8_t MyCenterID;
 
 /***	Time func & variable	***/
-extern uint8_t CtrSystemTime[8], HostSystemTime[8];
+extern uint8_t CtrSystemTime[8], HostSystemTime[8], WateringTime[4];
 extern void GetHostRTC(void);
 
 extern uint8_t fgHostFlag;
-extern uint8_t u8tick1S_GPIO_Restart;
 extern uint8_t PackageIndex1;
 extern uint8_t MeterRCDBuffer[44];
 extern uint8_t UserUID[4];
@@ -95,7 +93,7 @@ extern uint8_t HOSTTxQ_wp,HOSTTxQ_rp,HOSTTxQ_cnt;
 extern uint8_t METERTxQ_wp,METERTxQ_rp,METERTxQ_cnt;
 extern uint8_t METERRxQ_wp,METERRxQ_rp,METERRxQ_cnt;
 
-extern uint8_t NowPollingPowerMeter,NowPollingBms, NowPollingWM, NowPollingInv;
+extern uint8_t NowPollingPwrMtrID,NowPollingBmsID, NowPollingWtrMtrID, NowPollingPyrMtrID, NowPollingSoilSensorID, NowPollingAirSensorID, NowPollingInvID;
 extern uint8_t RoomMax;
 extern uint8_t HostTokenReady,MeterTokenReady;
 extern uint8_t TickHost,TickMeter;
@@ -107,7 +105,6 @@ extern uint8_t HostPackageIndex;
 extern uint8_t AutoLockTime;			// �۰ʤW�굥�ݮɶ�
 extern uint8_t iStatus;
 extern uint8_t CheckUserResult;
-extern uint8_t MeterDataUpdated;
 
 extern uint8_t MemberIndex;
 extern uint8_t CenterID;
@@ -115,11 +112,11 @@ extern uint8_t TickPollWating;
 extern uint32_t ReaderDeviceError;
 
 extern uint8_t TickHostUart, TickMeterUart;
-extern uint8_t NowPollingMeterBoard;
+extern uint8_t NowPollingMtrBoard;
 extern uint8_t MeterMode,MeterUser,AlivePacketIndex;
 extern uint16_t MeterBalance;
 extern uint8_t NodeTestAck;
-extern const uint8_t DefinePwrMeterMax[3];
+extern const uint8_t DefinePwrMtrMax[3];
 
 extern uint8_t MeterBoardError;
 extern uint8_t PollingCounter,HostRoomIndex,MeterRspID, HostDeviceIndex;
@@ -131,11 +128,11 @@ extern uint32_t MeterButtonStatus,MeterRelayStatus,MeterDeviceError;
 //	Host Cmds devices List
 extern _Bool flagMeterOTAUpdate;
 extern uint8_t MeterOtaCmdList[MtrBoardMax];
-extern uint8_t PwrMeterCmdList[MtrBoardMax][PwrMeterMax];
+extern uint8_t PwrMtrCmdList[MtrBoardMax][PwrMtrMax];
 extern uint8_t BmsCmdList[MtrBoardMax][BmsMax];
-extern uint8_t WtrMeterCmdList[MtrBoardMax][WtrMeterMax];
-extern uint8_t InvCmdList[MtrBoardMax][InvMax];
-
+extern uint8_t WtrMtrCmdList[MtrBoardMax][WtrMtrMax];
+extern uint8_t PyrMtrCmdList[MtrBoardMax][PyrMtrMax];
+extern uint8_t SoilSensorCmdList[MtrBoardMax][SoilSensorMax];
 
 extern _Bool bResetUARTQ;
 
@@ -158,21 +155,23 @@ extern volatile uint8_t MeterOtaFlag;
 
 extern uint8_t _SendStringToMETER(uint8_t *Str, uint8_t len);
 
-
 /***	Devices Data structures	***/
 extern RTC_Data_t RTC_Data;
-extern TotErrorRate_t TotErrorRate;
-extern DeviceStatus_t DevicesNG;
-extern Watering_Setup_t Watering_SetUp;
+extern _Bool WATERING_SETTING_FLAG;
 
 /* Host OTA meter Cmd */
 extern uint8_t OTAMeterID;
 extern void CalChecksumH(void);
 
-extern BmsData_t 	BmsData[BmsDeviceMax];
-extern WMData_t		WMData[WMDeviceMax];
-extern InvData_t 	InvData[InvDeviceMax];
-extern CtrlData_t 	CtrlData[InvDeviceMax];
-extern BatData_t		BatData[InvDeviceMax];
+extern volatile	MeterData_t 			MeterData[MtrBoardMax][PwrMtrMax];
+extern volatile	BmsData_t 				BmsData[MtrBoardMax][BmsMax];
+extern volatile WtrMtrData_t			WtrMtrData[MtrBoardMax][WtrMtrMax];
+extern volatile PyrMtrData_t			PyrMtrData[MtrBoardMax][PyrMtrMax];
+extern volatile AirSensorData_t 	AirSensorData[MtrBoardMax][AirSensorMax];
+extern volatile SoilSensorData_t 	SoilSensorData[MtrBoardMax][SoilSensorMax];
+extern volatile InvData_t 				InvData[MtrBoardMax];
+extern volatile	TotErrorRate_t 		TotErrorRate[MtrBoardMax];
+extern volatile DeviceStatus_t 		DevicesNG[MtrBoardMax];
+extern volatile Watering_Setup_t 	Watering_SetUp[MtrBoardMax];
 
 #endif  //_AO_EXTERN_FUNC_H_

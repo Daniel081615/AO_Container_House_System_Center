@@ -32,11 +32,13 @@
 
 //	Per Meter Board
 #define MtrBoardMax 1
-#define PwrMeterMax 1
+#define PwrMtrMax 1
 #define BmsMax			1
-#define WtrMeterMax 1
+#define WtrMtrMax 1
 #define InvMax			1
-
+#define	PyrMtrMax 1
+#define	SoilSensorMax 1
+#define	AirSensorMax 1
 
 
 #define MAX_WDT_TRIES				4
@@ -219,6 +221,7 @@
 #define INX_HOUR	4
 #define INX_MIN		5
 #define INX_SEC		6
+#define INX_WEEK	7
 
 #define HOST_INX_TIME_START 		(HOST_TOKEN_LENGTH-10)
 #define HOST_INX_TIME_SEC				(HOST_TOKEN_LENGTH-4)
@@ -329,7 +332,11 @@ METER_CMD_ALIVE=0x10,			//	0x10
 METER_CMD_POWER_METER,		//	0x11
 METER_CMD_BMS,						// 	0x12
 METER_CMD_WATER_METER,		//	0x13
-METER_CMD_INV,						//	0x14
+METER_CMD_PYRANOMETER,	//0x14
+METER_CMD_SOIL_SENSOR,	
+METER_CMD_AIR_SENSOR,	
+METER_CMD_INV,
+METER_GET_CMD_WATERING,
 
 METER_RSP_OTA_UPDATE = 0x20,
 METER_RSP_ACK=0x30,				//0x30
@@ -337,8 +344,12 @@ METER_RSP_SYS_INFO,				//0x31
 METER_RSP_USER_DATA,		//0x32
 METER_RSP_POWER_DATA,			//0x33
 METER_RSP_BMS_DATA,
-METER_RSP_WM_DATA,
+METER_RSP_WATER_DATA,
+METER_RSP_PYR_DATA,			//0x36
+METER_RSP_SOIL_DATA,				//0x37
+METER_RSP_AIR_DATA,			//0x38
 METER_RSP_INV_DATA,	
+METER_RSP_WATERING_STATUS,
 // go to  // 
 
 
@@ -352,11 +363,12 @@ CTR_GET_CMD_POWER_METER,	//0x11
 CTR_GET_CMD_BMS,					//0x12
 CTR_GET_CMD_WATER_METER,	//0x13
 CTR_GET_CMD_INV,					//0x14
-
-CTR_OTA_UPDATE_CTR,				//0x15
-CTR_OTA_UPDATE_MTR,				//0x16
-	
-CTR_SET_WTR_TIME,					//0x17
+CTR_GET_CMD_PYRANOMETER,		//0x15
+CTR_GET_CMD_SOIL_SENSOR,	//0x16
+CTR_GET_CMD_AIR_SENSOR,			//0x17
+CTR_OTA_UPDATE_CTR,				//0x18
+CTR_OTA_UPDATE_MTR,					//0x19
+CTR_SET_WTR_TIME,					//0x1A
 	
 //	Meter OTA
 CMD_MTR_OTA_UPDATE 		  = 0x20,
@@ -372,7 +384,10 @@ CTR_RSP_FW_INFO,				//0x34
 CTR_RSP_BMS_DATA,				//0x35
 CTR_RSP_WM_DATA,				//0x36
 CTR_RSP_INV_DATA,				//0x37
-CTR_RSP_WTR_TIME_SETUP,
+CTR_RSP_PYR_DATA,				//0x38
+CTR_RSP_SOIL_DATA,				//0x39
+CTR_RSP_AIR_DATA,				//0x3A
+CTR_RSP_WTR_TIME_SETUP,	//0x3B
 
 	//------Cenetr  OTA-------//
 CMD_CTR_OTA_UPDATE=0x40,		
@@ -384,8 +399,8 @@ CMD_CTR_FW_REBOOT,
 
 enum DEFINE_READER_SATE {
 PL_METER_NORM,
-PL_METER_POLL1,
-PL_METER_POLL2,
+PL_MtrBoard_SYSETM,
+PL_MtrBoard_SYSETM_RSP,
 PL_METER_POLL3,
 PL_METER_POLL4,
 PL_METER_POLL5,
@@ -396,6 +411,15 @@ PL_METER_POLL9,
 PL_METER_POLL10,
 PL_METER_POLL11,
 PL_METER_POLL12,
+PL_METER_POLL13,
+PL_METER_POLL14,
+PL_METER_POLL15,
+PL_METER_POLL16,
+PL_METER_POLL17,
+PL_METER_POLL18,
+	
+PL_METER_WATERING,
+PL_METER_WATERING_RSP,
 	
 //	CTR update MTR Cmds
 PL_MTR_CMD_CONNECT,
@@ -419,15 +443,19 @@ PL_METER_BOARD_OTA_STATE,
 };
 
 typedef struct Watering_Setup{
-	uint8_t Hour;
-	uint8_t Min;
 	uint8_t Period_min;
 } Watering_Setup_t ;
 
 typedef struct  {    
-		uint8_t ErrorRate;
-		uint8_t RelayStatus;
-		uint32_t TotalWatt;
+	uint8_t ErrorRate;
+	uint8_t RelayStatus;
+	uint32_t TotalWatt;
+	uint32_t V;
+	uint32_t I;
+	uint32_t F;
+	uint32_t P;
+	uint32_t VA;
+	uint32_t PwrFactor;
 } MeterData_t;
 
 /***	Bms, WM, INV Data		***/
@@ -457,53 +485,93 @@ typedef struct STR_WM_DATA{
 		uint8_t ErrorRate;
 		uint8_t ValveState;		
 		uint32_t TotalVolume;
-} WMData_t;
+} WtrMtrData_t;
+
+typedef struct STR_Pyranometer_DATA{
+		uint8_t ErrorRate;
+		uint16_t SolarRadiation;
+		uint16_t OffsetValue;
+} PyrMtrData_t;
+
+typedef struct STR_SoilSensor_DATA{
+		uint8_t ErrorRate;
+		uint16_t Moisture;
+    uint16_t Temperature;
+    uint16_t EC;
+    uint16_t PH;
+    uint16_t Nitrogen;
+    uint16_t Phosphorus;
+    uint16_t Potassium;
+    uint16_t Salinity;
+    uint16_t TDS;
+    uint16_t Fertility;
+
+    uint16_t EC_Coef;
+    uint16_t Salinity_Coef;
+    uint16_t TDS_Coef;
+
+    uint16_t Temp_Calib;
+    uint16_t Moisture_Calib;
+    uint16_t EC_Calib;
+    uint16_t PH_Calib;
+
+    uint32_t Fert_Coef;
+    int16_t Fert_Deviation;
+
+    uint32_t Nitrogen_Coef;
+    int16_t Nitrogen_Deviation;
+
+    uint32_t Phosphorus_Coef;
+    int16_t Phosphorus_Deviation;
+
+    uint32_t Potassium_Coef;
+    int16_t Potassium_Deviation;
+
+} SoilSensorData_t;
+
+typedef struct STR_AirSensor_DATA{
+		uint8_t ErrorRate;
+    uint16_t Co2;          
+    uint16_t Formaldehyde; 
+    uint16_t Tvoc;         
+    uint16_t Pm25;         
+    uint16_t Pm10;         
+    uint16_t Temperature;  
+    uint16_t Humidity;
+
+} AirSensorData_t;
 
 typedef struct STR_INV_DATA{
 	uint8_t ErrorRate;
-	_Bool ChargingFlag;	// 0: not charging, 1: charging
-	_Bool FaultFlag;		// 0: no,	1: yes
-	_Bool WarnFlag;			// 0: No, 1: Yes
+	
+	uint8_t statusByte1;
+	uint8_t statusByte3;
+	uint8_t warnByte1;
+	uint8_t warnByte2;
+	uint8_t faultByte1;
+	uint8_t faultByte2;
+	uint8_t faultByte3;
+
+	uint16_t InputVolt;
+	uint16_t InputFreq;
+	uint16_t OutputVolt;
+	uint16_t OutputFreq;
+	
+	uint16_t BatVolt;
+	uint8_t BatCapacity;
+	uint8_t InvCurrent;
+	uint8_t LoadPercentage;
+	uint8_t MachineTemp;
+	uint8_t MachineStatusCode;
+	uint8_t SysStatus;
+	
+	uint16_t PV_volt;
+	uint8_t CtrlCurrent;
+	uint8_t CtrlTemp;
+	uint8_t CtrlStatusCode;
 } InvData_t;
 
-typedef struct STR_CTRL_DATA{
-	
-	_Bool ConnectFlag;	// 0:	disconnect, 	1: connected
-	_Bool ChargingFlag;	// 0: not charging, 1: charging
-	_Bool FaultFlag;		// 0: no,	1: yes
-	_Bool WarnFlag;	// 0: No, 1: Yes
-} CtrlData_t;
 
-typedef struct STR_BAT_DATA{
-	_Bool Full;		// 0: not full,		1: full
-	
-	_Bool LoadWarnFlag;
-	_Bool TempWarnFlag;
-	_Bool LoadTimeoutWarnFlag;
-	_Bool LoadOverWarnFlag;
-	_Bool BatHighVoltWarnFlag;
-	_Bool BatLowVoltWarnFlag;
-	_Bool StoreDataErrWarnFlag;
-	_Bool StoreOpFailWarnFlag;
-	
-	_Bool InvFuncErrWarnFlag;
-	_Bool PlanShutdownWarnFlag;
-	_Bool OutputWarnFlag;
-	
-	_Bool InvErrFaultFlag;
-	_Bool TempOverFaultFlag;
-	_Bool TempSensorFaultFlag;
-	_Bool LoadTimeoutFaultFlag;
-	_Bool LoadErrFaultFlag;
-	_Bool LoadOverFaultFlag;
-	_Bool BatHighVoltFaultFlag;
-	_Bool BatLowVoltFaultFlag;
-	_Bool PlanShutdownFaultFlag;
-	_Bool OutputErrFaultFlag;
-	_Bool ChipStartFailFaultFlag;
-	_Bool CurrentSensorFaultFlag;
-
-} BatData_t;
 
 typedef struct RealTimeClock_Data{
 	// Year,Month,Day,Hour,Min,Sec,Week
@@ -522,6 +590,9 @@ typedef struct TotDeviceErrorRate
 	uint8_t PowerMeter;	
 	uint8_t Bms;
 	uint8_t WaterMeter;
+	uint8_t Pyranometer;
+	uint8_t SoilSensor;
+	uint8_t AirSensor;
 	uint8_t Inverter;
 	
 }TotErrorRate_t;
@@ -529,27 +600,14 @@ typedef struct TotDeviceErrorRate
 typedef struct DeviceStatus
 {
 	uint32_t PowerMeterNG;
-	uint32_t BmsDeviceNG;
-	uint32_t WMDeviceNG;	
-	uint8_t  InvDeviceNG;
+	uint32_t BmsNG;
+	uint32_t WaterMeterNG;	
+	uint32_t PyranometerNG;
+	uint32_t SoilSensorNG;
+	uint32_t AirSensorNG;
+	uint8_t  InvNG;
 	
 }DeviceStatus_t;
-
-#define SHOW_WAIT_DELAY		0x00
-#define SHOW_USER_INFO			0x01
-#define SHOW_TIME				0x02
-#define SHOW_SYSTEM_OFF		0x03
-#define SHOW_VERSION			0x04
-#define SHOW_LOW_VALUE			0x05
-#define SHOW_LOGO				0x06
-#define SHOW_INVALID			0x07
-#define SHOW_SETTING			0x08
-#define SHOW_FAILURE			0x09
-#define SHOW_SYSTEM_FREE		0x0A
-
-#define BmsDeviceMax 0x01
-#define WMDeviceMax  0x01
-#define InvDeviceMax 0x01
 
 #endif 
 

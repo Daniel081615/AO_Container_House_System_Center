@@ -67,11 +67,12 @@ volatile uint32_t   u32TimeTick2;
 volatile uint8_t Tick_10mSec;
 uint16_t     SystemTick;
 
-volatile MeterData_t MeterData[PwrMeterMax];
+
 uint8_t ErrorRate[ROOM_MAX];
 
 uint8_t CtrSystemTime[8]={0,0,0,0,0,0,0,0};		// Year,Month,Day,Hour,Min,Sec,Week
 uint8_t HostSystemTime[8] = {0,0,0,0,0,0,0,0};
+uint8_t WateringTime[4] = {0,0,0,0};
 uint8_t HostTxBuffer[HOST_TOKEN_LENGTH];
 uint8_t MeterTxBuffer[METER_TOKEN_LENGTH];
 uint8_t TokenHost[HOST_TOKEN_LENGTH];
@@ -120,8 +121,8 @@ uint16_t  TickTestDelayTime;
 
 uint8_t MeterRspID, HostDeviceIndex;
 
-uint8_t NowPollingMeterBoard;
-uint8_t NowPollingPowerMeter, NowPollingBms, NowPollingWM, NowPollingInv;
+uint8_t NowPollingMtrBoard;
+uint8_t NowPollingPwrMtrID, NowPollingBmsID, NowPollingWtrMtrID, NowPollingPyrMtrID, NowPollingSoilSensorID, NowPollingAirSensorID, NowPollingInvID;
 
 uint8_t TickPollingInterval_Meter;
 uint8_t PollRetryCounter_Meter;
@@ -147,22 +148,19 @@ uint8_t Tick20mS_ReaderReset;
 uint8_t tick_CalBalance;
 uint32_t MeterValueTest;
 
-
 //Host to meter devices & Ota Cmd List
 uint8_t MeterOtaCmdList[MtrBoardMax];
-uint8_t PwrMeterCmdList[MtrBoardMax][PwrMeterMax];
+uint8_t PwrMtrCmdList[MtrBoardMax][PwrMtrMax];
 uint8_t BmsCmdList[MtrBoardMax][BmsMax];
-uint8_t WtrMeterCmdList[MtrBoardMax][WtrMeterMax];
-uint8_t InvCmdList[MtrBoardMax][InvMax];
+uint8_t WtrMtrCmdList[MtrBoardMax][WtrMtrMax];
 
+uint8_t PyrMtrCmdList[MtrBoardMax][PyrMtrMax];
+uint8_t SoilSensorCmdList[MtrBoardMax][SoilSensorMax];
 /*---------------------------------------------------------------------------------------------------------*/
 /* Global variables                                                                                        */
 /*---------------------------------------------------------------------------------------------------------*/
 uint16_t SystemTick;
 RTC_Data_t RTC_Data;
-TotErrorRate_t TotErrorRate;
-DeviceStatus_t DevicesNG;
-Watering_Setup_t Watering_SetUp;
 /*---------------------------------------------------------------------------------------------------------*/
 /* Global variables                                                                                        */
 /*---------------------------------------------------------------------------------------------------------*/
@@ -191,6 +189,7 @@ uint8_t RoomNumberMax;
 uint8_t MyCenterID;
 uint8_t NowPollingRoom;
 uint8_t Tick1S_CheckMeterBoards;
+_Bool WATERING_SETTING_FLAG;
 
 /*
 
@@ -257,7 +256,7 @@ uint8_t TickHost, TickMeter;
 uint16_t  TickTestDelayTime;
 uint8_t MeterRspID;
 
-uint8_t NowPollingMeterBoard;
+uint8_t NowPollingMtrBoard;
 uint8_t TickPollingInterval_Meter;
 uint8_t PollRetryCounter_Meter;
 uint8_t HostRoomIndex;
@@ -273,14 +272,12 @@ _Bool fgInitOK;
 _Bool fgReaderReset ;
 uint8_t Tick20mS_ReaderReset;
 
-uint8_t LED_Tick_10mSec;
 uint8_t centerResetStatus = 0;
 uint16_t TickDirHostRS485Delay;
 _Bool		fgDirHostRS485Out2In;		
 uint16_t TickDirDebugRS485Delay;
 _Bool		fgDirDebugRS485Out2In;		
-uint8_t  ErrorCode,HostMissLink;
-uint8_t Tick1S_CalBalance;
+uint8_t  ErrorCode;
 
 
 
@@ -302,14 +299,8 @@ void ReadMyCenterID(void);
 
 void RecoverSystemMoniter(void);
 void ChangeDirHostRS485(void);
-void WaTeRingDeTecT(void);
-void RaedFlashRTC(void);
+void ScheduleWateringTask(void);
 
-uint8_t MT_Tick_1Sec;
-uint8_t LED_Tick_10mSec;
-uint8_t LED_Trigger_Timer_1s;
-uint8_t LED_High_Low_Count;
-uint8_t u8tick1S_GPIO_Restart;
 
 uint8_t OTAMeterID;
 
@@ -977,10 +968,8 @@ int main()
     MeterMemberIndex = 0 ;
     u32TimeTick2=0;   	
     MeterPollingState = PL_METER_NORM ;		
-    NowPollingMeterBoard = 1 ;	    
+    NowPollingMtrBoard = 1 ;	    
     fgTestInitOK = 0 ;	
-		
-		RaedFlashRTC();
 
     do
     {
@@ -992,7 +981,6 @@ int main()
         SystemTick = 0 ;
         MeterBoardPolling();		               					
         RecoverSystemMoniter();
-				WaTeRingDeTecT();
     }
     while(1);
 }
@@ -1051,62 +1039,49 @@ void ResetMeterUART(void)
 	METERTxQ_cnt = 0 ;
 }
 
-/***	
- *	@brief	According to RTC setting, schedule watering task
- *	@REMINDER		Need to add Host watering sheduled time process
- ***/
-//	Maybe add set watering time
-void 	WaTeRingDeTecT(void)
-{
-		uint8_t *p_rtc_data = (uint8_t*) &RTC_Data;
-		for (uint8_t i = 0; i < 8; i++){
-		
-				*(p_rtc_data + i) =  CtrSystemTime[i];
-		}
-		
-		//	Watering according to time period
-		//	Set Watering Period 12:00-12:05
-		if (RTC_Data.hour == Watering_SetUp.Hour)
-		{
-				if ((RTC_Data.min >= Watering_SetUp.Min) && 
-						(RTC_Data.min <= (Watering_SetUp.Min + Watering_SetUp.Period_min)))
-				{
-						//	SendMeter_WateringCmd();
-						LED_G1_On();
-				} else{
-						LED_G1_Off();
-				}
-		} 
-		
-		//	Ask for RTC, in a period of time
-//		uint16_t u16tempH, u16tempC, TimeGap;
-//		
-//		u16tempH = (HostSystemTime[3] * 60) + HostSystemTime[4];
-//		u16tempC = (CtrSystemTime[3] * 60)  + CtrSystemTime[4];
-//		
-//		TimeGap = abs(u16tempH - u16tempC);
-//		if (TimeGap > 0x05)
-//		{
-//				
-//		}
 
-}
-
-/***	
- *	@brief	Read flash RTC, Use when MCU initializing
- *	@note		Need to open data flash
+/***
+ * @brief Read RTC & Watering setup from Flash memory, and do watering task according to the setting
+ * @note 	Make sure flash memory read/write enable 
  ***/
-void RaedFlashRTC(void)
-{
-		SYS_UnlockReg();
-		FMC_Open();
-		uint32_t RTC_Base, Data[2];
-	
-		RTC_Base = FW_Status_Base + sizeof(FWstatus);
-		ReadData(RTC_Base, RTC_Base + sizeof(RTC_Data), (uint32_t*)&Data);
-		memcpy(CtrSystemTime, Data, sizeof(RTC_Data));
-		
-		SYS_LockReg();
-}
+//void ScheduleWateringTask(void)
+//{
+//    SYS_UnlockReg();
+//    FMC_Open();
+
+//    uint32_t rtc_base, watering_base, data[2];
+//		
+//		//	Read RTC from flash
+//    rtc_base = FW_Status_Base + sizeof(FWstatus);
+//    ReadData(rtc_base, rtc_base + sizeof(RTC_Data), (uint32_t*)&data);
+//    memcpy(CtrSystemTime, data, sizeof(RTC_Data));
+//	
+//		//	Read Watering setup from flash
+//    watering_base = FW_Status_Base + sizeof(FWstatus) + sizeof(CtrSystemTime);
+//    ReadData(watering_base, watering_base + sizeof(Watering_SetUp), (uint32_t*)&data);
+//    memcpy(&Watering_SetUp, data, sizeof(Watering_SetUp));
+//	
+//    memcpy(&RTC_Data, CtrSystemTime, sizeof(RTC_Data));
+//    
+//    if (RTC_Data.hour == Watering_SetUp.Hour)
+//    {
+//        if ((RTC_Data.min >= Watering_SetUp.Min) &&
+//            (RTC_Data.min <= (Watering_SetUp.Min + Watering_SetUp.Period_min)))
+//        {
+//            WATERING_SETTING_FLAG = WATERING_PWD;
+//        }
+//        else
+//        {
+//            WATERING_SETTING_FLAG = 0x00000000;
+//        }
+//    }
+//    else
+//    {
+//        LED_G1_Off();
+//    }
+//    
+//    FMC_Close();
+//    SYS_LockReg();
+//}
 
 /*** (C) COPYRIGHT 2016 Nuvoton Technology Corp. ***/
