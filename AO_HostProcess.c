@@ -55,6 +55,7 @@ void SendHost_CenterFWinfo(void);
 void SendHost_MeterFWInfo(void);
 void SendHost_CenterUpdateSuccsess(void);
 void SendHost_MeterUpdateSuccsess(void);
+void SendHost_WateringData(void);
 
 //	Read / Store MeterCmdList
 void ReadMeterOtaCmdList();
@@ -160,15 +161,16 @@ void HostProcess(void)
                         CmdType = CTR_RSP_AIR_DATA ;
                         ClearRespDelayTimer() ;												
 												break;								
-                    case CTR_OTA_UPDATE_CTR:							// 0x18
+                    case CTR_OTA_CMD:							// 0x18
                         Host_OTACenterProcess();
                         ClearRespDelayTimer();
                         break;
-										case CTR_OTA_UPDATE_MTR:							// 0x19
+										case CTR_2_METER_OTA_CMD:							// 0x19
 												Host_OTAMeterProcess();
 												break;
 										case CTR_SET_WTR_TIME:								//0x1A
 												Host_WateringSetupProcess();
+												CmdType = CTR_RSP_WTR_TIME_SETUP;
 												ClearRespDelayTimer();
                     default:
                         break;
@@ -217,6 +219,10 @@ void HostProcess(void)
                     case CTR_RSP_AIR_DATA :
                         SendHost_AirSensorData();
                         break;
+										case CTR_RSP_WTR_TIME_SETUP :
+												SendHost_WateringData();
+												break;
+										
                     default :
                         break;
                 }
@@ -393,24 +399,24 @@ void Host_OTACenterProcess(void)
 		switch(TokenHost[3])
     {
 			
-        case CMD_GET_CTR_FW_STATUS:     // 0x42
+        case CTR_GET_FW_STATUS_CMD:     // 0x42
             SendHost_CenterFWinfo();
             break;
 
-        case CMD_CTR_SWITCH_FWVER:         // 0x41
+        case CTR_SWITCH_FW_CMD:         // 0x41
             WRITE_FW_STATUS_FLAG(SWITCH_FW_FLAG);
             SendHost_CenterFWinfo();
             MarkFwAsActive(FALSE);
             JumpToBootloader();
             break;
 
-        case CMD_CTR_OTA_UPDATE:        // 0x40
+        case CTR_OTA_UPDATE_CMD:        // 0x40
             WRITE_FW_STATUS_FLAG(OTA_UPDATE_FLAG);
             SendHost_CenterFWinfo();
             JumpToBootloader();
             break;
 
-        case CMD_CTR_FW_REBOOT:         // 0x43 test
+        case CTR_REBOOT_CMD:         // 0x43 test
             WRITE_FW_STATUS_FLAG(REBOOT_FW_FLAG);
             SendHost_CenterFWinfo();
             JumpToBootloader();
@@ -432,7 +438,7 @@ void Host_OTAMeterProcess(void){
 		OTAMeterID = TokenHost[3];
 		MeterOtaCmdList[OTAMeterID-1] = TokenHost[4];	
 		
-		if (TokenHost[4] == CMD_MTR_OTA_UPDATE)
+		if (TokenHost[4] == METER_OTA_UPDATE_CMD)
 		{
 				if (other.flags != THIS_IS_METER_FW_FLAG) {
 						//	Download Meter FW in Center Bank
@@ -449,21 +455,18 @@ void Host_OTAMeterProcess(void){
 /*** 
  *	@brief	Host Send center board: meter board Watering time setup info
 Get watering time and send watering setup to meter board
- *	@note		do i need to store watering time in flash??
- *	@struct.	Let meter do the command and decision logic
- *	@Addfunc	Multi time setup
+ *	@note		do i need to store watering time in flash?? no need
+ *	@struct.	Let Center do the command and decision logic
  ***/
 
 void Host_WateringSetupProcess(void)
 {
 		uint8_t MtrBoardIdx;
-		uint8_t PktIdx;
 		GetHostRTC();
-		HostMeterIndex = TokenHost[3]-1;	//	MeterID
-		PktIdx = 6;
-	
+		MtrBoardIdx = TokenHost[3]-1;	//	MeterID
+		
 		WATERING_SETTING_FLAG = TRUE;
-	  Watering_SetUp[MtrBoardIdx].Period_min = TokenHost[PktIdx++];
+	  Watering_SetUp[MtrBoardIdx].Period_min = TokenHost[6];
 }
 
 
@@ -832,6 +835,37 @@ void SendHost_InvData(void)
 		CalChecksumH();			
 }
 
+void SendHost_WateringData(void)
+{
+    uint8_t PktIdx;
+    uint8_t MtrBoardIdx;
+		uint8_t WateringEndTime[8];
+    
+    HostTxBuffer[1] = MyCenterID ;
+    HostTxBuffer[2] = CTR_RSP_WTR_TIME_SETUP ;
+    HostTxBuffer[3] = HostMeterIndex ; 
+	
+    MtrBoardIdx = HostMeterIndex-1 ; 		
+		PktIdx = 4;
+		
+		WateringEndTime[INX_HOUR] = CtrSystemTime[INX_HOUR];
+		WateringEndTime[INX_MIN] = (CtrSystemTime[INX_MIN] + Watering_SetUp[MtrBoardIdx].Period_min);
+	
+		if (WateringEndTime[INX_MIN] > 60)
+		{
+				WateringEndTime[INX_HOUR] +=1;
+				WateringEndTime[INX_MIN] -= 60;
+		} 
+		
+		HostTxBuffer[PktIdx++] = Watering_SetUp[MtrBoardIdx].Period_min;
+		HostTxBuffer[PktIdx++] = WateringEndTime[INX_HOUR];
+		HostTxBuffer[PktIdx++] = WateringEndTime[INX_MIN];
+		HostTxBuffer[PktIdx++] = CtrSystemTime[INX_SEC];
+		HostTxBuffer[PktIdx++] = WateringStatus[MtrBoardIdx];	
+	
+		CalChecksumH();		
+}
+
 
 void SendHost_Ack(void)
 {
@@ -981,25 +1015,25 @@ void WriteMeterOtaCmdList(void)
  ***/
 void GetHostRTC(void)
 {
-		uint16_t u16tempH, u16tempC, TimeGap;
+		uint16_t u16tmpTimeH, u16tmpTimeC, TimeGap;
 		
 		// Year,Month,Day,Hour,Min,Sec,Week
 		for (uint8_t i = 0; i < 7; i++) {
 				HostSystemTime[i] = TokenHost[HOST_INX_TIME_START + i];
     }
+
+		u16tmpTimeH = (HostSystemTime[INX_MIN] * 60) + HostSystemTime[INX_SEC];
+		u16tmpTimeC = (CtrSystemTime[INX_MIN] * 60)  + CtrSystemTime[INX_SEC];
 		
-// Hour, Min
-//		u16tempH = (HostSystemTime[3] * 60) + HostSystemTime[4];
-//		u16tempC = (CtrSystemTime[3] * 60)  + CtrSystemTime[4];
-//		
-//		TimeGap = abs(u16tempH - u16tempC);
-//		
-//		if (TimeGap > 5)
-//		{
-//				for (uint8_t i = 0; i < 7; i++) 
-//				{
-//						CtrSystemTime[i] = HostSystemTime[i];
-//				}
+		TimeGap = abs(u16tmpTimeH - u16tmpTimeC);
+		
+		if (TimeGap >= 3)
+		{
+				for (uint8_t i = 0; i < 7; i++) 
+				{
+						CtrSystemTime[i] = HostSystemTime[i];
+				}
+		}
 //				
 //				uint32_t address_rtc_base;
 //				uint32_t data_buffer[2]; 

@@ -173,5 +173,6 @@ extern volatile InvData_t 				InvData[MtrBoardMax];
 extern volatile	TotErrorRate_t 		TotErrorRate[MtrBoardMax];
 extern volatile DeviceStatus_t 		DevicesNG[MtrBoardMax];
 extern volatile Watering_Setup_t 	Watering_SetUp[MtrBoardMax];
+extern volatile	_Bool 						WateringStatus[MtrBoardMax];
 
 #endif  //_AO_EXTERN_FUNC_H_

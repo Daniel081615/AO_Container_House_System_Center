@@ -153,7 +153,6 @@ uint8_t MeterOtaCmdList[MtrBoardMax];
 uint8_t PwrMtrCmdList[MtrBoardMax][PwrMtrMax];
 uint8_t BmsCmdList[MtrBoardMax][BmsMax];
 uint8_t WtrMtrCmdList[MtrBoardMax][WtrMtrMax];
-
 uint8_t PyrMtrCmdList[MtrBoardMax][PyrMtrMax];
 uint8_t SoilSensorCmdList[MtrBoardMax][SoilSensorMax];
 /*---------------------------------------------------------------------------------------------------------*/

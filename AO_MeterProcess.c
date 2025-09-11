@@ -27,6 +27,7 @@ void Meter_RSP_SoilSensorData(void);
 void Meter_RSP_AirSensorData(void);
 void Meter_RSP_InvData(void);
 void Meter_RSP_FWInfo(void);
+void METER_RSP_WateringStatus(void);
 
 //	Meter Polling Cmds
 void SendMeter_GetPowerData(void);
@@ -61,12 +62,14 @@ volatile 	InvData_t 				InvData[MtrBoardMax];
 volatile 	TotErrorRate_t 		TotErrorRate[MtrBoardMax];
 volatile 	DeviceStatus_t 		DevicesNG[MtrBoardMax];
 volatile 	Watering_Setup_t 	Watering_SetUp[MtrBoardMax];
+volatile 	_Bool							WateringStatus[MtrBoardMax];
 
 uint8_t _SendStringToMETER(uint8_t *Str, uint8_t len);
 uint8_t MeterPollingState;
 uint8_t UserIndex1;
 uint8_t ErrorCounter;
 uint8_t MtrBoardIdx; 
+uint32_t WateringFinishTime;
 
 //*** OTA Update ***//
 uint8_t g_packno;
@@ -104,43 +107,38 @@ void MeterBoardPolling(void)
     MtrBoardIdx = NowPollingMtrBoard-1;		
 		//Meter Cmd List
 		MeterOtaCmd = MeterOtaCmdList[OTAMeterID-1];
-		
-		//	I want to Poll the other board when the polling process of four devices is finished.
-		if ((EnPollPwrMtrFlag == FALSE) && (EnPollBmsFlag == FALSE) && 
-				(EnPollWtrMtrFlag 				== FALSE) && (EnPollInvFlag == FALSE) && 
-				(EnPollPyrFlag 				== FALSE) && (EnPollSoilSensorFlag == FALSE) && 
-				(EnPollAirSensorFlag == FALSE))
-		{
-				//	Start polling over again
-				NowPollingPwrMtrID = 1;	
-				NowPollingBmsID = 1;
-				NowPollingWtrMtrID 	= 1;
-				NowPollingInvID = 1;	
-				NowPollingPyrMtrID = 1;
-				NowPollingSoilSensorID = 1;
-				NowPollingAirSensorID = 1;
-			
-			
-				EnPollPwrMtrFlag = 1;
-				EnPollBmsFlag = 1;
-				EnPollWtrMtrFlag 	= 1;
-				EnPollPyrFlag = 1;
-				EnPollSoilSensorFlag 	= 1;
-				EnPollAirSensorFlag = 1;
-				EnPollInvFlag = 1;
-				
-				NowPollingMtrBoard++;
-        if (NowPollingMtrBoard > 1) {
-            NowPollingMtrBoard = 1;
-        }
-				//	Polling all over again
-				MeterPollingState = PL_METER_NORM;
-		}
-
     switch ( MeterPollingState )
     {			
         case PL_METER_NORM :
-            
+						//Poll the other board when all polling process is finished.
+						if ((EnPollPwrMtrFlag == FALSE) && (EnPollBmsFlag == FALSE) && 
+								(EnPollWtrMtrFlag 				== FALSE) && (EnPollInvFlag == FALSE) && 
+								(EnPollPyrFlag 				== FALSE) && (EnPollSoilSensorFlag == FALSE) && 
+								(EnPollAirSensorFlag == FALSE))
+						{
+								//	Start polling over again
+								NowPollingPwrMtrID = 1;	
+								NowPollingBmsID = 1;
+								NowPollingWtrMtrID 	= 1;
+								NowPollingInvID = 1;	
+								NowPollingPyrMtrID = 1;
+								NowPollingSoilSensorID = 1;
+								NowPollingAirSensorID = 1;
+							
+							
+								EnPollPwrMtrFlag = 1;
+								EnPollBmsFlag = 1;
+								EnPollWtrMtrFlag 	= 1;
+								EnPollPyrFlag = 1;
+								EnPollSoilSensorFlag 	= 1;
+								EnPollAirSensorFlag = 1;
+								EnPollInvFlag = 1;
+								
+								NowPollingMtrBoard++;
+								if (NowPollingMtrBoard > 1) {
+										NowPollingMtrBoard = 1;
+								}
+						}
             MeterPollingState = PL_MtrBoard_SYSETM ;            
             break;
 				
@@ -437,8 +435,8 @@ void MeterBoardPolling(void)
             break;	
 						
 				/***
-						Process Meter Cmds, if Cmds != CMD_MTR_OTA_UPDATE, poll the next meter
-						if Cmd == CMD_MTR_OTA_UPDATE
+						Process Meter Cmds, if Cmds != METER_OTA_UPDATE_CMD, poll the next meter
+						if Cmd == METER_OTA_UPDATE_CMD
 				 ***/
         case PL_METER_POLL17 :
 					
@@ -446,16 +444,15 @@ void MeterBoardPolling(void)
             {							
                 MeterRspID = 0xFF ;
                 ResetMeterUART();
-								if (MeterOtaCmd != 0) {
+								if (MeterOtaCmd != 0) 
+								{
 										SendMeter_MeterOTACmd(MeterOtaCmd);
 										TickPollingInterval_Meter = 0 ;
 										MeterPollingState = PL_METER_POLL18 ;
-								} 
-									else if (WATERING_SETTING_FLAG == TRUE) {
+								} else if (WATERING_SETTING_FLAG == TRUE) {
 										SendMeter_WateringTimeSetup();
 										MeterPollingState = PL_METER_WATERING;
-								} 
-									else {
+								} else {
 										MeterPollingState = PL_METER_NORM;
 								}
             }
@@ -465,14 +462,8 @@ void MeterBoardPolling(void)
             if (MeterRspID == NowPollingMtrBoard)
             {
 								PollSuccess_Handler(PL_METER_NORM);
-            } else {
-                if ( TickPollingInterval_Meter > POLLING_TIMEOUT )
-										PollingTimeout_Handler(PL_METER_POLL17,PL_METER_NORM);
-										//	when reaches maximum timeout tries, poll next device
-										if (MeterPollingState == PL_METER_NORM) {
-												NowPollingAirSensorID++;
-										}
-            }
+            } else if ( TickPollingInterval_Meter > POLLING_TIMEOUT )
+								PollingTimeout_Handler(PL_METER_POLL17,PL_METER_NORM);
 						break;
 
 						
@@ -485,7 +476,7 @@ void MeterBoardPolling(void)
 							
 								// if MTR OTA Update Cmd & Meter APP flag , go to OTA state machine 
 								//	!!!	 Or change to a sequence of OTA update, first go update Center, then when detect Meter APP flag, Automatically update Meter
-								if(MeterOtaCmd == CMD_MTR_OTA_UPDATE)
+								if(MeterOtaCmd == METER_OTA_UPDATE_CMD)
 								{
 										MeterOtaFlag = 1;
 										StartAddress = other.fw_start_addr;
@@ -644,7 +635,7 @@ void MeterBoardPolling(void)
 								}
 						} 
 						else if (TickPollingInterval_Meter > POLLING_TIMEOUT) {
-								MeterOtaCmdList[OTAMeterID-1] = CMD_MTR_OTA_UPDATE;
+								MeterOtaCmdList[OTAMeterID-1] = METER_OTA_UPDATE_CMD;
 								PollingTimeout_Handler(PL_METER_NORM, PL_METER_NORM);
 						}
 						break;
@@ -757,6 +748,10 @@ void MeterProcess(void)
 									case METER_RSP_AIR_DATA:
 										Meter_RSP_AirSensorData();
 										break;
+									
+									case METER_RSP_WATERING_STATUS:
+										METER_RSP_WateringStatus();
+										break;
 
 									case METER_RSP_INV_DATA:
 										Meter_RSP_InvData();
@@ -764,6 +759,8 @@ void MeterProcess(void)
 									
 									case METER_RSP_OTA_UPDATE :
 										Meter_RSP_FWInfo();
+										break;
+									
 									
 									default:					
 										break;
@@ -1253,6 +1250,14 @@ void Meter_RSP_InvData(void)
 		InvData[MtrBoardIdx].CtrlStatusCode	= TokenMeter[PktIdx++];
 }
 
+void METER_RSP_WateringStatus(void)
+{
+		uint8_t MtrBoardIdx;
+
+		MtrBoardIdx = TokenMeter[1] -1;
+    WateringStatus[MtrBoardIdx] = TokenHost[6];
+}
+
 /* Get FW info From Meter
 
 4-19 : FWststatus 	(16 bytes)
@@ -1410,16 +1415,16 @@ void SendMeter_GetInvData(void)
 1: OTA MeterID
 2: Meter OTA Cmd	(0x17)
 3: Sub Cmd
-	0x17 : CMD_MTR_OTA_UPDATE 		 
-	0x18 : CMD_MTR_SWITCH_FWVER 	
-	0x19 : CMD_GET_MTR_FW_STATUS
-	0x1A : CMD_MTR_FW_REBOOT
+	0x17 : METER_OTA_UPDATE_CMD 		 
+	0x18 : METER_SWITCH_FW_CMD 	
+	0x19 : METER_GET_FW_STATUS_CMD
+	0x1A : METER_REBOOT_CMD
 */
 void SendMeter_MeterOTACmd(uint8_t cmd)
 {         		
     
     MeterTxBuffer[1] = OTAMeterID;
-		MeterTxBuffer[2] = CMD_MTR_OTA_UPDATE;
+		MeterTxBuffer[2] = METER_OTA_UPDATE_CMD;
 		MeterTxBuffer[3] = cmd;
 		
 		SendMeterRTC();
@@ -1427,30 +1432,33 @@ void SendMeter_MeterOTACmd(uint8_t cmd)
 		CalChecksumM();	
 }
 
+#define WATERING_ON		0x01
+#define WATERING_OFF	0x00
+
 void SendMeter_WateringTimeSetup(void)
 {         		
 		uint8_t MtrBoardIdx;
-		uint8_t WateringPeriod;
-		uint16_t u16tmpNow, WateringFinishTime;
+		uint32_t WateringPeriod;
+		uint32_t u32timeNow;
 		
 		MtrBoardIdx = NowPollingMtrBoard-1;	
-		u16tmpNow = HostSystemTime[INX_HOUR] *60 | INX_MIN;
+		u32timeNow = ((CtrSystemTime[INX_HOUR] * 60) * 60) + (CtrSystemTime[INX_MIN]* 60) | CtrSystemTime[INX_SEC];
 	
     MeterTxBuffer[1] = NowPollingMtrBoard;	
     MeterTxBuffer[2] = METER_GET_CMD_WATERING;	
-		WateringPeriod = Watering_SetUp[MtrBoardIdx].Period_min;
+		WateringPeriod = (Watering_SetUp[MtrBoardIdx].Period_min * 60);
 	
 		
 		if (WateringFinishTime == 0x0000)
 		{	
-				WateringFinishTime = u16tmpNow | WateringPeriod;
-				//	WateringOnCmd;
+				WateringFinishTime = u32timeNow + WateringPeriod;
+				MeterTxBuffer[3] = WATERING_ON;
 		} else {
-				if(u16tmpNow < WateringFinishTime)
+				if(u32timeNow < WateringFinishTime)
 				{
-						//	WateringOnCmd;
+						MeterTxBuffer[3] = WATERING_ON;
 				} else {
-						//	WateringOffCmd;
+						MeterTxBuffer[3] = WATERING_OFF;
 						WateringFinishTime = 0x0000;
 						WATERING_SETTING_FLAG = FALSE;
 				}
