@@ -38,8 +38,7 @@ extern void SendHost_GetReocrd(void);
 extern void SendHost_MeterValue(void);
 extern void SendHost_CenterFWinfo(void);
 
-extern void ReadMeterOtaCmdList();
-extern void WriteMeterOtaCmdList(void);
+extern void WriteFlash_MtrOTAStatus(void);
 
 extern uint8_t _SendStringToHOST(uint8_t *Str, uint8_t len);
 extern void CalChecksumH(void);

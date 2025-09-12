@@ -1,10 +1,12 @@
-/*--------------------------------------------------------------------------- 
- * File Name     : AO_HostProcess.C
- * Company 		 : AOTECH
- * Author Name   : Barry Su
- * Starting Date : 2015.7.1
+/**--------------------------------------------------------------------------- 
+ * File Name  : AO_HostProcess.C
+ * Company 		: AOTECH
  * C Compiler : Keil C
- * --------------------------------------------------------------------------*/
+ * Last revise Date : 2025.09.11
+ * @Problem encountered : 
+		1. When meter OTA Update, How can we recognize Fw in the other bank is for Meter?
+		2. When there's no meter FW, how to download Fw in Center Bank?
+ * --------------------------------------------------------------------------**/
 #include <stdio.h>
 #include "NUC1261.h"
 #include "AO_MyDef.h"
@@ -21,10 +23,6 @@ uint8_t system_SW_Timer = 0;
 
 
 void HostProcess(void);
-void CalChecksumH(void);
-void GetHostRTC(void);
-void ClearRespDelayTimer(void);
-
 void HOST_AliveProcess(void);
 void Host_PwrMtrDataProcess(void);
 void Host_BmsDataProcess(void);
@@ -34,15 +32,10 @@ void Host_PyrMtrDataProcess(void);
 void Host_SoilSensorDataProcess(void);
 void Host_AirSensorDataProcess(void);
 void Host_WateringSetupProcess(void);
-//***** OTA Process *****//
-void Host_OTAMeterProcess(void);
+void Host_MeterOTAProcess(void);
 void Host_OTACenterProcess(void);
 
-
 void SendHost_Ack(void);
-void SystemSwitchProcess(void);
-
-
 void SendHost_SystemInformation(void);
 void SendHost_PowerData(void);
 void SendHost_BmsData(void);
@@ -51,22 +44,23 @@ void SendHost_PyrMtrData(void);
 void SendHost_SoilSensorData(void);
 void SendHost_AirSensorData(void);
 void SendHost_InvData(void);
-void SendHost_CenterFWinfo(void);
-void SendHost_MeterFWInfo(void);
+
 void SendHost_CenterUpdateSuccsess(void);
 void SendHost_MeterUpdateSuccsess(void);
 void SendHost_WateringData(void);
 
-//	Read / Store MeterCmdList
-void ReadMeterOtaCmdList();
-void WriteMeterOtaCmdList(void);
-
-void HOST_GetUserData(void);
 void SendHost_FirstReset_Ack(void);
+
+/**	OTA **/
+void SendHost_CenterFWinfo(void);
+void SendHost_MeterFWInfo(void);
+
+void CalChecksumH(void);
+void GetHostRTC(void);
+void ClearRespDelayTimer(void);
 
 uint8_t AckResult;
 uint8_t HostMeterIndex;
-uint8_t fgTestInitOK ;
 uint8_t SystemSetting;
 
 /*********************************
@@ -166,7 +160,7 @@ void HostProcess(void)
                         ClearRespDelayTimer();
                         break;
 										case CTR_2_METER_OTA_CMD:							// 0x19
-												Host_OTAMeterProcess();
+												Host_MeterOTAProcess();
 												break;
 										case CTR_SET_WTR_TIME:								//0x1A
 												Host_WateringSetupProcess();
@@ -222,7 +216,28 @@ void HostProcess(void)
 										case CTR_RSP_WTR_TIME_SETUP :
 												SendHost_WateringData();
 												break;
-										
+										case CTR_OTA_UPDATE_CMD:
+												Write_FwOtaCmd(UPDATE_CENTER);
+												SendHost_CenterFWinfo();
+												JumpToBootloader();
+												break;
+
+										case CTR_SWITCH_FW_CMD:
+												SendHost_CenterFWinfo();
+												_bBankSwitchFlag = 1;
+												MarkFwFlag(FALSE);
+												JumpToBootloader();
+												break;
+
+										case CTR_GET_FW_STATUS_CMD:
+												SendHost_CenterFWinfo();
+												SYS_LockReg();
+												break;
+
+										case CTR_REBOOT_CMD:
+												SendHost_CenterFWinfo();
+												JumpToBootloader();
+												break;
                     default :
                         break;
                 }
@@ -247,7 +262,7 @@ void ClearRespDelayTimer(void)
 *	Host_WtrMtrDataProcess() 					:	Get water meter Cmd
 *	Host_InvDataProcess() 				:	Get inverter Cmd
 *	Host_OTACenterProcess()				:	Get center board OTA Cmd
-*	Host_OTAMeterProcess()				:	Get meter board OTA Cmd
+*	Host_MeterOTAProcess()				:	Get meter board OTA Cmd
 *	Host_WateringSetupProcess			:	Get	watering time setup
 *	@note	"Meter index id is replaced by device ID... Need to be revise"
 *
@@ -393,60 +408,37 @@ void Host_OTACenterProcess(void)
 {
 		SYS_UnlockReg();
 		FMC_Open();
-	
+
+		CmdType = TokenHost[3];	
+		
+		Get_FwBankMetaInfo(	(FwStatus *)&BankStatus[Center], (FwMeta *)&BankMeta[Center][Active], (FwMeta *)&BankMeta[Center][Backup]);
+
 		GetHostRTC();
-	
-		switch(TokenHost[3])
-    {
-			
-        case CTR_GET_FW_STATUS_CMD:     // 0x42
-            SendHost_CenterFWinfo();
-            break;
-
-        case CTR_SWITCH_FW_CMD:         // 0x41
-            WRITE_FW_STATUS_FLAG(SWITCH_FW_FLAG);
-            SendHost_CenterFWinfo();
-            MarkFwAsActive(FALSE);
-            JumpToBootloader();
-            break;
-
-        case CTR_OTA_UPDATE_CMD:        // 0x40
-            WRITE_FW_STATUS_FLAG(OTA_UPDATE_FLAG);
-            SendHost_CenterFWinfo();
-            JumpToBootloader();
-            break;
-
-        case CTR_REBOOT_CMD:         // 0x43 test
-            WRITE_FW_STATUS_FLAG(REBOOT_FW_FLAG);
-            SendHost_CenterFWinfo();
-            JumpToBootloader();
-            break;
-
-        default:
-            break;
-		SYS_LockReg();
-		}
 }
 
-void Host_OTAMeterProcess(void){
+/***
+ *	Host_MeterOTAProcess()
+ *	@Brief	if Fw in center bank, MeterPolling process OTA., 
+							if "NOT", Go to Center Bootloader then write FW in another center flash bank.
+ ***/
+void Host_MeterOTAProcess(void)
+{
+		uint8_t MtrBoardIdx;	
 
 		SYS_UnlockReg();
 		FMC_Open();
 	
 		GetHostRTC();
-	
-		OTAMeterID = TokenHost[3];
-		MeterOtaCmdList[OTAMeterID-1] = TokenHost[4];	
+
+		MtrBoardIdx = TokenHost[3]-1;
+		MeterOtaCmdList[MtrBoardIdx] = TokenHost[4];	
 		
 		if (TokenHost[4] == METER_OTA_UPDATE_CMD)
 		{
-				if (other.flags != THIS_IS_METER_FW_FLAG) {
-						//	Download Meter FW in Center Bank
-						WRITE_FW_STATUS_FLAG(OTA_UPDATE_FLAG);
-						//	Store Ota Cmd in Flash
-						WriteMeterOtaCmdList();
+				if (BankMeta[Center][Backup].flags != Fw_MeterFwFlag) {
+
+						Write_FwOtaCmd(UPDATE_METER);
 						SendHost_CenterFWinfo();
-					
 						JumpToBootloader();
 				}
 		}  
@@ -891,75 +883,48 @@ void SendHost_FirstReset_Ack(void)
     CalChecksumH();
 }
 
-/* Send Center FW info to Host 
-0:0x55
-1: MyCenterID
-2: Command
-4-19 : FWststatus 	(16 bytes)
-20-51: FWMetadata1 	(32 bytes)
-52-83: FWMetadata2 	(32 bytes)
-*/
+
 void SendHost_CenterFWinfo(void)
 {
 		uint8_t i;
 		HostTxBuffer[2] = CmdType;
 
-		memcpy(&HostTxBuffer[4], &g_fw_ctx, sizeof(FWstatus));
-    memcpy(&HostTxBuffer[20], &meta, sizeof(FWMetadata));
-		memcpy(&HostTxBuffer[52], &other, sizeof(FWMetadata));
+		memcpy(&HostTxBuffer[4], 	(FwStatus *)&BankStatus[Center], sizeof(FwStatus));
+    memcpy(&HostTxBuffer[20],	(FwMeta *)&BankMeta[Center][Active], sizeof(FwMeta));
+		memcpy(&HostTxBuffer[52],	(FwMeta *)&BankMeta[Center][Backup], sizeof(FwMeta));
 
 		CalChecksumH();
 }
 
-
-/* Send meter fw info to host 
-0:0x55
-1: MyCenterID
-2: Command
-4-19 : FWststatus 	(16 bytes)
-20-51: FWMetadata1 	(32 bytes)
-52-83: FWMetadata2 	(32 bytes)
-*/
 void SendHost_MeterFWInfo(void){
 	
 		uint8_t i;
 		HostTxBuffer[2] = CmdType;
 
-		memcpy(&HostTxBuffer[4], &MeterMetaStatus, sizeof(FWstatus));
-    memcpy(&HostTxBuffer[20], &MeterMetaActive, sizeof(FWMetadata));
-		memcpy(&HostTxBuffer[52], &MeterMetaBackup, sizeof(FWMetadata));
+		memcpy(&HostTxBuffer[4], 	(FwStatus *)&BankStatus[Meter], sizeof(FwStatus));
+    memcpy(&HostTxBuffer[20], (FwMeta *)&BankMeta[Meter][Active], sizeof(FwMeta));
+		memcpy(&HostTxBuffer[52], (FwMeta *)&BankMeta[Meter][Backup], sizeof(FwMeta));
 	
 		CalChecksumH();
 	
 }
 
-/* When meter update success, send host Update Success Password
-0:0x55
-1: MyCenterID
-2: MeterRspID
-4: 0x0A
-5: 0xBB
-6: 0xC0
-7: 0xDD
+/* 
+	When meter update success, send host Update Success Password
 */
 void SendHost_MeterUpdateSuccsess(void)
 {
 		HostTxBuffer[1] = MyCenterID;					//MeterID
-		HostTxBuffer[2] = MeterRspID;	//MeterID
+		HostTxBuffer[2] = GotMeterRspID;	//MeterID
 		HostTxBuffer[4] = 0x0A;		HostTxBuffer[5] = 0xBB;
 		HostTxBuffer[6] = 0xC0;		HostTxBuffer[7] = 0xDD;
 		
-		memcpy(&HostTxBuffer[8], &MeterMetaStatus, sizeof(FWstatus));
+		memcpy(&HostTxBuffer[8], (FwStatus *)&BankStatus[Meter], sizeof(FwStatus));
 		CalChecksumH();
 }
 
-/* When Center update success, send host Update Success Password 
-0:0x55
-1: MyCenterID
-4: 0xEE
-5: 0xFF
-6: 0x5A
-7: 0xA5
+/* 
+	When Center update success, send host Update Success Password 
 */
 void SendHost_CenterUpdateSuccsess(void)
 {
@@ -967,46 +932,8 @@ void SendHost_CenterUpdateSuccsess(void)
 		HostTxBuffer[4] = 0xEE;		HostTxBuffer[5] = 0xFF;
 		HostTxBuffer[6] = 0x5A;		HostTxBuffer[7] = 0xA5;
 		
-		memcpy(&HostTxBuffer[8], &meta, sizeof(FWstatus));
+		memcpy(&HostTxBuffer[8], (FwMeta *)&BankMeta[Center][Active], sizeof(FwStatus));
 		CalChecksumH();
-}
-
-/***
- *	@breif	Read Meter Ota List from flash, to make sure update meter
- ***/
-
-void ReadMeterOtaCmdList()
-{
-		for (uint8_t i; i> ROOM_MAX; i++)
-		{
-				MeterOtaCmdList[i] = FMC_Read(FW_Status_Base + (i+1) * 4);
-				//FMC_Erase
-				//FMC_Erase_User();
-		}
-}
-
-
-/***
- *	@breif	Write Meter Ota List to flash, to make sure Ota Cmds stored
- ***/
-void WriteMeterOtaCmdList(void)
-{
-		SYS_UnlockReg();
-		FMC_ENABLE_ISP();
-		uint32_t MetaStatus[sizeof(FWstatus)/4];
-		
-		//	Read FwStatus
-		for (uint8_t i; i < 4; i++){
-				MetaStatus[i] = FMC_Read(FW_Status_Base + (i*4));
-		}
-		ReadData(FW_Status_Base, FW_Status_Base + sizeof(FWstatus), (uint32_t*)MetaStatus);
-		
-		FMC_Erase(FW_Status_Base);
-		
-		WriteData(FW_Status_Base, FW_Status_Base + sizeof(FWstatus), (uint32_t*)MetaStatus);
-		WriteData(FW_Status_Base + sizeof(FWstatus),FW_Status_Base + sizeof(FWstatus) + sizeof(MeterOtaCmdList) , (uint32_t*)MeterOtaCmdList);
-		
-		SYS_LockReg();
 }
 
 /***
@@ -1037,23 +964,21 @@ void GetHostRTC(void)
 //				
 //				uint32_t address_rtc_base;
 //				uint32_t data_buffer[2]; 
-//				FWstatus Status1;
-//				address_rtc_base = FW_Status_Base + sizeof(FWstatus);
+//				FwStatus Status1;
+//				address_rtc_base = BANK_STATUS_BASE + sizeof(FwStatus);
 //				memcpy(data_buffer, CtrSystemTime, sizeof(CtrSystemTime));
 //				
 //				SYS_UnlockReg();
 //				FMC_Open();
 
-//				ReadData(FW_Status_Base, address_rtc_base, (uint32_t*)&Status1);
-//				FMC_Erase_User(FW_Status_Base);
+//				ReadData(BANK_STATUS_BASE, address_rtc_base, (uint32_t*)&Status1);
+//				FMC_Erase_User(BANK_STATUS_BASE);
 //				
-//				WriteData(FW_Status_Base, FW_Status_Base + sizeof(Status1), (uint32_t*)&Status1);
+//				WriteData(BANK_STATUS_BASE, BANK_STATUS_BASE + sizeof(Status1), (uint32_t*)&Status1);
 //				WriteData(address_rtc_base, address_rtc_base + sizeof(data_buffer), (uint32_t*)&data_buffer);
 
 //				SYS_LockReg();
-//		}
-		
-		
+//		}	
 }
 
 

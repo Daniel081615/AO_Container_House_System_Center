@@ -8,6 +8,7 @@
 ".\obj\ao2022_center_1261.o"
 ".\obj\ota_manager.o"
 ".\obj\fmc_user.o"
+".\obj\ao_otaprocess.o"
 ".\obj\clk.o"
 ".\obj\crc.o"
 ".\obj\fmc.o"

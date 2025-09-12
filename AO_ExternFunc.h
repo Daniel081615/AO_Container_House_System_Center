@@ -52,8 +52,6 @@ extern void SendMeter_AliveToken(void);
 extern void SendMeter_SystemSW(void);
 extern void CalChecksumM(void);
 
-extern uint8_t fgTestInitOK;
-
 extern uint8_t MyCenterID;
 
 /***	Time func & variable	***/
@@ -119,7 +117,7 @@ extern uint8_t NodeTestAck;
 extern const uint8_t DefinePwrMtrMax[3];
 
 extern uint8_t MeterBoardError;
-extern uint8_t PollingCounter,HostRoomIndex,MeterRspID, HostDeviceIndex;
+extern uint8_t PollingCounter,HostRoomIndex,GotMeterRspID, HostDeviceIndex;
 extern uint8_t ReaderState,ReaderTick,bSendReaderCommand,ReaderCommandType;
 
 extern _Bool fgMeterAckOK;
@@ -159,8 +157,6 @@ extern uint8_t _SendStringToMETER(uint8_t *Str, uint8_t len);
 extern RTC_Data_t RTC_Data;
 extern _Bool WATERING_SETTING_FLAG;
 
-/* Host OTA meter Cmd */
-extern uint8_t OTAMeterID;
 extern void CalChecksumH(void);
 
 extern volatile	MeterData_t 			MeterData[MtrBoardMax][PwrMtrMax];

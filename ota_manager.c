@@ -1,81 +1,112 @@
 #include "ota_manager.h"
 #include "AO_ExternFunc.h"
 
-FWstatus g_fw_ctx = {0};
-FWMetadata meta = {0};
-FWMetadata other = {0};
 
-FWstatus MeterMetaStatus = {0};
-FWMetadata MeterMetaActive = {0};
-FWMetadata MeterMetaBackup = {0};
-
-int  WriteFWstatus(FWstatus *status);
-int  WriteMetadata(FWMetadata *meta, uint32_t meta_base);
+int  WriteFwStatus(FwStatus *status);
+int  WriteMetadata(FwMeta *meta, uint32_t MetaBase);
 int  WriteToFlash(void *data, uint32_t size, uint32_t base_addr, bool with_crc32, uint32_t crc_offset);
+
+
 void BlinkLEDs();
-void MarkFwAsActive(bool mark);
+void MarkFwFlag(bool mark);
 void VerifyFW(bool ResetStatus);
 void JumpToBootloader();
-void WRITE_FW_STATUS_FLAG(uint32_t flag);
-void ReadMetaInfo(FWstatus *ctx, FWMetadata *active, FWMetadata *backup);
-void BlinkStatusLED(GPIO_T *port, uint32_t pin, uint8_t times, uint32_t delay_ms);
-bool boolFwcheck(void);
-bool VerifyFirmware(FWMetadata *meta);
+void Write_FwOtaCmd(uint16_t cmd);
+void Write_FwStatus(uint16_t stat);
 
+void Get_FwBankMetaInfo(FwStatus *ctx, FwMeta *active, FwMeta *backup);
+void BlinkStatusLED(GPIO_T *port, uint32_t pin, uint8_t times, uint32_t delay_ms);
+
+
+bool FwCheck_CRC(FwMeta *meta);
+void FwValidateCRC(void);
 bool g_fw_metadata_ready = false;
 
 uint32_t CRC32_Calc(const uint8_t *pData, uint32_t len) ;
 
+volatile FwStatus BankStatus[2] = {0};
+volatile FwMeta BankMeta[2][MaxBankCnt] = {0};
+_Bool	_bBankSwitchFlag = 0;
+
+
+
 void VerifyFW(bool ResetStatus)
 {
+		SYS_UnlockReg();
+		FMC_ENABLE_ISP();
+	
 		if (ResetStatus){
-        bool bfwcheckresult = boolFwcheck();
-        MarkFwAsActive(bfwcheckresult);
-        if (!bfwcheckresult)
-					JumpToBootloader();
+        Get_FwBankMetaInfo((FwStatus *)&BankStatus[Center], (FwMeta *)&BankMeta[Center][Active], (FwMeta *)&BankMeta[Center][Backup]);
+			
+//        MarkFwFlag(b_FwValid);
+//        if (!b_FwValid)
+//					JumpToBootloader();
     }
-}
-
-void ReadMetaInfo(FWstatus *ctx, FWMetadata *active, FWMetadata *backup)
-{
-    ReadData(FW_Status_Base, FW_Status_Base + sizeof(FWstatus), (uint32_t *)ctx);
-    uint32_t addr[2] = { METADATA_FW1_BASE, METADATA_FW2_BASE };
-    uint32_t idx = (ctx->FW_meta_Addr == METADATA_FW1_BASE) ? 0 : 1;
-    ReadData(addr[idx], addr[idx] + sizeof(FWMetadata), (uint32_t *)active);
-    ReadData(addr[1 - idx], addr[1 - idx] + sizeof(FWMetadata), (uint32_t *)backup);
-}
-
-bool boolFwcheck(void) 
-{	
-		ReadMetaInfo(&g_fw_ctx, &meta, &other);
-    bool ok = VerifyFirmware(&meta);
-    bool valid = (meta.flags == FW_FLAG_PENDING) || 
-								((meta.flags & (FW_FLAG_ACTIVE | FW_FLAG_VALID)) == (FW_FLAG_ACTIVE | FW_FLAG_VALID)) ||
-									meta.WDTRst_counter <  3;
-		BlinkStatusLED( (valid&&ok) ? PD : PF, (valid&&ok) ? 7 : 2, 10, 1500);
-    return ok && valid;
-}
-
-void MarkFwAsActive(bool mark) 
-{		
-    uint32_t other_addr = (g_fw_ctx.FW_meta_Addr == METADATA_FW1_BASE) ? METADATA_FW2_BASE : METADATA_FW1_BASE;
-    if (mark) {
-        meta.flags &= ~FW_FLAG_PENDING;
-        meta.flags |= (FW_FLAG_VALID | FW_FLAG_ACTIVE);
-				meta.trial_counter += 1;
-        other.flags &= ~FW_FLAG_ACTIVE;
-				WRITE_FW_STATUS_FLAG(FW_VERIFIED);
-    }else if ( (g_fw_ctx.status == SWITCH_FW_FLAG) || (~mark) ) {
-        other.flags &= ~FW_FLAG_PENDING;
-        other.flags |= (FW_FLAG_VALID | FW_FLAG_ACTIVE);
-        meta.flags &= ~FW_FLAG_ACTIVE;
-				WRITE_FW_STATUS_FLAG(SWITCH_FW_FLAG);
-    }else{
-				WRITE_FW_STATUS_FLAG(OTA_FAILED_FLAG);
-		}
 		
-    WriteMetadata(&meta, g_fw_ctx.FW_meta_Addr);
-    WriteMetadata(&other, other_addr);	
+		SYS_LockReg();
+		
+}
+
+void Get_FwBankMetaInfo(FwStatus *ctx, FwMeta *active, FwMeta *backup)
+{
+		/**	Get Meta Infos	**/
+    ReadData(BANK_STATUS_BASE, BANK_STATUS_BASE + sizeof(FwStatus), (uint32_t *)ctx);
+    uint32_t addr[2] = {BANK1_META_BASE, BANK2_META_BASE};
+    uint32_t idx = (ctx->Meta_addr == BANK1_META_BASE) ? 0 : 1;
+    ReadData(addr[idx], addr[idx] + sizeof(FwMeta), (uint32_t *)active);
+    ReadData(addr[1 - idx], addr[1 - idx] + sizeof(FwMeta), (uint32_t *)backup);	
+}
+
+void FwValidateCRC(void)
+{
+		/**	Validate Fw	**/
+    bool ok = FwCheck_CRC((FwMeta *)&BankMeta[Center][Active]);
+    bool valid = (BankMeta[Center][Active].flags == Fw_PendingFlag) || 
+								((BankMeta[Center][Active].flags & (Fw_ActiveFlag | Fw_ValidFlag)) == (Fw_ActiveFlag | Fw_ValidFlag)) ||
+									BankMeta[Center][Active].WDTRst_counter <  3;
+		
+		BlinkStatusLED( (valid&&ok) ? PD : PF, (valid&&ok) ? 7 : 2, 10, 1500);
+		
+		//	Mark fw flag
+		MarkFwFlag(ok && valid);
+		
+		/**	Mark Bank status	**/
+		if ((BankMeta[Center][Active].flags & valid) && 
+				(BankMeta[Center][Backup].flags & valid))
+		{
+		}
+}
+
+/***
+ *	@brief	Set Valid Fw valid flag, if no fw to switch -> Update Center Fw
+ ***/
+void MarkFwFlag(bool mark) 
+{		
+    uint32_t BackupBank_addr = (BankStatus[Center].Meta_addr == BANK1_META_BASE) ? BANK2_META_BASE : BANK1_META_BASE;
+		//	Mark valid flags
+    if (mark) 
+		{	
+        BankMeta[Center][Active].flags &= ~Fw_PendingFlag;
+        BankMeta[Center][Active].flags |= (Fw_ValidFlag | Fw_ActiveFlag);
+				BankMeta[Center][Active].trial_counter += 1;
+        BankMeta[Center][Backup].flags &= ~Fw_ActiveFlag;
+    }	
+			else if ( _bBankSwitchFlag || (~mark)) {
+				
+				if ((BankMeta[Center][Backup].flags & Fw_MeterFwFlag) || 
+						(BankMeta[Center][Backup].flags & Fw_InvalidFlag))
+				{
+						Write_FwOtaCmd(UPDATE_CENTER);
+						JumpToBootloader();
+				}
+				
+        BankMeta[Center][Backup].flags &= ~Fw_PendingFlag;
+        BankMeta[Center][Backup].flags |= (Fw_ValidFlag | Fw_ActiveFlag);
+        BankMeta[Center][Active].flags &= ~Fw_ActiveFlag;
+    }
+		
+    WriteMetadata((FwMeta *)&BankMeta[Center][Active], BankStatus[Center].Meta_addr);
+    WriteMetadata((FwMeta *)&BankMeta[Center][Backup], BackupBank_addr);	
 }
 
 void BlinkStatusLED(GPIO_T *port, uint32_t pin, uint8_t times, uint32_t delay_ms) 
@@ -94,14 +125,25 @@ void BlinkLEDs()
 }
 
 
-void WRITE_FW_STATUS_FLAG(uint32_t flag) 
+void Write_FwOtaCmd(uint16_t cmd) 
 {	
+		SYS_UnlockReg();
 		FMC_Open();
-    g_fw_ctx.status = flag;
-    WriteFWstatus(&g_fw_ctx);
+    BankStatus[Center].Cmd = cmd;
+    WriteFwStatus((FwStatus *)&BankStatus[Center]);
+		SYS_LockReg();
 }
 
-bool VerifyFirmware(FWMetadata *meta) 
+void Write_FwStatus(uint16_t stat)
+{
+		SYS_UnlockReg();
+		FMC_Open();
+    BankStatus[Center].status = stat;
+    WriteFwStatus((FwStatus *)&BankStatus[Center]);
+		SYS_LockReg();
+}
+
+bool FwCheck_CRC(FwMeta *meta) 
 {	
     if ((meta->fw_start_addr == 0xFFFFFFFF) ||
         (meta->fw_size == 0xFFFFFFFF) ||
@@ -110,12 +152,12 @@ bool VerifyFirmware(FWMetadata *meta)
     return (crc == meta->fw_crc32);	
 }
 
-int WriteFWstatus(FWstatus *status) {
-		return WriteToFlash(status, sizeof(FWstatus), FW_Status_Base, false, 0);
+int WriteFwStatus(FwStatus *status) {
+		return WriteToFlash(status, sizeof(FwStatus), BANK_STATUS_BASE, false, 0);
 }
 
-int WriteMetadata(FWMetadata *meta, uint32_t meta_base) {
-		return WriteToFlash(meta, sizeof(FWMetadata), meta_base, true, offsetof(FWMetadata, meta_crc));
+int WriteMetadata(FwMeta *meta, uint32_t MetaBase) {
+		return WriteToFlash(meta, sizeof(FwMeta), MetaBase, true, offsetof(FwMeta, meta_crc));
 }
 
 int WriteToFlash(void *data, uint32_t size, uint32_t base_addr, bool with_crc32, uint32_t crc_offset)

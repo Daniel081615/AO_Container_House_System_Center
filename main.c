@@ -119,7 +119,7 @@ _Bool 	fgDIR485_NODE1_In,fgDIR485_NODE2_In ;
 uint8_t TickHost, TickMeter;
 uint16_t  TickTestDelayTime;
 
-uint8_t MeterRspID, HostDeviceIndex;
+uint8_t GotMeterRspID, HostDeviceIndex;
 
 uint8_t NowPollingMtrBoard;
 uint8_t NowPollingPwrMtrID, NowPollingBmsID, NowPollingWtrMtrID, NowPollingPyrMtrID, NowPollingSoilSensorID, NowPollingAirSensorID, NowPollingInvID;
@@ -253,7 +253,7 @@ _Bool bRecoverSystem;
 _Bool fgMeterAckOK;
 uint8_t TickHost, TickMeter;
 uint16_t  TickTestDelayTime;
-uint8_t MeterRspID;
+uint8_t GotMeterRspID;
 
 uint8_t NowPollingMtrBoard;
 uint8_t TickPollingInterval_Meter;
@@ -300,9 +300,6 @@ void RecoverSystemMoniter(void);
 void ChangeDirHostRS485(void);
 void ScheduleWateringTask(void);
 
-
-uint8_t OTAMeterID;
-
 volatile uint8_t MeterOtaFlag;
 
 
@@ -330,7 +327,7 @@ void WDT_IRQHandler(void)
 	
 		WDT_RESET_COUNTER();
 		
-		uint32_t other_addr = (g_fw_ctx.FW_meta_Addr == METADATA_FW1_BASE) ? METADATA_FW2_BASE : METADATA_FW1_BASE;
+		uint32_t BackupBank_addr = (BankStatus[Center].Meta_addr == BANK1_META_BASE) ? BANK2_META_BASE : BANK1_META_BASE;
 		
 		if (WDT_GET_TIMEOUT_INT_FLAG())
     {
@@ -338,16 +335,16 @@ void WDT_IRQHandler(void)
         WDT_CLEAR_TIMEOUT_INT_FLAG();
         g_u32WDTINTCounts++;			
 			
-				meta.WDTRst_counter = g_u32WDTINTCounts;
-				WriteMetadata(&meta, g_fw_ctx.FW_meta_Addr);
+				BankMeta[Center][Active].WDTRst_counter = g_u32WDTINTCounts;
+				WriteMetadata((FwMeta *)&BankMeta[Center][Active], BankStatus[Center].Meta_addr);
 			
 				if(g_u32WDTINTCounts > MAX_WDT_TRIES)
 				{
-						meta.flags &= ~(FW_FLAG_ACTIVE | FW_FLAG_VALID);
-						meta.flags |= FW_FLAG_INVALID;
-						other.flags |= FW_FLAG_ACTIVE;
-						WriteMetadata(&other, other_addr);
-						WriteMetadata(&meta, g_fw_ctx.FW_meta_Addr);
+						BankMeta[Center][Active].flags &= ~(Fw_ActiveFlag | Fw_ValidFlag);
+						BankMeta[Center][Active].flags |= Fw_InvalidFlag;
+						BankMeta[Center][Backup].flags |= Fw_ActiveFlag;
+						WriteMetadata((FwMeta *)&BankMeta[Center][Backup], BackupBank_addr);
+						WriteMetadata((FwMeta *)&BankMeta[Center][Active], BankStatus[Center].Meta_addr);
 						WDT_Open(WDT_TIMEOUT_2POW4, WDT_RESET_DELAY_3CLK, TRUE, FALSE);
 						while (1);
 				}
@@ -561,7 +558,6 @@ void UART1_IRQHandler(void)
 						//LED_TGL_R();
 					} 
 			}
-	    //printf("\nTransmission Test:");
 	}
 
 	u32IntSts = UART1->INTSTS;
@@ -850,7 +846,7 @@ void DefaultValue(void)
  /***			 @MCUMemoryLayout			***
  +------------------------------+ => Max APROM size: 0x00020000
  |															| 
- |					Data Flash					| => @Purpose: Store meta information of Bank1,2
+ |					Data Flash					| => @Purpose: Store BankMeta[Center][Active] information of Bank1,2
  |															|	=> Size: 0x1800 ~= 6kb
  +------------------------------+	=> Data flash base addr: 0x0001E800
  |															|
@@ -867,6 +863,7 @@ void DefaultValue(void)
  +------------------------------+	=> Bank1 base addr: 0x00000000
 
  @concern : Beacuse Host will send " @FIXED base " meter Fw, so it will be more, difficult when update thru center bank.	** 2025.08.05 **
+						Resolved it with bin patcher in bootloader. ** 2025.09.11**
  ***/
 
 int main()
@@ -887,6 +884,7 @@ int main()
 
     DIR_HOST_RS485_In();
     ReadMyCenterID();	
+	
     METER_PW1_On();
     METER_PW2_On();
     METER_PW3_On();
@@ -921,10 +919,9 @@ int main()
 		ReadMyCenterID();
 		
 		//	Metadata Verification
-//		VerifyFW(centerResetStatus);		
+		VerifyFW(centerResetStatus);		
 		SendHost_CenterUpdateSuccsess();
-		//	Read ota Cmds
-		ReadMeterOtaCmdList();
+
 		
 		SysTick_Config(PLL_CLOCK/100);
     NVIC_EnableIRQ(SysTick_IRQn);
@@ -968,7 +965,6 @@ int main()
     u32TimeTick2=0;   	
     MeterPollingState = PL_METER_NORM ;		
     NowPollingMtrBoard = 1 ;	    
-    fgTestInitOK = 0 ;	
 
     do
     {
@@ -1051,12 +1047,12 @@ void ResetMeterUART(void)
 //    uint32_t rtc_base, watering_base, data[2];
 //		
 //		//	Read RTC from flash
-//    rtc_base = FW_Status_Base + sizeof(FWstatus);
+//    rtc_base = BANK_STATUS_BASE + sizeof(FwStatus);
 //    ReadData(rtc_base, rtc_base + sizeof(RTC_Data), (uint32_t*)&data);
 //    memcpy(CtrSystemTime, data, sizeof(RTC_Data));
 //	
 //		//	Read Watering setup from flash
-//    watering_base = FW_Status_Base + sizeof(FWstatus) + sizeof(CtrSystemTime);
+//    watering_base = BANK_STATUS_BASE + sizeof(FwStatus) + sizeof(CtrSystemTime);
 //    ReadData(watering_base, watering_base + sizeof(Watering_SetUp), (uint32_t*)&data);
 //    memcpy(&Watering_SetUp, data, sizeof(Watering_SetUp));
 //	
