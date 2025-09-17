@@ -45,15 +45,15 @@ void SendHost_SoilSensorData(void);
 void SendHost_AirSensorData(void);
 void SendHost_InvData(void);
 
-void SendHost_CenterUpdateSuccsess(void);
-void SendHost_MeterUpdateSuccsess(void);
+void SendHost_CenterUpdateSuccess(void);
+void SendHost_MeterUpdateSuccess(void);
 void SendHost_WateringData(void);
 
 void SendHost_FirstReset_Ack(void);
 
 /**	OTA **/
 void SendHost_CenterFWinfo(void);
-void SendHost_MeterFWInfo(void);
+void SendHost_MeterFwInfo(void);
 
 void CalChecksumH(void);
 void GetHostRTC(void);
@@ -161,6 +161,7 @@ void HostProcess(void)
                         break;
 										case CTR_2_METER_OTA_CMD:							// 0x19
 												Host_MeterOTAProcess();
+												ClearRespDelayTimer();
 												break;
 										case CTR_SET_WTR_TIME:								//0x1A
 												Host_WateringSetupProcess();
@@ -216,16 +217,21 @@ void HostProcess(void)
 										case CTR_RSP_WTR_TIME_SETUP :
 												SendHost_WateringData();
 												break;
+										
 										case CTR_OTA_UPDATE_CMD:
-												Write_FwOtaCmd(UPDATE_CENTER);
+												SYS_UnlockReg();
+												FMC_ENABLE_ISP();
+												BankStatus[Center].Cmd = BTLD_UPDATE_CENTER;
+												WriteFwStatus(&BankStatus[Center]);
 												SendHost_CenterFWinfo();
 												JumpToBootloader();
 												break;
 
 										case CTR_SWITCH_FW_CMD:
+												SYS_UnlockReg();
+												FMC_ENABLE_ISP();
 												SendHost_CenterFWinfo();
-												_bBankSwitchFlag = 1;
-												MarkFwFlag(FALSE);
+												FwBankSwitchProcess(IsFwValid(&BankMeta[Center][Backup]));
 												JumpToBootloader();
 												break;
 
@@ -236,7 +242,11 @@ void HostProcess(void)
 
 										case CTR_REBOOT_CMD:
 												SendHost_CenterFWinfo();
+												NVIC_SystemReset();
 												JumpToBootloader();
+												break;
+										case CTR_RSP_MTR_FW_INFO:
+												SendHost_MeterFwInfo();
 												break;
                     default :
                         break;
@@ -407,41 +417,53 @@ void Host_InvDataProcess(void)
 void Host_OTACenterProcess(void)
 {
 		SYS_UnlockReg();
-		FMC_Open();
+		FMC_ENABLE_ISP();
 
-		CmdType = TokenHost[3];	
-		
-		Get_FwBankMetaInfo(	(FwStatus *)&BankStatus[Center], (FwMeta *)&BankMeta[Center][Active], (FwMeta *)&BankMeta[Center][Backup]);
+		CmdType = TokenHost[5];	
+		Get_DualBankStatus(	(FwStatus *)&BankStatus[Center], &BankMeta[Center][Active], &BankMeta[Center][Backup]);
+
+		SYS_LockReg();
 
 		GetHostRTC();
 }
 
 /***
  *	Host_MeterOTAProcess()
- *	@Brief	if Fw in center bank, MeterPolling process OTA., 
+ *	@Brief	if Meter fw is in center backup bank, MeterPolling process OTA., 
 							if "NOT", Go to Center Bootloader then write FW in another center flash bank.
+
+1: Center ID
+2: Cmd
+3: Meter ID
+4: Device ID
+5: Device Cmd
  ***/
 void Host_MeterOTAProcess(void)
 {
 		uint8_t MtrBoardIdx;	
 
 		SYS_UnlockReg();
-		FMC_Open();
+		FMC_ENABLE_ISP();
 	
 		GetHostRTC();
 
+		CmdType = CTR_RSP_MTR_FW_INFO;
 		MtrBoardIdx = TokenHost[3]-1;
-		MeterOtaCmdList[MtrBoardIdx] = TokenHost[4];	
+		MeterOtaCmdList[MtrBoardIdx] = TokenHost[5];	
 		
-		if (TokenHost[4] == METER_OTA_UPDATE_CMD)
+		if (MeterOtaCmdList[MtrBoardIdx] == METER_OTA_UPDATE_CMD)
 		{
-				if (BankMeta[Center][Backup].flags != Fw_MeterFwFlag) {
-
-						Write_FwOtaCmd(UPDATE_METER);
+				if (!(BankMeta[Center][Backup].flags == (Fw_MeterFwFlag | Fw_InvalidFlag))) 
+				{
+						BankStatus[Center].Cmd = BTLD_UPDATE_METER;
+						//	Use "OTA_MeterID_Flags" to mark which device need to be update
+						BankStatus[Center].OTA_MeterID_Flags = 1 << MtrBoardIdx;
+						WriteFwStatus((FwStatus *)&BankStatus[Center]);
 						SendHost_CenterFWinfo();
 						JumpToBootloader();
 				}
-		}  
+		}
+		SYS_LockReg();
 }
 
 /*** 
@@ -887,23 +909,30 @@ void SendHost_FirstReset_Ack(void)
 void SendHost_CenterFWinfo(void)
 {
 		uint8_t i;
+		HostTxBuffer[1] = MyCenterID ;
 		HostTxBuffer[2] = CmdType;
+		
 
 		memcpy(&HostTxBuffer[4], 	(FwStatus *)&BankStatus[Center], sizeof(FwStatus));
-    memcpy(&HostTxBuffer[20],	(FwMeta *)&BankMeta[Center][Active], sizeof(FwMeta));
-		memcpy(&HostTxBuffer[52],	(FwMeta *)&BankMeta[Center][Backup], sizeof(FwMeta));
+    memcpy(&HostTxBuffer[20],	&BankMeta[Center][Active], sizeof(FwMeta));
+		memcpy(&HostTxBuffer[52],	&BankMeta[Center][Backup], sizeof(FwMeta));
 
 		CalChecksumH();
 }
 
-void SendHost_MeterFWInfo(void){
+void SendHost_MeterFwInfo(void){
 	
 		uint8_t i;
-		HostTxBuffer[2] = CmdType;
+	
+		HostTxBuffer[1] = MyCenterID ;
+		HostTxBuffer[2] = MeterOtaCmdList[NowPollingMtrBoard-1];
+		HostTxBuffer[3] = NowPollingMtrBoard;
+		
+		
 
 		memcpy(&HostTxBuffer[4], 	(FwStatus *)&BankStatus[Meter], sizeof(FwStatus));
-    memcpy(&HostTxBuffer[20], (FwMeta *)&BankMeta[Meter][Active], sizeof(FwMeta));
-		memcpy(&HostTxBuffer[52], (FwMeta *)&BankMeta[Meter][Backup], sizeof(FwMeta));
+    memcpy(&HostTxBuffer[20], &BankMeta[Meter][Active], sizeof(FwMeta));
+		memcpy(&HostTxBuffer[52], &BankMeta[Meter][Backup], sizeof(FwMeta));
 	
 		CalChecksumH();
 	
@@ -912,7 +941,7 @@ void SendHost_MeterFWInfo(void){
 /* 
 	When meter update success, send host Update Success Password
 */
-void SendHost_MeterUpdateSuccsess(void)
+void SendHost_MeterUpdateSuccess(void)
 {
 		HostTxBuffer[1] = MyCenterID;					//MeterID
 		HostTxBuffer[2] = GotMeterRspID;	//MeterID
@@ -926,13 +955,13 @@ void SendHost_MeterUpdateSuccsess(void)
 /* 
 	When Center update success, send host Update Success Password 
 */
-void SendHost_CenterUpdateSuccsess(void)
+void SendHost_CenterUpdateSuccess(void)
 {
 		HostTxBuffer[1] = MyCenterID;
 		HostTxBuffer[4] = 0xEE;		HostTxBuffer[5] = 0xFF;
 		HostTxBuffer[6] = 0x5A;		HostTxBuffer[7] = 0xA5;
 		
-		memcpy(&HostTxBuffer[8], (FwMeta *)&BankMeta[Center][Active], sizeof(FwStatus));
+		memcpy(&HostTxBuffer[8], &BankMeta[Center][Active], sizeof(FwStatus));
 		CalChecksumH();
 }
 

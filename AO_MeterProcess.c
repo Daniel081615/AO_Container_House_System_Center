@@ -107,6 +107,12 @@ void MeterBoardPolling(void)
     MtrBoardIdx = NowPollingMtrBoard-1;		
 		//Meter Cmd List
 		MeterOtaCmd = MeterOtaCmdList[MtrBoardIdx];
+		
+		if (MeterOtaCmd != 0)
+		{
+				MeterPollingState = PL_METER_OTA_CMD;
+		}
+	
     switch ( MeterPollingState )
     {			
         case PL_METER_NORM :
@@ -144,7 +150,7 @@ void MeterBoardPolling(void)
 				
         case PL_MtrBoard_SYSETM :
 						if (!EnPollPwrMtrFlag){
-								MeterPollingState = PL_METER_POLL3;
+								MeterPollingState = PL_METER_POWERMETER;
 								return;
 						}
             if ( MeterWaitTick > 2 )
@@ -160,11 +166,11 @@ void MeterBoardPolling(void)
         case PL_MtrBoard_SYSETM_RSP :
             if (GotMeterRspID == NowPollingMtrBoard)
             {
-								PollSuccess_Handler(PL_METER_POLL3);
+								PollSuccess_Handler(PL_METER_POWERMETER);
             } else {
                 if ( TickPollingInterval_Meter > POLLING_TIMEOUT )
-										PollingTimeout_Handler(PL_MtrBoard_SYSETM, PL_METER_POLL3);
-										if (MeterPollingState == PL_METER_POLL3) {
+										PollingTimeout_Handler(PL_MtrBoard_SYSETM, PL_METER_POWERMETER);
+										if (MeterPollingState == PL_METER_POWERMETER) {
 												NowPollingPwrMtrID++;
 												if (NowPollingPwrMtrID > PwrMtrMax){
 														EnPollPwrMtrFlag = FALSE;
@@ -173,22 +179,22 @@ void MeterBoardPolling(void)
 						}
             break;
 						
-        case PL_METER_POLL3 :	
+        case PL_METER_POWERMETER :	
             if ( MeterWaitTick > 2 )
             {							
                 GotMeterRspID = 0xFF ;
                 ResetMeterUART();
                 SendMeter_GetPowerData();                           
                 TickPollingInterval_Meter = 0 ;
-                MeterPollingState = PL_METER_POLL4 ;
+                MeterPollingState = PL_METER_POWERMETER_RSP ;
             }
             break;
 						
-        case PL_METER_POLL4 :
+        case PL_METER_POWERMETER_RSP :
             if (GotMeterRspID == NowPollingMtrBoard)
             {		
 								PwrMtrCmdList[MtrBoardIdx][NowPollingPwrMtrID-1] = 0;
-								PollSuccess_Handler(PL_METER_POLL5);
+								PollSuccess_Handler(PL_METER_BMS);
 								//	Poll next power meter, or stop polling
 								NowPollingPwrMtrID++;
 								if (NowPollingPwrMtrID > PwrMtrMax){
@@ -197,9 +203,9 @@ void MeterBoardPolling(void)
 						} else {
                 // Timeout 
                 if ( TickPollingInterval_Meter > POLLING_TIMEOUT )
-										PollingTimeout_Handler(PL_METER_POLL3, PL_METER_POLL5);
+										PollingTimeout_Handler(PL_METER_POWERMETER, PL_METER_BMS);
 										//	when reaches maximum timeout tries, poll next device
-										if (MeterPollingState == PL_METER_POLL5) {
+										if (MeterPollingState == PL_METER_BMS) {
 												NowPollingPwrMtrID++;
 												if (NowPollingPwrMtrID > PwrMtrMax){
 														EnPollPwrMtrFlag = FALSE;
@@ -208,9 +214,9 @@ void MeterBoardPolling(void)
             }
             break;  
 						
-        case PL_METER_POLL5 :
+        case PL_METER_BMS :
 						if (!EnPollBmsFlag){
-								MeterPollingState = PL_METER_POLL7;
+								MeterPollingState = PL_METER_WATERMETER;
 								return;
 						}
             if ( MeterWaitTick > 2 )
@@ -219,15 +225,15 @@ void MeterBoardPolling(void)
                 ResetMeterUART();
                 SendMeter_GetBmsData();
                 TickPollingInterval_Meter = 0 ;
-                MeterPollingState = PL_METER_POLL6;
+                MeterPollingState = PL_METER_BMS_RSP;
             }
             break;
 						
-        case PL_METER_POLL6 :
+        case PL_METER_BMS_RSP :
             if (GotMeterRspID == NowPollingMtrBoard)
             {
 								BmsCmdList[MtrBoardIdx][NowPollingBmsID-1] = 0;
-								PollSuccess_Handler(PL_METER_POLL7);
+								PollSuccess_Handler(PL_METER_WATERMETER);
 								//	Poll next Bms, or stop polling
 								NowPollingBmsID++;
 								if (NowPollingBmsID > BmsMax){
@@ -235,9 +241,9 @@ void MeterBoardPolling(void)
 								}
             } else {
                 if ( TickPollingInterval_Meter > POLLING_TIMEOUT )
-										PollingTimeout_Handler(PL_METER_POLL5,PL_METER_POLL7);
+										PollingTimeout_Handler(PL_METER_BMS,PL_METER_WATERMETER);
 										//	when reaches maximum timeout tries, poll next device
-										if (MeterPollingState == PL_METER_POLL7) {
+										if (MeterPollingState == PL_METER_WATERMETER) {
 												NowPollingBmsID++;
 												if (NowPollingBmsID > BmsMax){
 														EnPollBmsFlag = FALSE;
@@ -246,9 +252,9 @@ void MeterBoardPolling(void)
             }
             break;						
 						
-        case PL_METER_POLL7 :	
+        case PL_METER_WATERMETER :	
 						if (!EnPollWtrMtrFlag){
-								MeterPollingState = PL_METER_POLL9;
+								MeterPollingState = PL_METER_INVERTER;
 								return;
 						}
             if ( MeterWaitTick > 2 )
@@ -257,15 +263,15 @@ void MeterBoardPolling(void)
                 ResetMeterUART();
                 SendMeter_GetWaterData();
                 TickPollingInterval_Meter = 0 ;
-                MeterPollingState = PL_METER_POLL8;
+                MeterPollingState = PL_METER_WATERMETER_RSP;
             }
             break;
 						
-        case PL_METER_POLL8 :
+        case PL_METER_WATERMETER_RSP :
             if (GotMeterRspID == NowPollingMtrBoard)
             {
 								WtrMtrCmdList[MtrBoardIdx][NowPollingWtrMtrID-1] = 0;
-								PollSuccess_Handler(PL_METER_POLL9);
+								PollSuccess_Handler(PL_METER_INVERTER);
 								//	Poll next WM, or stop polling
 								NowPollingWtrMtrID++;
 								if (NowPollingWtrMtrID > WtrMtrMax){
@@ -274,9 +280,9 @@ void MeterBoardPolling(void)
 															
             } else {
                 if ( TickPollingInterval_Meter > POLLING_TIMEOUT )
-										PollingTimeout_Handler(PL_METER_POLL7,PL_METER_POLL9);
+										PollingTimeout_Handler(PL_METER_WATERMETER,PL_METER_INVERTER);
 										//	when reaches maximum timeout tries, poll next device
-										if (MeterPollingState == PL_METER_POLL9) {
+										if (MeterPollingState == PL_METER_INVERTER) {
 												NowPollingWtrMtrID++;
 												if (NowPollingWtrMtrID > WtrMtrMax){
 														EnPollWtrMtrFlag = FALSE;
@@ -285,9 +291,9 @@ void MeterBoardPolling(void)
             }
             break;								
 
-        case PL_METER_POLL9 :	
+        case PL_METER_INVERTER :	
 						if (!EnPollInvFlag){
-								MeterPollingState = PL_METER_POLL11;
+								MeterPollingState = PL_METER_PYRANOMETER;
 								return;
 						}
             if ( MeterWaitTick > 2 )
@@ -296,14 +302,14 @@ void MeterBoardPolling(void)
                 ResetMeterUART();
                 SendMeter_GetInvData();
                 TickPollingInterval_Meter = 0 ;
-                MeterPollingState = PL_METER_POLL10;
+                MeterPollingState = PL_METER_INVERTER_RSP;
             }
             break;
 						
-        case PL_METER_POLL10 :
+        case PL_METER_INVERTER_RSP :
             if (GotMeterRspID == NowPollingMtrBoard)
             {
-								PollSuccess_Handler(PL_METER_POLL11);
+								PollSuccess_Handler(PL_METER_PYRANOMETER);
 								//	Poll next Bms, or stop polling
 								NowPollingInvID++;
 								if (NowPollingInvID > InvMax){
@@ -311,9 +317,9 @@ void MeterBoardPolling(void)
 								}
             } else {
                 if ( TickPollingInterval_Meter > POLLING_TIMEOUT )
-										PollingTimeout_Handler(PL_METER_POLL9,PL_METER_POLL11);
+										PollingTimeout_Handler(PL_METER_INVERTER,PL_METER_PYRANOMETER);
 										//	when reaches maximum timeout tries, poll next device
-										if (MeterPollingState == PL_METER_POLL11) {
+										if (MeterPollingState == PL_METER_PYRANOMETER) {
 												NowPollingInvID++;
 												if (NowPollingInvID > InvMax){
 														EnPollInvFlag = FALSE;
@@ -322,9 +328,9 @@ void MeterBoardPolling(void)
             }
             break;		
 
-        case PL_METER_POLL11 :	
+        case PL_METER_PYRANOMETER :	
 						if (!EnPollPyrFlag){
-								MeterPollingState = PL_METER_POLL13;
+								MeterPollingState = PL_METER_SOILSENSOR;
 								return;
 						}
             if ( MeterWaitTick > 2 )
@@ -333,15 +339,15 @@ void MeterBoardPolling(void)
                 ResetMeterUART();
                 SendMeter_GetPyrMtrData();
                 TickPollingInterval_Meter = 0 ;
-                MeterPollingState = PL_METER_POLL12;
+                MeterPollingState = PL_METER_PYRANOMETER_RSP;
             }
             break;
 						
-        case PL_METER_POLL12 :
+        case PL_METER_PYRANOMETER_RSP :
             if (GotMeterRspID == NowPollingMtrBoard)
             {
 								PyrMtrCmdList[MtrBoardIdx][NowPollingPyrMtrID-1] = 0;
-								PollSuccess_Handler(PL_METER_POLL13);
+								PollSuccess_Handler(PL_METER_SOILSENSOR);
 								//	Poll next Bms, or stop polling
 								NowPollingPyrMtrID++;
 								if (NowPollingPyrMtrID > PyrMtrMax){
@@ -349,9 +355,9 @@ void MeterBoardPolling(void)
 								}
             } else {
                 if ( TickPollingInterval_Meter > POLLING_TIMEOUT )
-										PollingTimeout_Handler(PL_METER_POLL11,PL_METER_POLL13);
+										PollingTimeout_Handler(PL_METER_PYRANOMETER,PL_METER_SOILSENSOR);
 										//	when reaches maximum timeout tries, poll next device
-										if (MeterPollingState == PL_METER_POLL13) {
+										if (MeterPollingState == PL_METER_SOILSENSOR) {
 												NowPollingPyrMtrID++;
 												if (NowPollingPyrMtrID > PyrMtrMax){
 														EnPollPyrFlag = FALSE;
@@ -360,9 +366,9 @@ void MeterBoardPolling(void)
             }
             break;		
 
-        case PL_METER_POLL13 :	
+        case PL_METER_SOILSENSOR :	
 						if (!EnPollSoilSensorFlag){
-								MeterPollingState = PL_METER_POLL15;
+								MeterPollingState = PL_METER_AIRSENSOR;
 								return;
 						}
             if ( MeterWaitTick > 2 )
@@ -371,15 +377,15 @@ void MeterBoardPolling(void)
                 ResetMeterUART();
                 SendMeter_GetSoilData();
                 TickPollingInterval_Meter = 0 ;
-                MeterPollingState = PL_METER_POLL14;
+                MeterPollingState = PL_METER_SOILSENSOR_RSP;
             }
             break;
 						
-        case PL_METER_POLL14 :
+        case PL_METER_SOILSENSOR_RSP :
             if (GotMeterRspID == NowPollingMtrBoard)
             {
 								SoilSensorCmdList[MtrBoardIdx][NowPollingSoilSensorID-1] = 0;
-								PollSuccess_Handler(PL_METER_POLL15);
+								PollSuccess_Handler(PL_METER_AIRSENSOR);
 								//	Poll next Bms, or stop polling
 								NowPollingSoilSensorID++;
 								if (NowPollingSoilSensorID > SoilSensorMax){
@@ -387,9 +393,9 @@ void MeterBoardPolling(void)
 								}
             } else {
                 if ( TickPollingInterval_Meter > POLLING_TIMEOUT )
-										PollingTimeout_Handler(PL_METER_POLL13,PL_METER_POLL15);
+										PollingTimeout_Handler(PL_METER_SOILSENSOR,PL_METER_AIRSENSOR);
 										//	when reaches maximum timeout tries, poll next device
-										if (MeterPollingState == PL_METER_POLL15) {
+										if (MeterPollingState == PL_METER_AIRSENSOR) {
 												NowPollingSoilSensorID++;
 												if (NowPollingSoilSensorID > SoilSensorMax){
 														EnPollSoilSensorFlag = FALSE;
@@ -398,9 +404,9 @@ void MeterBoardPolling(void)
             }
             break;						
 
-        case PL_METER_POLL15 :	
+        case PL_METER_AIRSENSOR :	
 						if (!EnPollAirSensorFlag){
-								MeterPollingState = PL_METER_POLL17;
+								MeterPollingState = PL_METER_WATERING;
 								return;
 						}
             if ( MeterWaitTick > 2 )
@@ -409,13 +415,13 @@ void MeterBoardPolling(void)
                 ResetMeterUART();
                 SendMeter_GetAirData();
                 TickPollingInterval_Meter = 0 ;
-                MeterPollingState = PL_METER_POLL16;
+                MeterPollingState = PL_METER_AIRSENSOR_RSP;
             }
             break;
-        case PL_METER_POLL16 :
+        case PL_METER_AIRSENSOR_RSP :
             if (GotMeterRspID == NowPollingMtrBoard)
             {
-								PollSuccess_Handler(PL_METER_POLL17);
+								PollSuccess_Handler(PL_METER_WATERING);
 								//	Poll next Bms, or stop polling
 								NowPollingAirSensorID++;
 								if (NowPollingAirSensorID > AirSensorMax){
@@ -423,9 +429,9 @@ void MeterBoardPolling(void)
 								}
             } else {
                 if ( TickPollingInterval_Meter > POLLING_TIMEOUT )
-										PollingTimeout_Handler(PL_METER_POLL15,PL_METER_POLL17);
+										PollingTimeout_Handler(PL_METER_AIRSENSOR,PL_METER_WATERING);
 										//	when reaches maximum timeout tries, poll next device
-										if (MeterPollingState == PL_METER_POLL17) {
+										if (MeterPollingState == PL_METER_WATERING) {
 												NowPollingAirSensorID++;
 												if (NowPollingAirSensorID > AirSensorMax){
 														EnPollAirSensorFlag = FALSE;
@@ -434,66 +440,59 @@ void MeterBoardPolling(void)
             }
             break;	
 						
-				/***
-						Process Meter Cmds, if Cmds != METER_OTA_UPDATE_CMD, poll the next meter
-						if Cmd == METER_OTA_UPDATE_CMD
-				 ***/
-        case PL_METER_POLL17 :
+        case PL_METER_WATERING :
 					
             if ( MeterWaitTick > 2 )
             {							
                 GotMeterRspID = 0xFF ;
                 ResetMeterUART();
-								if (MeterOtaCmd != 0) 
-								{
-										SendMeter_MeterOTACmd(MeterOtaCmd);
-										TickPollingInterval_Meter = 0 ;
-										MeterPollingState = PL_METER_POLL18 ;
-								} else if (WATERING_SETTING_FLAG == TRUE) {
+								if (WATERING_SETTING_FLAG == TRUE) {
 										SendMeter_WateringTimeSetup();
-										MeterPollingState = PL_METER_WATERING;
+										MeterPollingState = PL_METER_WATERING_RSP;
 								} else {
 										MeterPollingState = PL_METER_NORM;
 								}
             }
             break;
-						
-				case PL_METER_WATERING :
+				case PL_METER_WATERING_RSP :
             if (GotMeterRspID == NowPollingMtrBoard)
             {
 								PollSuccess_Handler(PL_METER_NORM);
             } else if ( TickPollingInterval_Meter > POLLING_TIMEOUT )
-								PollingTimeout_Handler(PL_METER_POLL17,PL_METER_NORM);
+								PollingTimeout_Handler(PL_METER_WATERING,PL_METER_NORM);
 						break;
 
+		/***+-------------------------------------------------------------+
+			|										@OTA Update State machine									|
+			+-------------------------------------------------------------+	***/						
 						
-				case PL_METER_POLL18:
-						if (GotMeterRspID == NowPollingMtrBoard)
-						{
-								SendHost_MeterFWInfo();
-							
-								MeterOtaCmdList[MtrBoardIdx] = 0;
-								PollSuccess_Handler(PL_METER_NORM);
-							
-								if(MeterOtaCmd == METER_OTA_UPDATE_CMD)
+				case PL_METER_OTA_CMD:
+            if ( MeterWaitTick > 2 )
+            {				
+                GotMeterRspID = 0xFF ;
+                ResetMeterUART();
+								SendMeter_MeterOTACmd(MeterOtaCmd);
+								MeterPollingState = PL_METER_OTA_RSP;
+            }
+            break;
+						
+				case PL_METER_OTA_RSP :
+            if (GotMeterRspID == NowPollingMtrBoard)
+            {
+								if (MeterOtaCmd == METER_OTA_UPDATE_CMD)
 								{
 										MeterOtaFlag = 1;
 										StartAddress = BankMeta[Center][Backup].fw_start_addr;
 										TotalLen 		 = BankMeta[Center][Backup].fw_size;
-									
-//										MeterOtaCmdList[MtrBoardIdx] = 0;
-										MeterPollingState = PL_MTR_CMD_CONNECT;
+										PollSuccess_Handler(PL_MTR_CMD_CONNECT);
 										break;
 								}
-						}
-						//	if Timeout, do Update next round
-						else if (TickPollingInterval_Meter > POLLING_TIMEOUT)
-								PollingTimeout_Handler(PL_METER_POLL17, PL_METER_NORM);
-						break;
-						
-/*+-------------------------------------------------------------+
-	|										OTA Update State machine									|
-	+-------------------------------------------------------------+	*/
+								MeterOtaCmdList[MtrBoardIdx] = 0;
+								PollSuccess_Handler(PL_METER_NORM);
+								
+            } else if ( TickPollingInterval_Meter > POLLING_TIMEOUT )
+								PollingTimeout_Handler(PL_METER_OTA_CMD,PL_METER_NORM);
+						break;					
 				
 				case PL_MTR_CMD_CONNECT:
 				
@@ -1269,8 +1268,8 @@ void METER_RSP_WateringStatus(void)
 void Meter_RSP_FWInfo(void)
 {
 		memcpy((FwStatus *)&BankStatus[Meter], &TokenMeter[4], sizeof(FwStatus));
-    memcpy((FwMeta *)&BankMeta[Meter][Active], &TokenMeter[20], sizeof(FwMeta));
-		memcpy((FwMeta *)&BankMeta[Meter][Backup], &TokenMeter[52], sizeof(FwMeta));
+    memcpy(&BankMeta[Meter][Active], &TokenMeter[20], sizeof(FwMeta));
+		memcpy(&BankMeta[Meter][Backup], &TokenMeter[52], sizeof(FwMeta));
 }
 
 /***

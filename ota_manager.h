@@ -28,11 +28,11 @@
 	*	@Discussion 
 			1.	Maybe Depart FWStatus.status (uint32_t) into status & Cmds (uint16_t + uint16_t) 
 					typedef struct {
-							uint32_t FW_Addr;
-							uint32_t Meta_addr;
+							uint32_t Fw_Base;
+							uint32_t Fw_Meta_Base;
 							uint16_t status;
 							uint16_t cmd;
-							uint32_t FWVersion;
+							uint32_t FwVersion;
 					} FwStatus;
 					
 					i.	status 
@@ -42,18 +42,25 @@
 						
 					...	Flag that needs to write in FwStatus ...
 					ii.	Cmds
-						#define UPDATE_CENTER	0x0001
-						#define UPDATE_METER	0x0002
-						#define	NOCMD					0x00FF
+						#define BTLD_UPDATE_CENTER	0x0001
+						#define BTLD_UPDATE_METER	0x0002
 			
  ***/
  
-#define UPDATE_CENTER	0x0001
-#define UPDATE_METER	0x0002
-#define	NOCMD					0x00FF
-
-#define OTA_UPDATE_FLAG          0xDDCCBBAA
-#define FW_VERIFIED			 				 0x5AA5A55A
+ enum {
+	 //Bootloader Cmds
+	 BTLD_CLEAR_CMD = 0,
+	 BTLD_UPDATE_CENTER,
+	 BTLD_UPDATE_METER,	 
+	 
+	 //	FwBank status
+	 DUAL_FW_BANK_VALID = 0x10,
+	 ACTIVE_FW_BANK_VALID,
+	 BACKUP_FW_BANK_VALID,
+	 METER_OTA_UPDATEING,
+	 ALL_FW_BANK_INVALID
+	 
+ } ;
 
 // Memory addresses
 #define BANK1_BASE               0x00002000
@@ -78,10 +85,10 @@
 #define MTR_CMD_GET_DEVICEID      0xB1
 #define MTR_CMD_RESEND_PACKET     0xFF
 
-#define Center	0x00
-#define Meter		0x01
-#define Active	0x00
-#define	Backup	0x01
+#define Center	0
+#define Meter		1
+#define Active	0
+#define	Backup	1
 #define MaxBankCnt	2
 
 typedef struct __attribute__((packed)) {
@@ -97,32 +104,28 @@ typedef struct __attribute__((packed)) {
 
 
 typedef struct {
-    uint32_t FW_Addr;
-    uint32_t Meta_addr;
+    uint32_t Fw_Base;
+    uint32_t Fw_Meta_Base;
     uint16_t status;
 		uint16_t Cmd;
-		uint32_t FWVersion;
+		uint32_t OTA_MeterID_Flags;
 } FwStatus;
 
 extern int  WriteFwStatus(FwStatus *status);
 extern int  WriteMetadata(FwMeta *meta, uint32_t MetaBase);
 extern int  WriteToFlash(void *data, uint32_t size, uint32_t base_addr, bool with_crc32, uint32_t crc_offset);
 extern void BlinkLEDs();
-extern void MarkFwFlag(bool mark);
-extern void VerifyFW(bool ResetStatus);
 extern void JumpToBootloader();
 
-extern void Write_FwOtaCmd(uint16_t cmd);
-extern void Write_FwStatus(uint16_t stat);
+extern void FwValidationHandler(void);
 
-extern void Get_FwBankMetaInfo(FwStatus *ctx, FwMeta *active, FwMeta *backup);
+extern void Get_DualBankStatus(FwStatus *ctx, FwMeta *active, FwMeta *backup);
 extern void BlinkStatusLED(GPIO_T *port, uint32_t pin, uint8_t times, uint32_t delay_ms);
-extern bool FwCheck_CRC(FwMeta *meta);
+extern _Bool FwCheck_CRC(FwMeta *meta);
 extern uint32_t CRC32_Calc(const uint8_t *pData, uint32_t len) ;
 
-extern volatile FwStatus BankStatus[2];
-extern volatile FwMeta BankMeta[2][MaxBankCnt];
-extern _Bool	_bBankSwitchFlag;
+extern FwStatus BankStatus[2];
+extern FwMeta BankMeta[2][MaxBankCnt];
 
 
 

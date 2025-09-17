@@ -16,10 +16,7 @@
 #include "AO_MeterProcess.h"
 #include "AO2022_Center_1261.h"
 
-// 0 : 校本部東一
-// 1 : 校本部東二
-// 2 : 南港
-// 3 : 新北
+
 #define AREA_ID     0
 
 #define PLLCTL_SETTING  CLK_PLLCTL_72MHz_HIRC
@@ -38,18 +35,15 @@ const uint8_t RoomMaxTable[SMART_ROOM_MAX]={1,30,23,29,31,29,31,29,31};
 
 #endif
 
+uint8_t MeterIDArray[MtrBoardMax] = {1};
+
 
 uint8_t RoomMax;
 uint8_t MeterDeviceMax;
 uint8_t MyCenterID;
-uint8_t SystemMode;		// 單人 / 多人 / 負值
 uint8_t iStatus;
 uint8_t fgHostFlag;
-_Bool 	fgReaderSync,fgOpenRoomDoor,fgBalanceUpdated,fgUserChargeModeUpdated;
-uint16_t MeterBalanceValueX;	// Add / Dec Balance from Host
-uint8_t MeterBalanceOP;	// 0xA5 : Add / 0x5A Dec 
-uint8_t HostOldDoorRCDStart;	// Read Door RCD from Meter
-uint8_t HostRecordType,HostRecordIndex;
+
 uint8_t HostPackageIndex;
 uint8_t MeterResult;
 uint8_t AutoLockTime ;			// 自動上鎖等待時間
@@ -79,14 +73,9 @@ uint8_t TokenHost[HOST_TOKEN_LENGTH];
 uint8_t TokenMeter[METER_TOKEN_LENGTH];
 
 
-uint8_t 	UID[4];
-uint8_t 	NewUser,NowUser,LastUser;
-uint8_t 	MemberIndex;
 uint8_t 	CenterID;
 uint8_t	Tick_20mSec,DelayTick;
 uint8_t 	HostTokenReady,MeterTokenReady;
-uint8_t 	Node1TokenReady,Node2TokenReady;
-uint8_t     CenterRecord_WP,CenterRecord_RP,CenterNewRecordCounter,TickRecord;
 
 uint8_t TickTest;
 
@@ -94,9 +83,7 @@ uint8_t MeterInitState;
 
 _Bool flagMeterOtaUpdate; 
 
-uint8_t ReTryCounter,TickWaitAck;
-uint8_t ReaderInitialState;
-uint8_t CheckUserResult;
+
 uint8_t PollingMode;
 uint8_t TickReader;
 uint8_t iTickDelaySendHostCMD,bDelaySendHostCMD,bValueUpdated,bSystemTimeReady;
@@ -112,7 +99,7 @@ uint8_t TickHostUart, TickMeterUart;
 uint8_t TickNode1Uart, TickNode2Uart;
 
 uint8_t ReaderState,ReaderTick,bSendReaderCommand,ReaderCommandType;
-_Bool bRecoverSystem,bInitSystemMode;
+_Bool bRecoverSystem;
 _Bool fgMeterAckOK;
 _Bool fgDIR485_HOST_In,fgDIR485_METER_In;
 _Bool 	fgDIR485_NODE1_In,fgDIR485_NODE2_In ;
@@ -140,7 +127,6 @@ _Bool fgFirstTimeCheckAC;
 _Bool bACPowerStatus;
 uint8_t AC_Status_Counter,tick_CheckAC;
 uint16_t Tick1S_CheckACLoss;
-uint8_t LastSystemMode;
 uint8_t Tick_RoomModePro;
 uint8_t LastRoomMode,RoomModeCounter;
 _Bool fgReaderReset ;
@@ -167,7 +153,7 @@ volatile uint8_t g_u8RxData;
 volatile uint8_t g_u8DataLen;
 volatile uint8_t g_u8EndFlag = 0;
 
-volatile uint32_t g_u32WDTINTCounts;
+volatile uint16_t g_u16WDTINTCounts;
 volatile uint8_t g_u8IsWDTWakeupINT;
 
 //uint8_t PWRMeterData[ROOM_MAX];
@@ -186,26 +172,8 @@ uint8_t METERTxQ[MAX_METER_TXQ_LENGTH];
 
 uint8_t RoomNumberMax;
 uint8_t MyCenterID;
-uint8_t NowPollingRoom;
-uint8_t Tick1S_CheckMeterBoards;
 _Bool WATERING_SETTING_FLAG;
 
-/*
-
-    1. Room's Mode / Now User Index
-    2. Member's UID 1 ~ 10
-    3. Member's Balance 1 ~ 10
-    4. Meter-Total Watt
-    5. Meter-V / I / F / Watt / VAR / PF 
-
-*/
-
-	
-
-// Center ID 對應連接Meter模組數量
-
-
-// 新北高工
 #if 1
 #define HK_MAX	5
 const uint8_t RoomNumberMaxTable[HK_MAX]=
@@ -213,7 +181,6 @@ const uint8_t RoomNumberMaxTable[HK_MAX]=
 #endif 
 
 
-uint8_t SystemMode;		// 單人 / 多人 / 負值
 uint8_t iStatus;
 uint8_t fgHostFlag;
 uint16_t MeterBalanceValueX;	// Add / Dec Balance from Host
@@ -222,8 +189,6 @@ uint8_t MeterBalanceOP;	// 0xA5 : Add / 0x5A Dec
 uint8_t HostRecordType,HostRecordIndex;
 uint8_t HostPackageIndex;
 uint8_t MeterResult;
-
-// 暫存 Host 端參數
 
 uint8_t MeterMemberIndex;
 uint8_t HostPacketIndex;
@@ -299,6 +264,7 @@ void ReadMyCenterID(void);
 void RecoverSystemMoniter(void);
 void ChangeDirHostRS485(void);
 void ScheduleWateringTask(void);
+void SendHost_UpdateSuccess_10ms(uint8_t ms);
 
 volatile uint8_t MeterOtaFlag;
 
@@ -321,31 +287,31 @@ void WDT_IRQHandler(void)
 		SYS_UnlockReg();
 		FMC_Open();
 	
-		
-		//LED_G_On();
-		LED_R1_TOGGLE();LED_TGL_R();
+		/*	tEST*/
+//		LED_R1_TOGGLE();LED_TGL_R();
 	
 		WDT_RESET_COUNTER();
 		
-		uint32_t BackupBank_addr = (BankStatus[Center].Meta_addr == BANK1_META_BASE) ? BANK2_META_BASE : BANK1_META_BASE;
+		uint32_t BackupBank_addr = (BankStatus[Center].Fw_Meta_Base == BANK1_META_BASE) ? BANK2_META_BASE : BANK1_META_BASE;
 		
 		if (WDT_GET_TIMEOUT_INT_FLAG())
     {
 			
         WDT_CLEAR_TIMEOUT_INT_FLAG();
-        g_u32WDTINTCounts++;			
+        g_u16WDTINTCounts++;			
 			
-				BankMeta[Center][Active].WDTRst_counter = g_u32WDTINTCounts;
-				WriteMetadata((FwMeta *)&BankMeta[Center][Active], BankStatus[Center].Meta_addr);
+				BankMeta[Center][Active].WDTRst_counter = g_u16WDTINTCounts;
+				WriteMetadata(&BankMeta[Center][Active], BankStatus[Center].Fw_Meta_Base);
 			
-				if(g_u32WDTINTCounts > MAX_WDT_TRIES)
+				if(g_u16WDTINTCounts > MAX_WDT_TRIES)
 				{
 						BankMeta[Center][Active].flags &= ~(Fw_ActiveFlag | Fw_ValidFlag);
 						BankMeta[Center][Active].flags |= Fw_InvalidFlag;
 						BankMeta[Center][Backup].flags |= Fw_ActiveFlag;
-						WriteMetadata((FwMeta *)&BankMeta[Center][Backup], BackupBank_addr);
-						WriteMetadata((FwMeta *)&BankMeta[Center][Active], BankStatus[Center].Meta_addr);
+						WriteMetadata(&BankMeta[Center][Backup], BackupBank_addr);
+						WriteMetadata(&BankMeta[Center][Active], BankStatus[Center].Fw_Meta_Base);
 						WDT_Open(WDT_TIMEOUT_2POW4, WDT_RESET_DELAY_3CLK, TRUE, FALSE);
+						BlinkStatusLED( (FALSE) ? PD : PF, (FALSE) ? 7 : 2, 10, 800);
 						while (1);
 				}
     }
@@ -893,6 +859,10 @@ int main()
     LED_G_Off();
     LED_R_On();
     LED_R_Off();
+		LED_G1_On();
+		LED_G1_Off();
+		LED_R1_On();
+		LED_R1_Off();
 
     // For Meter
     UART0_Init();
@@ -915,16 +885,14 @@ int main()
     _SendStringToHOST(HostTxBuffer,10);
     */
 
-    centerResetStatus = 1;
 		ReadMyCenterID();
 		
 		//	Metadata Verification
-		VerifyFW(centerResetStatus);		
-		SendHost_CenterUpdateSuccsess();
-
+		FwValidationHandler();
 		
 		SysTick_Config(PLL_CLOCK/100);
     NVIC_EnableIRQ(SysTick_IRQn);
+
 
     /* Lock protected registers */
     SYS_LockReg();
@@ -940,23 +908,15 @@ int main()
     ReadMyCenterID();    
     DIR_HOST_RS485_In();
     MeterDeviceMax = MeterDeviceMaxTable[MyCenterID] ;
-
-    u32TimeTick2=0; 	
-    // Delay for System stable
-    do {
-        SystemTick = 0 ;
-				WDT_RESET_COUNTER();	
-    } while( u32TimeTick2 < 250 ); 
+    
+		// Delay for System stable
+		ResetHostUART();
+		ResetMeterUART();	
+		SendHost_UpdateSuccess_10ms(10);
+		
 
     SoftI2cMasterInit();	
     ReadMyCenterID();
-
-    u32TimeTick2=0;  
-    // Delay for System stable
-    do {
-    	SystemTick = 0;
-			WDT_RESET_COUNTER();
-    } while( u32TimeTick2 < 75 ); 
 
     SystemTick = 0 ;			
     fgFirstTimeCheckAC = 1 ;
@@ -1034,6 +994,16 @@ void ResetMeterUART(void)
 	METERTxQ_cnt = 0 ;
 }
 
+
+void SendHost_UpdateSuccess_10ms(uint8_t ms)
+{
+		u32TimeTick2 = 0;
+		do {
+				SystemTick = 0 ;
+				SendHost_CenterUpdateSuccess();
+				WDT_RESET_COUNTER();
+		} while( u32TimeTick2 < ms );
+}
 
 /***
  * @brief Read RTC & Watering setup from Flash memory, and do watering task according to the setting

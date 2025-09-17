@@ -10,6 +10,11 @@
 #define _AO_EXTERN_FUNC_H_
 
 #include "AO_MyDef.h"
+/***
+	OTA Functions
+***/
+extern void FwBankSwitchProcess(_Bool BackupValid);
+extern _Bool IsFwValid(FwMeta * Meta);
 
 extern void ReadParameterFromEE(void);
 extern void WriteParameterFromEE(void);
@@ -33,7 +38,6 @@ extern void WriteUserValueToEE_One(uint8_t fMemberIndex);
 extern void SaveCMD2HostSendQ(void);
 extern uint16_t ReadUserValueFromEE_One(uint8_t fMemberIndex);
 extern void SendHost_MeterStatus(void);
-extern void InitSystemMode(void);
 extern void SendHost_GetInfo(void);
 extern void WritePowerToEE(void);
 extern void SendHost_RspReaderInformation(void);
@@ -41,9 +45,9 @@ extern void SendHost_RspReadEE(void);
 extern void SendReader_SystemSW(void);
 extern void SendMeter_UserInformation(uint8_t PacketIndex);
 extern void SendHost_Ack(void);
-extern void SendHost_MeterFWInfo(void);
-extern void SendHost_MeterUpdateSuccsess(void);
-extern void SendHost_CenterUpdateSuccsess(void);
+extern void SendHost_MeterFwInfo(void);
+extern void SendHost_MeterUpdateSuccess(void);
+extern void SendHost_CenterUpdateSuccess(void);
 extern void RecordAddNew(uint8_t fnRoomIndex);
 extern void RoomPowerSetting(uint8_t fnRoomIndex, uint8_t fnStatus );
 extern void SendMeter_PollingAlive(void);
