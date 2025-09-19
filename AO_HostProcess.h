@@ -44,8 +44,6 @@ extern uint8_t _SendStringToHOST(uint8_t *Str, uint8_t len);
 extern void CalChecksumH(void);
 
 extern uint8_t AckResult;
-
-extern uint8_t g_packno;
 extern uint8_t lcmd;
 
 

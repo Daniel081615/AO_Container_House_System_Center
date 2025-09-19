@@ -307,7 +307,11 @@ void WDT_IRQHandler(void)
 				{
 						BankMeta[Center][Active].flags &= ~(Fw_ActiveFlag | Fw_ValidFlag);
 						BankMeta[Center][Active].flags |= Fw_InvalidFlag;
-						BankMeta[Center][Backup].flags |= Fw_ActiveFlag;
+					
+						if (BankMeta[Center][Active].flags == Fw_ValidFlag){
+								BankMeta[Center][Backup].flags |= Fw_ActiveFlag;
+						}
+						
 						WriteMetadata(&BankMeta[Center][Backup], BackupBank_addr);
 						WriteMetadata(&BankMeta[Center][Active], BankStatus[Center].Fw_Meta_Base);
 						WDT_Open(WDT_TIMEOUT_2POW4, WDT_RESET_DELAY_3CLK, TRUE, FALSE);

@@ -70,20 +70,15 @@
 #define BANK_STATUS_BASE         0x0001E800
 
 
-#define MTR_CMD_UPDATE_APROM      0xA0
-#define MTR_CMD_UPDATE_CONFIG     0xA1
-#define MTR_CMD_READ_CONFIG       0xA2
-#define MTR_CMD_ERASE_ALL         0xA3
-#define MTR_CMD_SYNC_PACKNO       0xA4
-#define	MTR_CMD_UPDATE_METADATA		0xA5
-#define MTR_CMD_GET_FWVER         0xA6
-#define MTR_CMD_SEL_FW						0xA7	
-#define MTR_CMD_RUN_APROM         0xAB
-#define MTR_CMD_RUN_LDROM         0xAC
-#define MTR_CMD_RESET             0xAD
-#define MTR_CMD_CONNECT           0xAE
-#define MTR_CMD_GET_DEVICEID      0xB1
-#define MTR_CMD_RESEND_PACKET     0xFF
+
+#define   CMD_UPDATE_APROM    0xA0
+#define		CMD_GET_PACKNO			0xA1
+#define   CMD_ERASE_BANK      0xA3
+#define   CMD_SYNC_PACKNO			0xA4
+#define   CMD_UPDATE_METADATA 0xA5
+#define   CMD_CONNECT         0xAE
+#define   CMD_RESEND_PACKET   0xFF
+	
 
 #define Center	0
 #define Meter		1

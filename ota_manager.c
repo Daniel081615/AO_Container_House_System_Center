@@ -42,7 +42,7 @@ void FwValidationHandler(void)
 		Get_DualBankStatus((FwStatus *)&BankStatus[Center], &BankMeta[Center][Active], &BankMeta[Center][Backup]);
 		uint32_t BackupBank_addr = (BankStatus[Center].Fw_Meta_Base == BANK1_META_BASE) ? BANK2_META_BASE : BANK1_META_BASE;
 		
-    _Bool activeValid = IsFwValid((FwMeta *)&BankMeta[Center][Active]);
+    _Bool activeValid = IsFwValid(&BankMeta[Center][Active]);
 		_Bool backupValid = IsFwValid(&BankMeta[Center][Backup]);
 	
 		Update_FwMetadata(activeValid, backupValid);
@@ -56,7 +56,7 @@ void FwValidationHandler(void)
 				WriteFwStatus(&BankStatus[Center]);
 				JumpToBootloader();
     } else if (BankStatus[Center].status == METER_OTA_UPDATEING){
-				
+			
 				uint32_t MeterOTAID =  BankStatus[Center].OTA_MeterID_Flags;
 				for (uint8_t i = 0; i < MtrBoardMax; i++)
 				{
@@ -65,7 +65,6 @@ void FwValidationHandler(void)
 								MeterOtaCmdList[i] = METER_OTA_UPDATE_CMD;
 						}
 				}
-				
 		} else if (BankStatus[Center].status == BACKUP_FW_BANK_VALID){
 				FwBankSwitchProcess(backupValid);
 		}	
