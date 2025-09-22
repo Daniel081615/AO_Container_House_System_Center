@@ -74,6 +74,7 @@ uint8_t MtrBoardIdx;
 uint32_t WateringFinishTime;
 
 //*** OTA Update ***//
+volatile _Bool b_UpdateFinished;
 static uint8_t g_packno, last_packno;
 static uint32_t pack_cnt;
 uint8_t lcmd;
@@ -109,7 +110,6 @@ void MeterBoardPolling(void)
     MtrBoardIdx = NowPollingMtrBoard-1;		
 		//Meter Cmd List
 		MeterOtaCmd = MeterOtaCmdList[MtrBoardIdx];
-		//MeterOtaCmd = 0x50;
     switch ( MeterPollingState )
     {			
         case PL_METER_NORM :
@@ -474,7 +474,7 @@ void MeterBoardPolling(void)
 										TickPollingInterval_Meter = 0;
 										MeterPollingState = PL_METER_OTA_RSP;
 								} else {
-								MeterPollingState = PL_METER_NORM;
+										MeterPollingState = PL_METER_NORM;
 								}
 						} 
 						break;
@@ -567,13 +567,7 @@ void MeterBoardPolling(void)
 							
 								SendMeterBootloader_UpdateBuff ();
 								TickPollingInterval_Meter = 0;
-								
-								/***	Update process over ***/
-								if (TotalLen == 0){
-										MeterPollingState = OTA_GET_MTR_UPDATE_PWD;
-								} else {
-										MeterPollingState = PL_METER_OTA_SEND_UPDATE_BUF_RSP;
-								}
+								MeterPollingState = PL_METER_OTA_SEND_UPDATE_BUF_RSP;
 						}
 					break;
 							
@@ -592,14 +586,12 @@ void MeterBoardPolling(void)
 								last_packno 	= g_packno;
 								StartAddress 	+= srclen;
 							
-								if (TotalLen < srclen){
+								if (TotalLen < srclen*2){
 										srclen = TotalLen - srclen;
 										TotalLen = 0;
-										
 								} else {
 										TotalLen -= srclen;
 								}
-
 								PollSuccess_Handler(PL_METER_OTA_SEND_UPDATE_BUF);
 						}
 							else if (TickPollingInterval_Meter > POLLING_TIMEOUT)
@@ -637,36 +629,35 @@ void MeterBoardPolling(void)
 								PollingTimeout_Handler(PL_METER_OTA_GET_PACKNO, PL_METER_OTA_CMD);
 						}
 						
-				case PL_METER_OTA_RESEND_UPDATE_BUF:
-						break;
+//				case PL_METER_OTA_RESEND_UPDATE_BUF:
+//						break;
 						
 				case	OTA_GET_MTR_UPDATE_PWD:
 						
-						if (GotMeterRspID == NowPollingMtrBoard)
+						if (b_UpdateFinished) 
 						{
-								GotMeterRspID = 0xff;
-							
+								/*** LED_BLINKS ***/
+								b_UpdateFinished = FALSE;
 								BlinkStatusLED(TRUE ? PD : PF, TRUE ? 7 : 2, 20, 750);
-								//	Meter Send Host 0x0ABBC0DD When Boot
-								if (TokenMeter[4] == 0x0A &&
-										TokenMeter[5] == 0xBB &&
-										TokenMeter[6] == 0xC0 &&
-										TokenMeter[7] == 0xDD)
-								{
-										NowPollingPwrMtrID++;
-										MeterOtaCmdList[MtrBoardIdx] = 0;
-										BankStatus[Center].OTA_MeterID_Flags &= ~ 1 << NowPollingMtrBoard;
-										WriteFwStatus(&BankStatus[Center]);
-										
-										if (NowPollingPwrMtrID > PwrMtrMax )
-												NowPollingPwrMtrID = 1;
-										PollSuccess_Handler(PL_METER_NORM);
-										SYS_LockReg();
-								}
+								
+								SYS_UnlockReg();
+								FMC_ENABLE_ISP();
+
+								BankStatus[Center].OTA_MeterID_Flags &= ~ 1 << NowPollingMtrBoard;
+								WriteFwStatus(&BankStatus[Center]);
+								SYS_LockReg();
+							
+								NowPollingPwrMtrID++;
+								MeterOtaCmdList[MtrBoardIdx] = 0;
+								if (NowPollingPwrMtrID > PwrMtrMax )
+										NowPollingPwrMtrID = 1;
+								PollSuccess_Handler(PL_METER_NORM);
+								/** Not sure if needed **/
+								NVIC_SystemReset();
 						} 
-						else if (TickPollingInterval_Meter > POLLING_TIMEOUT) {
+							else if (TickPollingInterval_Meter > POLLING_TIMEOUT) {
 								MeterOtaCmdList[MtrBoardIdx] = METER_OTA_UPDATE_CMD;
-								PollingTimeout_Handler(PL_METER_NORM, PL_METER_NORM);
+								PollingTimeout_Handler(OTA_GET_MTR_UPDATE_PWD, PL_METER_NORM);
 								SYS_LockReg();
 						}
 						break;
@@ -745,11 +736,15 @@ void MeterProcess(void)
 								g_packno = TokenMeter[3];
 								switch(TokenMeter[2])
 								{
-									 case	CMD_UPDATE_APROM:
-										 break;
-									 case CMD_GET_PACKNO:
-										 break;
-									 
+									 case	CMD_OTA_SUCCESS_PWD:
+												if (TokenMeter[4] == 0x0A && TokenMeter[5] == 0xBB && 
+														TokenMeter[6] == 0xC0 && TokenMeter[7] == 0xDD)
+												{
+														MeterOtaFlag = 0;
+														b_UpdateFinished = TRUE;
+														MeterPollingState = OTA_GET_MTR_UPDATE_PWD;
+												}
+												break;
 								}
 										
 						} 
@@ -796,13 +791,10 @@ void MeterProcess(void)
 
 									case METER_RSP_INV_DATA:
 										Meter_RSP_InvData();
-										break;									
-									
-									case METER_RSP_OTA_UPDATE :
-										Meter_RSP_FWInfo();
 										break;
 									
-									case METER_OTA_UPDATE_CMD :
+									case METER_RSP_FW_STATUS :
+										Meter_RSP_FWInfo();
 										break;
 									
 									
@@ -1303,13 +1295,14 @@ void METER_RSP_WateringStatus(void)
 }
 
 /* Get FW info From Meter
-
 4-19 : FWststatus 	(16 bytes)
 20-51: FwMeta1 	(32 bytes)
-52-83: FwMeta2 	(32 bytes)
-*/
+52-83: FwMeta2 	(32 bytes) */
 void Meter_RSP_FWInfo(void)
 {
+		uint8_t MtrBoardIdx;
+		MtrBoardIdx = TokenMeter[1] -1;	
+	
 		memcpy((FwStatus *)&BankStatus[Meter], &TokenMeter[4], sizeof(FwStatus));
     memcpy(&BankMeta[Meter][Active], &TokenMeter[20], sizeof(FwMeta));
 		memcpy(&BankMeta[Meter][Backup], &TokenMeter[52], sizeof(FwMeta));
@@ -1323,8 +1316,7 @@ void Meter_RSP_FWInfo(void)
 3 : Polling device ID
 90 - 97: RTC
 98 : Checksum(1-97)
-99 : 0x0A
- ***/
+99 : 0x0A																									***/
 void SendMeter_AliveToken(void)
 {
 	
@@ -1469,7 +1461,7 @@ void SendMeter_MeterOTACmd(uint8_t cmd)
     
     MeterTxBuffer[1] = NowPollingMtrBoard;
 		MeterTxBuffer[2] = METER_OTA_UPDATE_CMD;
-		MeterTxBuffer[3] = cmd;
+		MeterTxBuffer[5] = cmd;
 		
 		SendMeterRTC();
 		

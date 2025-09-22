@@ -160,8 +160,8 @@ void HostProcess(void)
                         ClearRespDelayTimer();
                         break;
 										case CTR_2_METER_OTA_CMD:							// 0x19
-												Host_MeterOTAProcess();
 												ClearRespDelayTimer();
+												Host_MeterOTAProcess();
 												break;
 										case CTR_SET_WTR_TIME:								//0x1A
 												Host_WateringSetupProcess();
@@ -232,7 +232,6 @@ void HostProcess(void)
 												FMC_ENABLE_ISP();
 												SendHost_CenterFWinfo();
 												FwBankSwitchProcess(IsFwValid(&BankMeta[Center][Backup]));
-												JumpToBootloader();
 												break;
 
 										case CTR_GET_FW_STATUS_CMD:
@@ -419,7 +418,7 @@ void Host_OTACenterProcess(void)
 		SYS_UnlockReg();
 		FMC_ENABLE_ISP();
 
-		CmdType = TokenHost[5];	
+		CmdType = TokenHost[5];
 		Get_DualBankStatus(	(FwStatus *)&BankStatus[Center], &BankMeta[Center][Active], &BankMeta[Center][Backup]);
 
 		SYS_LockReg();
@@ -444,12 +443,12 @@ void Host_MeterOTAProcess(void)
 
 		SYS_UnlockReg();
 		FMC_ENABLE_ISP();
-	
-		GetHostRTC();
 
 		CmdType = CTR_RSP_MTR_FW_INFO;
 		MtrBoardIdx = TokenHost[3]-1;
-		MeterOtaCmdList[MtrBoardIdx] = TokenHost[5];	
+		MeterOtaCmdList[MtrBoardIdx] = TokenHost[5];
+
+		WaitTime = 10;
 		
 		if (MeterOtaCmdList[MtrBoardIdx] == METER_OTA_UPDATE_CMD)
 		{
@@ -464,6 +463,7 @@ void Host_MeterOTAProcess(void)
 				}
 		}
 		SYS_LockReg();
+		GetHostRTC();
 }
 
 /*** 
@@ -908,34 +908,27 @@ void SendHost_FirstReset_Ack(void)
 
 void SendHost_CenterFWinfo(void)
 {
-		uint8_t i;
 		HostTxBuffer[1] = MyCenterID ;
-		HostTxBuffer[2] = CmdType;
-		
+		HostTxBuffer[2] = CmdType;	
 
-		memcpy(&HostTxBuffer[4], 	(FwStatus *)&BankStatus[Center], sizeof(FwStatus));
+		memcpy(&HostTxBuffer[4], 	&BankStatus[Center], sizeof(FwStatus));
     memcpy(&HostTxBuffer[20],	&BankMeta[Center][Active], sizeof(FwMeta));
 		memcpy(&HostTxBuffer[52],	&BankMeta[Center][Backup], sizeof(FwMeta));
 
 		CalChecksumH();
 }
 
-void SendHost_MeterFwInfo(void){
-	
-		uint8_t i;
-	
+void SendHost_MeterFwInfo(void)
+{
 		HostTxBuffer[1] = MyCenterID ;
 		HostTxBuffer[2] = MeterOtaCmdList[NowPollingMtrBoard-1];
 		HostTxBuffer[3] = NowPollingMtrBoard;
-		
-		
 
-		memcpy(&HostTxBuffer[4], 	(FwStatus *)&BankStatus[Meter], sizeof(FwStatus));
+		memcpy(&HostTxBuffer[4], 	&BankStatus[Meter], sizeof(FwStatus));
     memcpy(&HostTxBuffer[20], &BankMeta[Meter][Active], sizeof(FwMeta));
 		memcpy(&HostTxBuffer[52], &BankMeta[Meter][Backup], sizeof(FwMeta));
 	
 		CalChecksumH();
-	
 }
 
 /* 

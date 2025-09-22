@@ -892,7 +892,7 @@ int main()
 		ReadMyCenterID();
 		
 		//	Metadata Verification
-		FwValidationHandler();
+		FwValidator();
 		
 		SysTick_Config(PLL_CLOCK/100);
     NVIC_EnableIRQ(SysTick_IRQn);

@@ -8,7 +8,7 @@ _Bool backupValid;
 bool g_fw_metadata_ready = false;
 
 void Get_DualBankStatus(FwStatus *ctx, FwMeta *active, FwMeta *backup);
-void FwValidationHandler(void);
+void FwValidator(void);
 void JumpToBootloader();
 
 _Bool IsFwValid(FwMeta * Meta);
@@ -34,7 +34,7 @@ void FwBankSwitchProcess(_Bool BackupValid);
 /***
  *	@brief	Handles the Fw validate process of Boot Initialization
  ***/
-void FwValidationHandler(void)
+void FwValidator(void)
 {
 		SYS_UnlockReg();
 		FMC_ENABLE_ISP();
@@ -106,8 +106,8 @@ void FwBankSwitchProcess(_Bool BackupValid)
 		} else {
 				BankStatus[Center].Cmd = BTLD_UPDATE_CENTER;
 				WriteFwStatus((FwStatus *)&BankStatus[Center]);
-				JumpToBootloader();
 		}
+		JumpToBootloader();
 }
 
 /***

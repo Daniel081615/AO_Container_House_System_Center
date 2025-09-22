@@ -68,9 +68,7 @@
 #define BANK1_META_BASE						0x0001F000
 #define BANK2_META_BASE						0x0001F800
 #define BANK_STATUS_BASE         0x0001E800
-
-
-
+ 
 #define   CMD_UPDATE_APROM    0xA0
 #define		CMD_GET_PACKNO			0xA1
 #define   CMD_ERASE_BANK      0xA3
@@ -112,7 +110,7 @@ extern int  WriteToFlash(void *data, uint32_t size, uint32_t base_addr, bool wit
 extern void BlinkLEDs();
 extern void JumpToBootloader();
 
-extern void FwValidationHandler(void);
+extern void FwValidator(void);
 
 extern void Get_DualBankStatus(FwStatus *ctx, FwMeta *active, FwMeta *backup);
 extern void BlinkStatusLED(GPIO_T *port, uint32_t pin, uint8_t times, uint32_t delay_ms);
