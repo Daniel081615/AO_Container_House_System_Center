@@ -61,6 +61,14 @@
 	 ALL_FW_BANK_INVALID
 	 
  } ;
+ 
+typedef enum {
+		STATE_START,
+		STATE_LED_G,
+    STATE_LED_R,
+    STATE_LED_R1,
+    STATE_LED_G1,
+} LedState_t;
 
 // Memory addresses
 #define BANK1_BASE               0x00002000
@@ -90,8 +98,9 @@ typedef struct __attribute__((packed)) {
     uint32_t fw_version;
     uint32_t fw_start_addr;
     uint32_t fw_size;
-    uint32_t trial_counter;
-    uint32_t WDTRst_counter;
+    uint16_t trial_counter;
+    uint16_t WDTRst_counter;
+		uint32_t UpdateTime;
     uint32_t meta_crc;
 } FwMeta;
 
@@ -107,7 +116,7 @@ typedef struct {
 extern int  WriteFwStatus(FwStatus *status);
 extern int  WriteMetadata(FwMeta *meta, uint32_t MetaBase);
 extern int  WriteToFlash(void *data, uint32_t size, uint32_t base_addr, bool with_crc32, uint32_t crc_offset);
-extern void BlinkLEDs();
+extern void OtaLeds();
 extern void JumpToBootloader();
 
 extern void FwValidator(void);

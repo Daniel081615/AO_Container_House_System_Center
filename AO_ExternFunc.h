@@ -114,14 +114,14 @@ extern uint8_t TickPollWating;
 extern uint32_t ReaderDeviceError;
 
 extern uint8_t TickHostUart, TickMeterUart;
-extern uint8_t NowPollingMtrBoard;
+extern volatile uint8_t NowPollingMtrBoard;
 extern uint8_t MeterMode,MeterUser,AlivePacketIndex;
 extern uint16_t MeterBalance;
 extern uint8_t NodeTestAck;
 extern const uint8_t DefinePwrMtrMax[3];
 
 extern uint8_t MeterBoardError;
-extern uint8_t PollingCounter,HostRoomIndex,GotMeterRspID, HostDeviceIndex;
+extern uint8_t PollingCounter,GotMeterRspID, HostDeviceIndex;
 extern uint8_t ReaderState,ReaderTick,bSendReaderCommand,ReaderCommandType;
 
 extern _Bool fgMeterAckOK;
@@ -153,7 +153,7 @@ extern void WDT_Reset_System(void);
 extern uint8_t centerResetStatus,MeterDeviceMax;
 
 
-extern volatile uint8_t MeterOtaFlag;
+extern volatile _Bool fgMeterOta;
 
 extern uint8_t _SendStringToMETER(uint8_t *Str, uint8_t len);
 

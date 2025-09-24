@@ -13,9 +13,10 @@ void JumpToBootloader();
 
 _Bool IsFwValid(FwMeta * Meta);
 _Bool FwCheck_CRC(FwMeta *meta);
-void Update_FwMetadata(bool activeValid, bool backupValid);
-void Update_BankStatus(bool activeValid, bool backupValid);
+void Set_metaflags(bool activeValid, bool backupValid);
+void Set_BankStatus(bool activeValid, bool backupValid);
 
+static uint8_t currentLedState = 0;
 
 
 /**	Low level function	**/
@@ -25,7 +26,7 @@ int  WriteFwStatus(FwStatus *status);
 int  WriteMetadata(FwMeta *meta, uint32_t MetaBase);
 int  WriteToFlash(void *data, uint32_t size, uint32_t base_addr, bool with_crc32, uint32_t crc_offset);
 uint32_t CRC32_Calc(const uint8_t *pData, uint32_t len) ;
-void BlinkLEDs();
+void OtaLeds();
 
 
 void FwBankSwitchProcess(_Bool BackupValid);
@@ -45,8 +46,8 @@ void FwValidator(void)
     _Bool activeValid = IsFwValid(&BankMeta[Center][Active]);
 		_Bool backupValid = IsFwValid(&BankMeta[Center][Backup]);
 	
-		Update_FwMetadata(activeValid, backupValid);
-		Update_BankStatus(activeValid, backupValid);
+		Set_metaflags(activeValid, backupValid);
+		Set_BankStatus(activeValid, backupValid);
 	
 		BlinkStatusLED( (activeValid) ? PD : PF, (activeValid) ? 7 : 2, 10, 750);
 	
@@ -113,7 +114,7 @@ void FwBankSwitchProcess(_Bool BackupValid)
 /***
  *	@brief	Set Meta flags up according to the Fw validation result
  ***/
-void Update_FwMetadata(bool activeValid, bool backupValid)
+void Set_metaflags(bool activeValid, bool backupValid)
 {
 
 		SetFwFlags(&BankMeta[Center][Active], activeValid, activeValid);
@@ -122,11 +123,9 @@ void Update_FwMetadata(bool activeValid, bool backupValid)
         BankMeta[Center][Active].trial_counter++;
         SetFwFlags(&BankMeta[Center][Backup], false, backupValid);
     } else {
-				if (backupValid)
-				{
+				if (backupValid){
 						SetFwFlags(&BankMeta[Center][Backup], true, backupValid);
-				} else 
-				{
+				} else {
 						SetFwFlags(&BankMeta[Center][Backup], false, backupValid);
 				}
     } 
@@ -135,7 +134,7 @@ void Update_FwMetadata(bool activeValid, bool backupValid)
 /***
  *	@brief	Set bank status up according to the Fw validation result
  ***/
-void Update_BankStatus(bool activeValid, bool backupValid)
+void Set_BankStatus(bool activeValid, bool backupValid)
 {
     if (activeValid)
 		{	
@@ -180,6 +179,8 @@ _Bool IsFwValid(FwMeta * Meta)
 										 ((Meta->flags & (Fw_ValidFlag)) == (Fw_ValidFlag))) &&
 											 Meta->WDTRst_counter <  MAX_WDT_TRIES;
 		
+		if (!CrcOk) Meta->flags = 0x00000000;
+		
 		return CrcOk && flagValid;
 }
 
@@ -194,11 +195,39 @@ void BlinkStatusLED(GPIO_T *port, uint32_t pin, uint8_t times, uint32_t delay_ms
     }
 }
 
-void BlinkLEDs()
+void OtaLeds()
 {
-    static uint8_t valid = 0;
-    valid ^= 1;
-    BlinkStatusLED(valid ? PD : PF, valid ? 7 : 2, 1, 2500);
+	
+		switch (currentLedState) {
+        
+				case STATE_START:
+						LED_G1_Off();
+						currentLedState = STATE_LED_G;
+						break;
+				
+				case STATE_LED_G:
+            LED_G_On();
+						currentLedState = STATE_LED_R;
+            break;
+				
+        case STATE_LED_R:
+						LED_G_Off(); LED_R_On();
+						currentLedState = STATE_LED_R1;
+            break;
+
+        case STATE_LED_R1:
+						LED_R_Off(); LED_R1_On();
+						currentLedState = STATE_LED_G1;
+            break;
+        case STATE_LED_G1:
+						LED_R1_Off(); LED_G1_On();
+						currentLedState = STATE_START;
+            break;
+				default:
+						currentLedState = STATE_START;
+						break;
+    }
+		
 }
 
 _Bool FwCheck_CRC(FwMeta *meta) 

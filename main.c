@@ -108,14 +108,14 @@ uint16_t  TickTestDelayTime;
 
 uint8_t GotMeterRspID, HostDeviceIndex;
 
-uint8_t NowPollingMtrBoard;
+volatile uint8_t NowPollingMtrBoard;
 uint8_t NowPollingPwrMtrID, NowPollingBmsID, NowPollingWtrMtrID, NowPollingPyrMtrID, NowPollingSoilSensorID, NowPollingAirSensorID, NowPollingInvID;
 
 uint8_t TickPollingInterval_Meter;
 uint8_t PollRetryCounter_Meter;
 uint8_t RoomIndex;
 uint8_t NodeTestAck,TestState1,TestState2;
-uint8_t TestNodeTick,HostRoomIndex;
+uint8_t TestNodeTick;
 
 uint8_t MeterDeviceMax;
 uint8_t MeterWaitTick;
@@ -220,10 +220,8 @@ uint8_t TickHost, TickMeter;
 uint16_t  TickTestDelayTime;
 uint8_t GotMeterRspID;
 
-uint8_t NowPollingMtrBoard;
 uint8_t TickPollingInterval_Meter;
 uint8_t PollRetryCounter_Meter;
-uint8_t HostRoomIndex;
 
 uint8_t RoomNumberMax;
 uint8_t MeterWaitTick;
@@ -265,8 +263,6 @@ void RecoverSystemMoniter(void);
 void ChangeDirHostRS485(void);
 void ScheduleWateringTask(void);
 void SendHost_UpdateSuccess_10ms(uint8_t ms);
-
-volatile uint8_t MeterOtaFlag;
 
 
 
@@ -893,8 +889,8 @@ int main()
 		
 		//	Metadata Verification
 		FwValidator();
-		
-		SysTick_Config(PLL_CLOCK/100);
+		// 10^-6 sec * 100 => 10^-4 sec => 0.1 ms
+		SysTick_Config(SystemCoreClock/100);
     NVIC_EnableIRQ(SysTick_IRQn);
 
 
@@ -932,7 +928,7 @@ int main()
 
     do
     {
-				WDT_RESET_COUNTER();	// Feed Dog
+				WDT_RESET_COUNTER();
         ReadMyCenterID();
         SystemTick = 0 ;								
         HostProcess();

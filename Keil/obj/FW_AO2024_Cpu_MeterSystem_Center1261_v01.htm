@@ -3,7 +3,7 @@
 <title>Static Call Graph - [.\obj\FW_AO2024_Cpu_MeterSystem_Center1261_v01.axf]</title></head>
 <body><HR>
 <H1>Static Call Graph for image .\obj\FW_AO2024_Cpu_MeterSystem_Center1261_v01.axf</H1><HR>
-<BR><P>#&#060CALLGRAPH&#062# ARM Linker, 6230001: Last Updated: Mon Sep 22 18:04:13 2025
+<BR><P>#&#060CALLGRAPH&#062# ARM Linker, 6230001: Last Updated: Wed Sep 24 18:11:27 2025
 <BR><P>
 <H3>Maximum Stack Usage =        304 bytes + Unknown(Cycles, Untraceable Function Pointers)</H3><H3>
 Call chain for Maximum Stack Depth:</H3>
@@ -193,10 +193,10 @@ Global Symbols
 <P><STRONG><a name="[52]"></a>__aeabi_memcpy</STRONG> (Thumb, 36 bytes, Stack size 0 bytes, memcpya.o(.text))
 <BR><BR>[Called By]<UL><LI><a href="#[84]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;SendHost_MeterFwInfo
 <LI><a href="#[81]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;SendHost_CenterFWinfo
-<LI><a href="#[b4]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;SendHost_CenterUpdateSuccess
+<LI><a href="#[b5]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;SendHost_CenterUpdateSuccess
 <LI><a href="#[50]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;CRC32_Calc
-<LI><a href="#[aa]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;Meter_RSP_FWInfo
-<LI><a href="#[9b]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;SendMeterBootloader_UpdateBuff
+<LI><a href="#[ab]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;Meter_RSP_FWInfo
+<LI><a href="#[9b]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;SendMeterBootloader_UpdatePack
 </UL>
 
 <P><STRONG><a name="[d8]"></a>__aeabi_memcpy4</STRONG> (Thumb, 0 bytes, Stack size 0 bytes, memcpya.o(.text), UNUSED)
@@ -206,8 +206,10 @@ Global Symbols
 <P><STRONG><a name="[49]"></a>__aeabi_uidiv</STRONG> (Thumb, 0 bytes, Stack size 16 bytes, uidiv_div0.o(.text))
 <BR><BR>[Stack]<UL><LI>Max Depth = 16<LI>Call Chain = __aeabi_uidiv
 </UL>
-<BR>[Called By]<UL><LI><a href="#[bd]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;UART1_Init
-<LI><a href="#[bb]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;UART0_Init
+<BR>[Called By]<UL><LI><a href="#[89]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;MeterBoardPolling
+<LI><a href="#[22]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;main
+<LI><a href="#[be]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;UART1_Init
+<LI><a href="#[bc]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;UART0_Init
 <LI><a href="#[4c]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;CLK_GetPLLClockFreq
 <LI><a href="#[4f]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;SystemCoreClockUpdate
 <LI><a href="#[4b]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;CLK_GetPLLClockFreq
@@ -215,16 +217,19 @@ Global Symbols
 <LI><a href="#[4a]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;CLK_GetPLLClockFreq
 </UL>
 
-<P><STRONG><a name="[d1]"></a>__aeabi_uidivmod</STRONG> (Thumb, 62 bytes, Stack size 16 bytes, uidiv_div0.o(.text), UNUSED)
-<BR><BR>[Called By]<UL><LI><a href="#[cc]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;_printf_core
+<P><STRONG><a name="[9c]"></a>__aeabi_uidivmod</STRONG> (Thumb, 62 bytes, Stack size 16 bytes, uidiv_div0.o(.text))
+<BR><BR>[Stack]<UL><LI>Max Depth = 16<LI>Call Chain = __aeabi_uidivmod
+</UL>
+<BR>[Called By]<UL><LI><a href="#[89]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;MeterBoardPolling
+<LI><a href="#[cd]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;_printf_core
 </UL>
 
 <P><STRONG><a name="[2b]"></a>__aeabi_uldivmod</STRONG> (Thumb, 96 bytes, Stack size 48 bytes, uldiv.o(.text), UNUSED)
 <BR><BR>[Calls]<UL><LI><a href="#[2c]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;__aeabi_llsr
 <LI><a href="#[2d]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;__aeabi_llsl
 </UL>
-<BR>[Called By]<UL><LI><a href="#[cc]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;_printf_core
-<LI><a href="#[cd]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;_fp_digits
+<BR>[Called By]<UL><LI><a href="#[cd]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;_printf_core
+<LI><a href="#[ce]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;_fp_digits
 </UL>
 
 <P><STRONG><a name="[da]"></a>__I$use$fp</STRONG> (Thumb, 0 bytes, Stack size unknown bytes, iusefp.o(.text), UNUSED)
@@ -237,7 +242,7 @@ Global Symbols
 </UL>
 <BR>[Called By]<UL><LI><a href="#[33]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;__aeabi_drsub
 <LI><a href="#[32]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;__aeabi_dsub
-<LI><a href="#[cd]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;_fp_digits
+<LI><a href="#[ce]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;_fp_digits
 </UL>
 
 <P><STRONG><a name="[32]"></a>__aeabi_dsub</STRONG> (Thumb, 12 bytes, Stack size 8 bytes, dadd.o(.text), UNUSED)
@@ -251,24 +256,24 @@ Global Symbols
 <P><STRONG><a name="[34]"></a>__aeabi_dmul</STRONG> (Thumb, 202 bytes, Stack size 72 bytes, dmul.o(.text), UNUSED)
 <BR><BR>[Calls]<UL><LI><a href="#[30]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;_double_epilogue
 </UL>
-<BR>[Called By]<UL><LI><a href="#[cd]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;_fp_digits
+<BR>[Called By]<UL><LI><a href="#[ce]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;_fp_digits
 </UL>
 
 <P><STRONG><a name="[35]"></a>__aeabi_ddiv</STRONG> (Thumb, 234 bytes, Stack size 40 bytes, ddiv.o(.text), UNUSED)
 <BR><BR>[Calls]<UL><LI><a href="#[31]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;_double_round
 </UL>
-<BR>[Called By]<UL><LI><a href="#[cd]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;_fp_digits
+<BR>[Called By]<UL><LI><a href="#[ce]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;_fp_digits
 </UL>
 
 <P><STRONG><a name="[36]"></a>__aeabi_d2ulz</STRONG> (Thumb, 54 bytes, Stack size 8 bytes, dfixul.o(.text), UNUSED)
 <BR><BR>[Calls]<UL><LI><a href="#[2c]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;__aeabi_llsr
 <LI><a href="#[2d]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;__aeabi_llsl
 </UL>
-<BR>[Called By]<UL><LI><a href="#[cd]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;_fp_digits
+<BR>[Called By]<UL><LI><a href="#[ce]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;_fp_digits
 </UL>
 
-<P><STRONG><a name="[ce]"></a>__aeabi_cdrcmple</STRONG> (Thumb, 38 bytes, Stack size 0 bytes, cdrcmple.o(.text), UNUSED)
-<BR><BR>[Called By]<UL><LI><a href="#[cd]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;_fp_digits
+<P><STRONG><a name="[cf]"></a>__aeabi_cdrcmple</STRONG> (Thumb, 38 bytes, Stack size 0 bytes, cdrcmple.o(.text), UNUSED)
+<BR><BR>[Called By]<UL><LI><a href="#[ce]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;_fp_digits
 </UL>
 
 <P><STRONG><a name="[2a]"></a>__scatterload</STRONG> (Thumb, 38 bytes, Stack size 0 bytes, init.o(.text))
@@ -390,10 +395,10 @@ Global Symbols
 <LI><a href="#[7]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;WDT_IRQHandler
 </UL>
 
-<P><STRONG><a name="[b0]"></a>CLK_EnableModuleClock</STRONG> (Thumb, 48 bytes, Stack size 16 bytes, clk.o(.text.CLK_EnableModuleClock))
+<P><STRONG><a name="[b1]"></a>CLK_EnableModuleClock</STRONG> (Thumb, 48 bytes, Stack size 16 bytes, clk.o(.text.CLK_EnableModuleClock))
 <BR><BR>[Stack]<UL><LI>Max Depth = 16<LI>Call Chain = CLK_EnableModuleClock
 </UL>
-<BR>[Called By]<UL><LI><a href="#[ad]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;SYS_Init
+<BR>[Called By]<UL><LI><a href="#[ae]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;SYS_Init
 </UL>
 
 <P><STRONG><a name="[47]"></a>CLK_EnablePLL</STRONG> (Thumb, 476 bytes, Stack size 72 bytes, clk.o(.text.CLK_EnablePLL))
@@ -406,10 +411,10 @@ Global Symbols
 <BR>[Called By]<UL><LI><a href="#[4d]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;CLK_SetCoreClock
 </UL>
 
-<P><STRONG><a name="[ae]"></a>CLK_EnableXtalRC</STRONG> (Thumb, 20 bytes, Stack size 4 bytes, clk.o(.text.CLK_EnableXtalRC))
+<P><STRONG><a name="[af]"></a>CLK_EnableXtalRC</STRONG> (Thumb, 20 bytes, Stack size 4 bytes, clk.o(.text.CLK_EnableXtalRC))
 <BR><BR>[Stack]<UL><LI>Max Depth = 4<LI>Call Chain = CLK_EnableXtalRC
 </UL>
-<BR>[Called By]<UL><LI><a href="#[ad]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;SYS_Init
+<BR>[Called By]<UL><LI><a href="#[ae]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;SYS_Init
 </UL>
 
 <P><STRONG><a name="[4d]"></a>CLK_SetCoreClock</STRONG> (Thumb, 172 bytes, Stack size 16 bytes, clk.o(.text.CLK_SetCoreClock))
@@ -419,7 +424,7 @@ Global Symbols
 <LI><a href="#[48]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;CLK_WaitClockReady
 <LI><a href="#[47]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;CLK_EnablePLL
 </UL>
-<BR>[Called By]<UL><LI><a href="#[ad]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;SYS_Init
+<BR>[Called By]<UL><LI><a href="#[ae]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;SYS_Init
 </UL>
 
 <P><STRONG><a name="[4e]"></a>CLK_SetHCLK</STRONG> (Thumb, 96 bytes, Stack size 24 bytes, clk.o(.text.CLK_SetHCLK))
@@ -429,19 +434,19 @@ Global Symbols
 <LI><a href="#[4f]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;SystemCoreClockUpdate
 </UL>
 <BR>[Called By]<UL><LI><a href="#[4d]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;CLK_SetCoreClock
-<LI><a href="#[ad]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;SYS_Init
+<LI><a href="#[ae]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;SYS_Init
 </UL>
 
-<P><STRONG><a name="[b1]"></a>CLK_SetModuleClock</STRONG> (Thumb, 156 bytes, Stack size 44 bytes, clk.o(.text.CLK_SetModuleClock))
+<P><STRONG><a name="[b2]"></a>CLK_SetModuleClock</STRONG> (Thumb, 156 bytes, Stack size 44 bytes, clk.o(.text.CLK_SetModuleClock))
 <BR><BR>[Stack]<UL><LI>Max Depth = 44<LI>Call Chain = CLK_SetModuleClock
 </UL>
-<BR>[Called By]<UL><LI><a href="#[ad]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;SYS_Init
+<BR>[Called By]<UL><LI><a href="#[ae]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;SYS_Init
 </UL>
 
-<P><STRONG><a name="[af]"></a>CLK_SetSysTickClockSrc</STRONG> (Thumb, 24 bytes, Stack size 4 bytes, clk.o(.text.CLK_SetSysTickClockSrc))
+<P><STRONG><a name="[b0]"></a>CLK_SetSysTickClockSrc</STRONG> (Thumb, 24 bytes, Stack size 4 bytes, clk.o(.text.CLK_SetSysTickClockSrc))
 <BR><BR>[Stack]<UL><LI>Max Depth = 4<LI>Call Chain = CLK_SetSysTickClockSrc
 </UL>
-<BR>[Called By]<UL><LI><a href="#[ad]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;SYS_Init
+<BR>[Called By]<UL><LI><a href="#[ae]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;SYS_Init
 </UL>
 
 <P><STRONG><a name="[48]"></a>CLK_WaitClockReady</STRONG> (Thumb, 60 bytes, Stack size 12 bytes, clk.o(.text.CLK_WaitClockReady))
@@ -449,7 +454,7 @@ Global Symbols
 </UL>
 <BR>[Called By]<UL><LI><a href="#[4d]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;CLK_SetCoreClock
 <LI><a href="#[4e]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;CLK_SetHCLK
-<LI><a href="#[ad]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;SYS_Init
+<LI><a href="#[ae]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;SYS_Init
 <LI><a href="#[47]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;CLK_EnablePLL
 </UL>
 
@@ -460,7 +465,7 @@ Global Symbols
 <LI><a href="#[53]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;CRC_GetChecksum
 <LI><a href="#[51]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;CRC_Open
 </UL>
-<BR>[Called By]<UL><LI><a href="#[c5]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;WriteToFlash
+<BR>[Called By]<UL><LI><a href="#[c6]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;WriteToFlash
 <LI><a href="#[5d]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;FwCheck_CRC
 </UL>
 
@@ -494,7 +499,7 @@ Global Symbols
 <LI><a href="#[77]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;SendHost_Ack
 <LI><a href="#[76]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;SendHost_SystemInformation
 <LI><a href="#[6a]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;SendHost_FirstReset_Ack
-<LI><a href="#[b4]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;SendHost_CenterUpdateSuccess
+<LI><a href="#[b5]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;SendHost_CenterUpdateSuccess
 </UL>
 
 <P><STRONG><a name="[56]"></a>CalChecksumM</STRONG> (Thumb, 88 bytes, Stack size 16 bytes, ao_meterprocess.o(.text.CalChecksumM))
@@ -502,48 +507,48 @@ Global Symbols
 </UL>
 <BR>[Calls]<UL><LI><a href="#[57]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;_SendStringToMETER
 </UL>
-<BR>[Called By]<UL><LI><a href="#[92]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;SendMeter_GetPyrMtrData
+<BR>[Called By]<UL><LI><a href="#[98]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;SendMeterBootloader_ConnectCmd
+<LI><a href="#[96]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;SendMeter_MeterOTACmd
+<LI><a href="#[95]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;SendMeter_WateringTimeSetup
+<LI><a href="#[94]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;SendMeter_GetAirData
+<LI><a href="#[93]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;SendMeter_GetSoilData
+<LI><a href="#[92]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;SendMeter_GetPyrMtrData
 <LI><a href="#[91]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;SendMeter_GetInvData
 <LI><a href="#[90]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;SendMeter_GetWaterData
 <LI><a href="#[8f]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;SendMeter_GetBmsData
 <LI><a href="#[8e]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;SendMeter_GetPowerData
 <LI><a href="#[8b]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;SendMeter_AliveToken
-<LI><a href="#[9c]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;SendMeterBootloader_GetPackNo
-<LI><a href="#[9b]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;SendMeterBootloader_UpdateBuff
+<LI><a href="#[9d]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;SendMeterBootloader_ResentUpdatePack
+<LI><a href="#[9b]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;SendMeterBootloader_UpdatePack
 <LI><a href="#[9a]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;SendMeterBootloader_CmdEraseAPROM
 <LI><a href="#[99]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;SendMeterBootloader_UpdateMetadata
-<LI><a href="#[98]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;SendMeterBootloader_ConnectCmd
-<LI><a href="#[96]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;SendMeter_MeterOTACmd
-<LI><a href="#[95]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;SendMeter_WateringTimeSetup
-<LI><a href="#[94]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;SendMeter_GetAirData
-<LI><a href="#[93]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;SendMeter_GetSoilData
 </UL>
 
 <P><STRONG><a name="[6b]"></a>ClearRespDelayTimer</STRONG> (Thumb, 20 bytes, Stack size 0 bytes, ao_hostprocess.o(.text.ClearRespDelayTimer))
 <BR><BR>[Called By]<UL><LI><a href="#[68]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;HostProcess
 </UL>
 
-<P><STRONG><a name="[ca]"></a>DefaultValue</STRONG> (Thumb, 2 bytes, Stack size 0 bytes, main.o(.text.DefaultValue))
+<P><STRONG><a name="[cb]"></a>DefaultValue</STRONG> (Thumb, 2 bytes, Stack size 0 bytes, main.o(.text.DefaultValue))
 <BR><BR>[Called By]<UL><LI><a href="#[22]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;main
 </UL>
 
-<P><STRONG><a name="[c6]"></a>FMC_Close</STRONG> (Thumb, 12 bytes, Stack size 0 bytes, fmc.o(.text.FMC_Close))
-<BR><BR>[Called By]<UL><LI><a href="#[c5]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;WriteToFlash
+<P><STRONG><a name="[c7]"></a>FMC_Close</STRONG> (Thumb, 12 bytes, Stack size 0 bytes, fmc.o(.text.FMC_Close))
+<BR><BR>[Called By]<UL><LI><a href="#[c6]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;WriteToFlash
 </UL>
 
 <P><STRONG><a name="[86]"></a>FMC_Open</STRONG> (Thumb, 12 bytes, Stack size 0 bytes, fmc.o(.text.FMC_Open))
 <BR><BR>[Called By]<UL><LI><a href="#[5c]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;JumpToBootloader
 <LI><a href="#[22]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;main
 <LI><a href="#[7]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;WDT_IRQHandler
-<LI><a href="#[c5]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;WriteToFlash
+<LI><a href="#[c6]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;WriteToFlash
 </UL>
 
 <P><STRONG><a name="[65]"></a>FMC_Proc</STRONG> (Thumb, 212 bytes, Stack size 32 bytes, fmc_user.o(.text.FMC_Proc))
 <BR><BR>[Stack]<UL><LI>Max Depth = 32<LI>Call Chain = FMC_Proc
 </UL>
 <BR>[Called By]<UL><LI><a href="#[60]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;Get_DualBankStatus
-<LI><a href="#[c5]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;WriteToFlash
-<LI><a href="#[9b]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;SendMeterBootloader_UpdateBuff
+<LI><a href="#[c6]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;WriteToFlash
+<LI><a href="#[9b]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;SendMeterBootloader_UpdatePack
 </UL>
 
 <P><STRONG><a name="[58]"></a>FwBankSwitchProcess</STRONG> (Thumb, 124 bytes, Stack size 40 bytes, ota_manager.o(.text.FwBankSwitchProcess))
@@ -576,15 +581,15 @@ Global Symbols
 <LI><a href="#[5b]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;WriteFwStatus
 <LI><a href="#[45]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;BlinkStatusLED
 <LI><a href="#[5a]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;WriteMetadata
-<LI><a href="#[63]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;Update_BankStatus
-<LI><a href="#[62]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;Update_FwMetadata
+<LI><a href="#[63]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;Set_BankStatus
+<LI><a href="#[62]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;Set_metaflags
 <LI><a href="#[64]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;SYS_LockReg
 <LI><a href="#[5f]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;SYS_UnlockReg
 </UL>
 <BR>[Called By]<UL><LI><a href="#[22]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;main
 </UL>
 
-<P><STRONG><a name="[c7]"></a>GPIO_Mode_Init</STRONG> (Thumb, 320 bytes, Stack size 48 bytes, main.o(.text.GPIO_Mode_Init))
+<P><STRONG><a name="[c8]"></a>GPIO_Mode_Init</STRONG> (Thumb, 320 bytes, Stack size 48 bytes, main.o(.text.GPIO_Mode_Init))
 <BR><BR>[Stack]<UL><LI>Max Depth = 48<LI>Call Chain = GPIO_Mode_Init
 </UL>
 <BR>[Called By]<UL><LI><a href="#[22]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;main
@@ -754,7 +759,7 @@ Global Symbols
 <BR>[Called By]<UL><LI><a href="#[68]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;HostProcess
 </UL>
 
-<P><STRONG><a name="[61]"></a>IsFwValid</STRONG> (Thumb, 146 bytes, Stack size 40 bytes, ota_manager.o(.text.IsFwValid))
+<P><STRONG><a name="[61]"></a>IsFwValid</STRONG> (Thumb, 160 bytes, Stack size 40 bytes, ota_manager.o(.text.IsFwValid))
 <BR><BR>[Stack]<UL><LI>Max Depth = 120<LI>Call Chain = IsFwValid &rArr; FwCheck_CRC &rArr; CRC32_Calc &rArr; CRC_Open
 </UL>
 <BR>[Calls]<UL><LI><a href="#[5d]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;FwCheck_CRC
@@ -778,16 +783,21 @@ Global Symbols
 <LI><a href="#[5e]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;FwValidator
 </UL>
 
-<P><STRONG><a name="[a8]"></a>METER_RSP_WateringStatus</STRONG> (Thumb, 32 bytes, Stack size 4 bytes, ao_meterprocess.o(.text.METER_RSP_WateringStatus))
+<P><STRONG><a name="[a9]"></a>METER_RSP_WateringStatus</STRONG> (Thumb, 32 bytes, Stack size 4 bytes, ao_meterprocess.o(.text.METER_RSP_WateringStatus))
 <BR><BR>[Stack]<UL><LI>Max Depth = 4<LI>Call Chain = METER_RSP_WateringStatus
 </UL>
 <BR>[Called By]<UL><LI><a href="#[9f]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;MeterProcess
 </UL>
 
-<P><STRONG><a name="[89]"></a>MeterBoardPolling</STRONG> (Thumb, 3056 bytes, Stack size 56 bytes, ao_meterprocess.o(.text.MeterBoardPolling))
-<BR><BR>[Stack]<UL><LI>Max Depth = 236<LI>Call Chain = MeterBoardPolling &rArr; SendMeterBootloader_UpdateBuff &rArr; CalChecksumM &rArr; _SendStringToMETER &rArr; UART_EnableInt &rArr; NVIC_EnableIRQ
+<P><STRONG><a name="[89]"></a>MeterBoardPolling</STRONG> (Thumb, 3280 bytes, Stack size 72 bytes, ao_meterprocess.o(.text.MeterBoardPolling))
+<BR><BR>[Stack]<UL><LI>Max Depth = 252<LI>Call Chain = MeterBoardPolling &rArr; SendMeterBootloader_UpdatePack &rArr; CalChecksumM &rArr; _SendStringToMETER &rArr; UART_EnableInt &rArr; NVIC_EnableIRQ
 </UL>
-<BR>[Calls]<UL><LI><a href="#[92]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;SendMeter_GetPyrMtrData
+<BR>[Calls]<UL><LI><a href="#[98]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;SendMeterBootloader_ConnectCmd
+<LI><a href="#[96]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;SendMeter_MeterOTACmd
+<LI><a href="#[95]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;SendMeter_WateringTimeSetup
+<LI><a href="#[94]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;SendMeter_GetAirData
+<LI><a href="#[93]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;SendMeter_GetSoilData
+<LI><a href="#[92]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;SendMeter_GetPyrMtrData
 <LI><a href="#[91]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;SendMeter_GetInvData
 <LI><a href="#[90]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;SendMeter_GetWaterData
 <LI><a href="#[8f]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;SendMeter_GetBmsData
@@ -795,64 +805,61 @@ Global Symbols
 <LI><a href="#[8d]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;PollingTimeout_Handler
 <LI><a href="#[8c]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;PollSuccess_Handler
 <LI><a href="#[8b]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;SendMeter_AliveToken
-<LI><a href="#[9e]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;NVIC_SystemReset
-<LI><a href="#[9d]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;SYS_LockReg
+<LI><a href="#[9e]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;SYS_LockReg
 <LI><a href="#[97]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;SYS_UnlockReg
 <LI><a href="#[60]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;Get_DualBankStatus
 <LI><a href="#[5b]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;WriteFwStatus
 <LI><a href="#[8a]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;ResetMeterUART
 <LI><a href="#[45]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;BlinkStatusLED
-<LI><a href="#[9c]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;SendMeterBootloader_GetPackNo
-<LI><a href="#[9b]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;SendMeterBootloader_UpdateBuff
+<LI><a href="#[9c]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;__aeabi_uidivmod
+<LI><a href="#[49]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;__aeabi_uidiv
+<LI><a href="#[9d]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;SendMeterBootloader_ResentUpdatePack
+<LI><a href="#[9b]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;SendMeterBootloader_UpdatePack
 <LI><a href="#[9a]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;SendMeterBootloader_CmdEraseAPROM
 <LI><a href="#[99]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;SendMeterBootloader_UpdateMetadata
-<LI><a href="#[98]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;SendMeterBootloader_ConnectCmd
-<LI><a href="#[96]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;SendMeter_MeterOTACmd
-<LI><a href="#[95]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;SendMeter_WateringTimeSetup
-<LI><a href="#[94]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;SendMeter_GetAirData
-<LI><a href="#[93]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;SendMeter_GetSoilData
 </UL>
 <BR>[Called By]<UL><LI><a href="#[22]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;main
 </UL>
 
-<P><STRONG><a name="[9f]"></a>MeterProcess</STRONG> (Thumb, 392 bytes, Stack size 24 bytes, ao_meterprocess.o(.text.MeterProcess))
+<P><STRONG><a name="[9f]"></a>MeterProcess</STRONG> (Thumb, 364 bytes, Stack size 24 bytes, ao_meterprocess.o(.text.MeterProcess))
 <BR><BR>[Stack]<UL><LI>Max Depth = 112<LI>Call Chain = MeterProcess &rArr; Meter_RSP_BmsData
 </UL>
 <BR>[Calls]<UL><LI><a href="#[8a]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;ResetMeterUART
-<LI><a href="#[aa]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;Meter_RSP_FWInfo
-<LI><a href="#[a9]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;Meter_RSP_InvData
-<LI><a href="#[a8]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;METER_RSP_WateringStatus
-<LI><a href="#[a7]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;Meter_RSP_AirSensorData
-<LI><a href="#[a6]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;Meter_RSP_SoilSensorData
-<LI><a href="#[a5]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;Meter_RSP_PyranometerData
-<LI><a href="#[a4]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;Meter_RSP_WaterData
-<LI><a href="#[a3]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;Meter_RSP_BmsData
-<LI><a href="#[a2]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;Meter_RSP_PowerData
-<LI><a href="#[a1]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;Meter_RSP_SysInformation
-<LI><a href="#[a0]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;Meter_AckProcess
+<LI><a href="#[ab]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;Meter_RSP_FWInfo
+<LI><a href="#[aa]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;Meter_RSP_InvData
+<LI><a href="#[a9]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;METER_RSP_WateringStatus
+<LI><a href="#[a8]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;Meter_RSP_AirSensorData
+<LI><a href="#[a7]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;Meter_RSP_SoilSensorData
+<LI><a href="#[a6]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;Meter_RSP_PyranometerData
+<LI><a href="#[a5]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;Meter_RSP_WaterData
+<LI><a href="#[a4]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;Meter_RSP_BmsData
+<LI><a href="#[a3]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;Meter_RSP_PowerData
+<LI><a href="#[a2]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;Meter_RSP_SysInformation
+<LI><a href="#[a1]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;Meter_AckProcess
+<LI><a href="#[a0]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;OtaLeds
 </UL>
 <BR>[Called By]<UL><LI><a href="#[22]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;main
 </UL>
 
-<P><STRONG><a name="[a0]"></a>Meter_AckProcess</STRONG> (Thumb, 260 bytes, Stack size 36 bytes, ao_meterprocess.o(.text.Meter_AckProcess))
+<P><STRONG><a name="[a1]"></a>Meter_AckProcess</STRONG> (Thumb, 260 bytes, Stack size 36 bytes, ao_meterprocess.o(.text.Meter_AckProcess))
 <BR><BR>[Stack]<UL><LI>Max Depth = 36<LI>Call Chain = Meter_AckProcess
 </UL>
 <BR>[Called By]<UL><LI><a href="#[9f]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;MeterProcess
 </UL>
 
-<P><STRONG><a name="[a7]"></a>Meter_RSP_AirSensorData</STRONG> (Thumb, 364 bytes, Stack size 40 bytes, ao_meterprocess.o(.text.Meter_RSP_AirSensorData))
+<P><STRONG><a name="[a8]"></a>Meter_RSP_AirSensorData</STRONG> (Thumb, 364 bytes, Stack size 40 bytes, ao_meterprocess.o(.text.Meter_RSP_AirSensorData))
 <BR><BR>[Stack]<UL><LI>Max Depth = 40<LI>Call Chain = Meter_RSP_AirSensorData
 </UL>
 <BR>[Called By]<UL><LI><a href="#[9f]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;MeterProcess
 </UL>
 
-<P><STRONG><a name="[a3]"></a>Meter_RSP_BmsData</STRONG> (Thumb, 792 bytes, Stack size 88 bytes, ao_meterprocess.o(.text.Meter_RSP_BmsData))
+<P><STRONG><a name="[a4]"></a>Meter_RSP_BmsData</STRONG> (Thumb, 792 bytes, Stack size 88 bytes, ao_meterprocess.o(.text.Meter_RSP_BmsData))
 <BR><BR>[Stack]<UL><LI>Max Depth = 88<LI>Call Chain = Meter_RSP_BmsData
 </UL>
 <BR>[Called By]<UL><LI><a href="#[9f]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;MeterProcess
 </UL>
 
-<P><STRONG><a name="[aa]"></a>Meter_RSP_FWInfo</STRONG> (Thumb, 64 bytes, Stack size 24 bytes, ao_meterprocess.o(.text.Meter_RSP_FWInfo))
+<P><STRONG><a name="[ab]"></a>Meter_RSP_FWInfo</STRONG> (Thumb, 64 bytes, Stack size 24 bytes, ao_meterprocess.o(.text.Meter_RSP_FWInfo))
 <BR><BR>[Stack]<UL><LI>Max Depth = 24<LI>Call Chain = Meter_RSP_FWInfo
 </UL>
 <BR>[Calls]<UL><LI><a href="#[52]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;__aeabi_memcpy
@@ -860,38 +867,44 @@ Global Symbols
 <BR>[Called By]<UL><LI><a href="#[9f]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;MeterProcess
 </UL>
 
-<P><STRONG><a name="[a9]"></a>Meter_RSP_InvData</STRONG> (Thumb, 584 bytes, Stack size 32 bytes, ao_meterprocess.o(.text.Meter_RSP_InvData))
+<P><STRONG><a name="[aa]"></a>Meter_RSP_InvData</STRONG> (Thumb, 584 bytes, Stack size 32 bytes, ao_meterprocess.o(.text.Meter_RSP_InvData))
 <BR><BR>[Stack]<UL><LI>Max Depth = 32<LI>Call Chain = Meter_RSP_InvData
 </UL>
 <BR>[Called By]<UL><LI><a href="#[9f]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;MeterProcess
 </UL>
 
-<P><STRONG><a name="[a2]"></a>Meter_RSP_PowerData</STRONG> (Thumb, 596 bytes, Stack size 36 bytes, ao_meterprocess.o(.text.Meter_RSP_PowerData))
+<P><STRONG><a name="[a3]"></a>Meter_RSP_PowerData</STRONG> (Thumb, 596 bytes, Stack size 36 bytes, ao_meterprocess.o(.text.Meter_RSP_PowerData))
 <BR><BR>[Stack]<UL><LI>Max Depth = 36<LI>Call Chain = Meter_RSP_PowerData
 </UL>
 <BR>[Called By]<UL><LI><a href="#[9f]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;MeterProcess
 </UL>
 
-<P><STRONG><a name="[a5]"></a>Meter_RSP_PyranometerData</STRONG> (Thumb, 168 bytes, Stack size 48 bytes, ao_meterprocess.o(.text.Meter_RSP_PyranometerData))
+<P><STRONG><a name="[a6]"></a>Meter_RSP_PyranometerData</STRONG> (Thumb, 168 bytes, Stack size 48 bytes, ao_meterprocess.o(.text.Meter_RSP_PyranometerData))
 <BR><BR>[Stack]<UL><LI>Max Depth = 48<LI>Call Chain = Meter_RSP_PyranometerData
 </UL>
 <BR>[Called By]<UL><LI><a href="#[9f]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;MeterProcess
 </UL>
 
-<P><STRONG><a name="[a6]"></a>Meter_RSP_SoilSensorData</STRONG> (Thumb, 1506 bytes, Stack size 52 bytes, ao_meterprocess.o(.text.Meter_RSP_SoilSensorData))
+<P><STRONG><a name="[a7]"></a>Meter_RSP_SoilSensorData</STRONG> (Thumb, 1506 bytes, Stack size 52 bytes, ao_meterprocess.o(.text.Meter_RSP_SoilSensorData))
 <BR><BR>[Stack]<UL><LI>Max Depth = 52<LI>Call Chain = Meter_RSP_SoilSensorData
 </UL>
 <BR>[Called By]<UL><LI><a href="#[9f]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;MeterProcess
 </UL>
 
-<P><STRONG><a name="[a1]"></a>Meter_RSP_SysInformation</STRONG> (Thumb, 588 bytes, Stack size 32 bytes, ao_meterprocess.o(.text.Meter_RSP_SysInformation))
+<P><STRONG><a name="[a2]"></a>Meter_RSP_SysInformation</STRONG> (Thumb, 588 bytes, Stack size 32 bytes, ao_meterprocess.o(.text.Meter_RSP_SysInformation))
 <BR><BR>[Stack]<UL><LI>Max Depth = 32<LI>Call Chain = Meter_RSP_SysInformation
 </UL>
 <BR>[Called By]<UL><LI><a href="#[9f]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;MeterProcess
 </UL>
 
-<P><STRONG><a name="[a4]"></a>Meter_RSP_WaterData</STRONG> (Thumb, 148 bytes, Stack size 36 bytes, ao_meterprocess.o(.text.Meter_RSP_WaterData))
+<P><STRONG><a name="[a5]"></a>Meter_RSP_WaterData</STRONG> (Thumb, 148 bytes, Stack size 36 bytes, ao_meterprocess.o(.text.Meter_RSP_WaterData))
 <BR><BR>[Stack]<UL><LI>Max Depth = 36<LI>Call Chain = Meter_RSP_WaterData
+</UL>
+<BR>[Called By]<UL><LI><a href="#[9f]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;MeterProcess
+</UL>
+
+<P><STRONG><a name="[a0]"></a>OtaLeds</STRONG> (Thumb, 140 bytes, Stack size 4 bytes, ota_manager.o(.text.OtaLeds))
+<BR><BR>[Stack]<UL><LI>Max Depth = 4<LI>Call Chain = OtaLeds
 </UL>
 <BR>[Called By]<UL><LI><a href="#[9f]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;MeterProcess
 </UL>
@@ -902,8 +915,8 @@ Global Symbols
 <BR>[Called By]<UL><LI><a href="#[89]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;MeterBoardPolling
 </UL>
 
-<P><STRONG><a name="[8d]"></a>PollingTimeout_Handler</STRONG> (Thumb, 84 bytes, Stack size 8 bytes, ao_meterprocess.o(.text.PollingTimeout_Handler))
-<BR><BR>[Stack]<UL><LI>Max Depth = 8<LI>Call Chain = PollingTimeout_Handler
+<P><STRONG><a name="[8d]"></a>PollingTimeout_Handler</STRONG> (Thumb, 120 bytes, Stack size 28 bytes, ao_meterprocess.o(.text.PollingTimeout_Handler))
+<BR><BR>[Stack]<UL><LI>Max Depth = 28<LI>Call Chain = PollingTimeout_Handler
 </UL>
 <BR>[Called By]<UL><LI><a href="#[89]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;MeterBoardPolling
 </UL>
@@ -911,15 +924,15 @@ Global Symbols
 <P><STRONG><a name="[24]"></a>ProcessHardFault</STRONG> (Thumb, 64 bytes, Stack size 24 bytes, retarget.o(.text.ProcessHardFault))
 <BR><BR>[Stack]<UL><LI>Max Depth = 48<LI>Call Chain = ProcessHardFault &rArr; printf
 </UL>
-<BR>[Calls]<UL><LI><a href="#[ab]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;printf
+<BR>[Calls]<UL><LI><a href="#[ac]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;printf
 </UL>
 <BR>[Address Reference Count : 1]<UL><LI> startup_nuc1261.o(.text)
 </UL>
-<P><STRONG><a name="[c8]"></a>ReadMyCenterID</STRONG> (Thumb, 164 bytes, Stack size 0 bytes, main.o(.text.ReadMyCenterID))
+<P><STRONG><a name="[c9]"></a>ReadMyCenterID</STRONG> (Thumb, 164 bytes, Stack size 0 bytes, main.o(.text.ReadMyCenterID))
 <BR><BR>[Called By]<UL><LI><a href="#[22]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;main
 </UL>
 
-<P><STRONG><a name="[ac]"></a>RecoverSystemMoniter</STRONG> (Thumb, 48 bytes, Stack size 16 bytes, main.o(.text.RecoverSystemMoniter))
+<P><STRONG><a name="[ad]"></a>RecoverSystemMoniter</STRONG> (Thumb, 48 bytes, Stack size 16 bytes, main.o(.text.RecoverSystemMoniter))
 <BR><BR>[Stack]<UL><LI>Max Depth = 16<LI>Call Chain = RecoverSystemMoniter
 </UL>
 <BR>[Calls]<UL><LI><a href="#[8a]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;ResetMeterUART
@@ -932,7 +945,7 @@ Global Symbols
 <P><STRONG><a name="[69]"></a>ResetHostUART</STRONG> (Thumb, 28 bytes, Stack size 0 bytes, main.o(.text.ResetHostUART))
 <BR><BR>[Called By]<UL><LI><a href="#[68]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;HostProcess
 <LI><a href="#[22]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;main
-<LI><a href="#[ac]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;RecoverSystemMoniter
+<LI><a href="#[ad]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;RecoverSystemMoniter
 <LI><a href="#[5]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;SysTick_Handler
 </UL>
 
@@ -940,7 +953,7 @@ Global Symbols
 <BR><BR>[Called By]<UL><LI><a href="#[89]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;MeterBoardPolling
 <LI><a href="#[9f]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;MeterProcess
 <LI><a href="#[22]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;main
-<LI><a href="#[ac]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;RecoverSystemMoniter
+<LI><a href="#[ad]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;RecoverSystemMoniter
 <LI><a href="#[5]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;SysTick_Handler
 </UL>
 
@@ -949,39 +962,39 @@ Global Symbols
 </UL>
 <BR>[Address Reference Count : 1]<UL><LI> startup_nuc1261.o(.text)
 </UL>
-<P><STRONG><a name="[ad]"></a>SYS_Init</STRONG> (Thumb, 304 bytes, Stack size 56 bytes, main.o(.text.SYS_Init))
+<P><STRONG><a name="[ae]"></a>SYS_Init</STRONG> (Thumb, 304 bytes, Stack size 56 bytes, main.o(.text.SYS_Init))
 <BR><BR>[Stack]<UL><LI>Max Depth = 200<LI>Call Chain = SYS_Init &rArr; CLK_SetCoreClock &rArr; CLK_EnablePLL &rArr; CLK_GetPLLClockFreq &rArr; __aeabi_uidiv
 </UL>
-<BR>[Calls]<UL><LI><a href="#[b1]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;CLK_SetModuleClock
-<LI><a href="#[b0]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;CLK_EnableModuleClock
-<LI><a href="#[af]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;CLK_SetSysTickClockSrc
+<BR>[Calls]<UL><LI><a href="#[b2]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;CLK_SetModuleClock
+<LI><a href="#[b1]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;CLK_EnableModuleClock
+<LI><a href="#[b0]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;CLK_SetSysTickClockSrc
 <LI><a href="#[4d]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;CLK_SetCoreClock
 <LI><a href="#[4e]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;CLK_SetHCLK
 <LI><a href="#[48]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;CLK_WaitClockReady
-<LI><a href="#[ae]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;CLK_EnableXtalRC
+<LI><a href="#[af]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;CLK_EnableXtalRC
 </UL>
 <BR>[Called By]<UL><LI><a href="#[22]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;main
 </UL>
 
-<P><STRONG><a name="[bc]"></a>SYS_ResetModule</STRONG> (Thumb, 52 bytes, Stack size 20 bytes, sys.o(.text.SYS_ResetModule))
+<P><STRONG><a name="[bd]"></a>SYS_ResetModule</STRONG> (Thumb, 52 bytes, Stack size 20 bytes, sys.o(.text.SYS_ResetModule))
 <BR><BR>[Stack]<UL><LI>Max Depth = 20<LI>Call Chain = SYS_ResetModule
 </UL>
-<BR>[Called By]<UL><LI><a href="#[bd]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;UART1_Init
-<LI><a href="#[bb]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;UART0_Init
+<BR>[Called By]<UL><LI><a href="#[be]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;UART1_Init
+<LI><a href="#[bc]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;UART0_Init
 </UL>
 
-<P><STRONG><a name="[b2]"></a>SendChar</STRONG> (Thumb, 16 bytes, Stack size 16 bytes, retarget.o(.text.SendChar))
+<P><STRONG><a name="[b3]"></a>SendChar</STRONG> (Thumb, 16 bytes, Stack size 16 bytes, retarget.o(.text.SendChar))
 <BR><BR>[Stack]<UL><LI>Max Depth = 20<LI>Call Chain = SendChar &rArr; SendChar_ToUART
 </UL>
-<BR>[Calls]<UL><LI><a href="#[b3]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;SendChar_ToUART
+<BR>[Calls]<UL><LI><a href="#[b4]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;SendChar_ToUART
 </UL>
 <BR>[Called By]<UL><LI><a href="#[26]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;fputc
 </UL>
 
-<P><STRONG><a name="[b3]"></a>SendChar_ToUART</STRONG> (Thumb, 64 bytes, Stack size 4 bytes, retarget.o(.text.SendChar_ToUART))
+<P><STRONG><a name="[b4]"></a>SendChar_ToUART</STRONG> (Thumb, 64 bytes, Stack size 4 bytes, retarget.o(.text.SendChar_ToUART))
 <BR><BR>[Stack]<UL><LI>Max Depth = 4<LI>Call Chain = SendChar_ToUART
 </UL>
-<BR>[Called By]<UL><LI><a href="#[b2]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;SendChar
+<BR>[Called By]<UL><LI><a href="#[b3]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;SendChar
 </UL>
 
 <P><STRONG><a name="[77]"></a>SendHost_Ack</STRONG> (Thumb, 24 bytes, Stack size 16 bytes, ao_hostprocess.o(.text.SendHost_Ack))
@@ -1018,13 +1031,13 @@ Global Symbols
 <LI><a href="#[68]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;HostProcess
 </UL>
 
-<P><STRONG><a name="[b4]"></a>SendHost_CenterUpdateSuccess</STRONG> (Thumb, 44 bytes, Stack size 8 bytes, ao_hostprocess.o(.text.SendHost_CenterUpdateSuccess))
+<P><STRONG><a name="[b5]"></a>SendHost_CenterUpdateSuccess</STRONG> (Thumb, 44 bytes, Stack size 8 bytes, ao_hostprocess.o(.text.SendHost_CenterUpdateSuccess))
 <BR><BR>[Stack]<UL><LI>Max Depth = 76<LI>Call Chain = SendHost_CenterUpdateSuccess &rArr; CalChecksumH &rArr; _SendStringToHOST &rArr; UART_EnableInt &rArr; NVIC_EnableIRQ
 </UL>
 <BR>[Calls]<UL><LI><a href="#[54]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;CalChecksumH
 <LI><a href="#[52]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;__aeabi_memcpy
 </UL>
-<BR>[Called By]<UL><LI><a href="#[b5]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;SendHost_UpdateSuccess_10ms
+<BR>[Called By]<UL><LI><a href="#[b6]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;SendHost_UpdateSuccess_10ms
 </UL>
 
 <P><STRONG><a name="[6a]"></a>SendHost_FirstReset_Ack</STRONG> (Thumb, 24 bytes, Stack size 16 bytes, ao_hostprocess.o(.text.SendHost_FirstReset_Ack))
@@ -1084,10 +1097,10 @@ Global Symbols
 <BR>[Called By]<UL><LI><a href="#[68]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;HostProcess
 </UL>
 
-<P><STRONG><a name="[b5]"></a>SendHost_UpdateSuccess_10ms</STRONG> (Thumb, 52 bytes, Stack size 16 bytes, main.o(.text.SendHost_UpdateSuccess_10ms))
+<P><STRONG><a name="[b6]"></a>SendHost_UpdateSuccess_10ms</STRONG> (Thumb, 52 bytes, Stack size 16 bytes, main.o(.text.SendHost_UpdateSuccess_10ms))
 <BR><BR>[Stack]<UL><LI>Max Depth = 92<LI>Call Chain = SendHost_UpdateSuccess_10ms &rArr; SendHost_CenterUpdateSuccess &rArr; CalChecksumH &rArr; _SendStringToHOST &rArr; UART_EnableInt &rArr; NVIC_EnableIRQ
 </UL>
-<BR>[Calls]<UL><LI><a href="#[b4]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;SendHost_CenterUpdateSuccess
+<BR>[Calls]<UL><LI><a href="#[b5]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;SendHost_CenterUpdateSuccess
 </UL>
 <BR>[Called By]<UL><LI><a href="#[22]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;main
 </UL>
@@ -1117,17 +1130,17 @@ Global Symbols
 <BR>[Called By]<UL><LI><a href="#[89]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;MeterBoardPolling
 </UL>
 
-<P><STRONG><a name="[98]"></a>SendMeterBootloader_ConnectCmd</STRONG> (Thumb, 28 bytes, Stack size 8 bytes, ao_meterprocess.o(.text.SendMeterBootloader_ConnectCmd))
+<P><STRONG><a name="[98]"></a>SendMeterBootloader_ConnectCmd</STRONG> (Thumb, 24 bytes, Stack size 8 bytes, ao_meterprocess.o(.text.SendMeterBootloader_ConnectCmd))
 <BR><BR>[Stack]<UL><LI>Max Depth = 76<LI>Call Chain = SendMeterBootloader_ConnectCmd &rArr; CalChecksumM &rArr; _SendStringToMETER &rArr; UART_EnableInt &rArr; NVIC_EnableIRQ
 </UL>
 <BR>[Calls]<UL><LI><a href="#[56]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;CalChecksumM
-<LI><a href="#[b6]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;SendMeterRTC
+<LI><a href="#[b7]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;SendMeterRTC
 </UL>
 <BR>[Called By]<UL><LI><a href="#[89]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;MeterBoardPolling
 </UL>
 
-<P><STRONG><a name="[9c]"></a>SendMeterBootloader_GetPackNo</STRONG> (Thumb, 40 bytes, Stack size 104 bytes, ao_meterprocess.o(.text.SendMeterBootloader_GetPackNo))
-<BR><BR>[Stack]<UL><LI>Max Depth = 172<LI>Call Chain = SendMeterBootloader_GetPackNo &rArr; CalChecksumM &rArr; _SendStringToMETER &rArr; UART_EnableInt &rArr; NVIC_EnableIRQ
+<P><STRONG><a name="[9d]"></a>SendMeterBootloader_ResentUpdatePack</STRONG> (Thumb, 40 bytes, Stack size 104 bytes, ao_meterprocess.o(.text.SendMeterBootloader_ResentUpdatePack))
+<BR><BR>[Stack]<UL><LI>Max Depth = 172<LI>Call Chain = SendMeterBootloader_ResentUpdatePack &rArr; CalChecksumM &rArr; _SendStringToMETER &rArr; UART_EnableInt &rArr; NVIC_EnableIRQ
 </UL>
 <BR>[Calls]<UL><LI><a href="#[97]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;SYS_UnlockReg
 <LI><a href="#[56]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;CalChecksumM
@@ -1135,8 +1148,16 @@ Global Symbols
 <BR>[Called By]<UL><LI><a href="#[89]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;MeterBoardPolling
 </UL>
 
-<P><STRONG><a name="[9b]"></a>SendMeterBootloader_UpdateBuff</STRONG> (Thumb, 84 bytes, Stack size 112 bytes, ao_meterprocess.o(.text.SendMeterBootloader_UpdateBuff))
-<BR><BR>[Stack]<UL><LI>Max Depth = 180<LI>Call Chain = SendMeterBootloader_UpdateBuff &rArr; CalChecksumM &rArr; _SendStringToMETER &rArr; UART_EnableInt &rArr; NVIC_EnableIRQ
+<P><STRONG><a name="[99]"></a>SendMeterBootloader_UpdateMetadata</STRONG> (Thumb, 172 bytes, Stack size 24 bytes, ao_meterprocess.o(.text.SendMeterBootloader_UpdateMetadata))
+<BR><BR>[Stack]<UL><LI>Max Depth = 92<LI>Call Chain = SendMeterBootloader_UpdateMetadata &rArr; CalChecksumM &rArr; _SendStringToMETER &rArr; UART_EnableInt &rArr; NVIC_EnableIRQ
+</UL>
+<BR>[Calls]<UL><LI><a href="#[56]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;CalChecksumM
+</UL>
+<BR>[Called By]<UL><LI><a href="#[89]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;MeterBoardPolling
+</UL>
+
+<P><STRONG><a name="[9b]"></a>SendMeterBootloader_UpdatePack</STRONG> (Thumb, 100 bytes, Stack size 112 bytes, ao_meterprocess.o(.text.SendMeterBootloader_UpdatePack))
+<BR><BR>[Stack]<UL><LI>Max Depth = 180<LI>Call Chain = SendMeterBootloader_UpdatePack &rArr; CalChecksumM &rArr; _SendStringToMETER &rArr; UART_EnableInt &rArr; NVIC_EnableIRQ
 </UL>
 <BR>[Calls]<UL><LI><a href="#[97]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;SYS_UnlockReg
 <LI><a href="#[52]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;__aeabi_memcpy
@@ -1146,35 +1167,27 @@ Global Symbols
 <BR>[Called By]<UL><LI><a href="#[89]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;MeterBoardPolling
 </UL>
 
-<P><STRONG><a name="[99]"></a>SendMeterBootloader_UpdateMetadata</STRONG> (Thumb, 180 bytes, Stack size 24 bytes, ao_meterprocess.o(.text.SendMeterBootloader_UpdateMetadata))
-<BR><BR>[Stack]<UL><LI>Max Depth = 92<LI>Call Chain = SendMeterBootloader_UpdateMetadata &rArr; CalChecksumM &rArr; _SendStringToMETER &rArr; UART_EnableInt &rArr; NVIC_EnableIRQ
-</UL>
-<BR>[Calls]<UL><LI><a href="#[56]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;CalChecksumM
-</UL>
-<BR>[Called By]<UL><LI><a href="#[89]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;MeterBoardPolling
-</UL>
-
-<P><STRONG><a name="[b6]"></a>SendMeterRTC</STRONG> (Thumb, 52 bytes, Stack size 4 bytes, ao_meterprocess.o(.text.SendMeterRTC))
+<P><STRONG><a name="[b7]"></a>SendMeterRTC</STRONG> (Thumb, 52 bytes, Stack size 4 bytes, ao_meterprocess.o(.text.SendMeterRTC))
 <BR><BR>[Stack]<UL><LI>Max Depth = 4<LI>Call Chain = SendMeterRTC
 </UL>
-<BR>[Called By]<UL><LI><a href="#[92]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;SendMeter_GetPyrMtrData
+<BR>[Called By]<UL><LI><a href="#[98]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;SendMeterBootloader_ConnectCmd
+<LI><a href="#[96]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;SendMeter_MeterOTACmd
+<LI><a href="#[95]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;SendMeter_WateringTimeSetup
+<LI><a href="#[94]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;SendMeter_GetAirData
+<LI><a href="#[93]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;SendMeter_GetSoilData
+<LI><a href="#[92]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;SendMeter_GetPyrMtrData
 <LI><a href="#[91]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;SendMeter_GetInvData
 <LI><a href="#[90]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;SendMeter_GetWaterData
 <LI><a href="#[8f]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;SendMeter_GetBmsData
 <LI><a href="#[8e]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;SendMeter_GetPowerData
 <LI><a href="#[8b]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;SendMeter_AliveToken
-<LI><a href="#[98]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;SendMeterBootloader_ConnectCmd
-<LI><a href="#[96]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;SendMeter_MeterOTACmd
-<LI><a href="#[95]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;SendMeter_WateringTimeSetup
-<LI><a href="#[94]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;SendMeter_GetAirData
-<LI><a href="#[93]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;SendMeter_GetSoilData
 </UL>
 
 <P><STRONG><a name="[8b]"></a>SendMeter_AliveToken</STRONG> (Thumb, 32 bytes, Stack size 8 bytes, ao_meterprocess.o(.text.SendMeter_AliveToken))
 <BR><BR>[Stack]<UL><LI>Max Depth = 76<LI>Call Chain = SendMeter_AliveToken &rArr; CalChecksumM &rArr; _SendStringToMETER &rArr; UART_EnableInt &rArr; NVIC_EnableIRQ
 </UL>
 <BR>[Calls]<UL><LI><a href="#[56]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;CalChecksumM
-<LI><a href="#[b6]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;SendMeterRTC
+<LI><a href="#[b7]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;SendMeterRTC
 </UL>
 <BR>[Called By]<UL><LI><a href="#[89]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;MeterBoardPolling
 </UL>
@@ -1183,7 +1196,7 @@ Global Symbols
 <BR><BR>[Stack]<UL><LI>Max Depth = 84<LI>Call Chain = SendMeter_GetAirData &rArr; CalChecksumM &rArr; _SendStringToMETER &rArr; UART_EnableInt &rArr; NVIC_EnableIRQ
 </UL>
 <BR>[Calls]<UL><LI><a href="#[56]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;CalChecksumM
-<LI><a href="#[b6]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;SendMeterRTC
+<LI><a href="#[b7]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;SendMeterRTC
 </UL>
 <BR>[Called By]<UL><LI><a href="#[89]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;MeterBoardPolling
 </UL>
@@ -1192,7 +1205,7 @@ Global Symbols
 <BR><BR>[Stack]<UL><LI>Max Depth = 84<LI>Call Chain = SendMeter_GetBmsData &rArr; CalChecksumM &rArr; _SendStringToMETER &rArr; UART_EnableInt &rArr; NVIC_EnableIRQ
 </UL>
 <BR>[Calls]<UL><LI><a href="#[56]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;CalChecksumM
-<LI><a href="#[b6]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;SendMeterRTC
+<LI><a href="#[b7]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;SendMeterRTC
 </UL>
 <BR>[Called By]<UL><LI><a href="#[89]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;MeterBoardPolling
 </UL>
@@ -1201,7 +1214,7 @@ Global Symbols
 <BR><BR>[Stack]<UL><LI>Max Depth = 84<LI>Call Chain = SendMeter_GetInvData &rArr; CalChecksumM &rArr; _SendStringToMETER &rArr; UART_EnableInt &rArr; NVIC_EnableIRQ
 </UL>
 <BR>[Calls]<UL><LI><a href="#[56]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;CalChecksumM
-<LI><a href="#[b6]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;SendMeterRTC
+<LI><a href="#[b7]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;SendMeterRTC
 </UL>
 <BR>[Called By]<UL><LI><a href="#[89]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;MeterBoardPolling
 </UL>
@@ -1210,7 +1223,7 @@ Global Symbols
 <BR><BR>[Stack]<UL><LI>Max Depth = 84<LI>Call Chain = SendMeter_GetPowerData &rArr; CalChecksumM &rArr; _SendStringToMETER &rArr; UART_EnableInt &rArr; NVIC_EnableIRQ
 </UL>
 <BR>[Calls]<UL><LI><a href="#[56]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;CalChecksumM
-<LI><a href="#[b6]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;SendMeterRTC
+<LI><a href="#[b7]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;SendMeterRTC
 </UL>
 <BR>[Called By]<UL><LI><a href="#[89]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;MeterBoardPolling
 </UL>
@@ -1219,7 +1232,7 @@ Global Symbols
 <BR><BR>[Stack]<UL><LI>Max Depth = 84<LI>Call Chain = SendMeter_GetPyrMtrData &rArr; CalChecksumM &rArr; _SendStringToMETER &rArr; UART_EnableInt &rArr; NVIC_EnableIRQ
 </UL>
 <BR>[Calls]<UL><LI><a href="#[56]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;CalChecksumM
-<LI><a href="#[b6]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;SendMeterRTC
+<LI><a href="#[b7]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;SendMeterRTC
 </UL>
 <BR>[Called By]<UL><LI><a href="#[89]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;MeterBoardPolling
 </UL>
@@ -1228,7 +1241,7 @@ Global Symbols
 <BR><BR>[Stack]<UL><LI>Max Depth = 84<LI>Call Chain = SendMeter_GetSoilData &rArr; CalChecksumM &rArr; _SendStringToMETER &rArr; UART_EnableInt &rArr; NVIC_EnableIRQ
 </UL>
 <BR>[Calls]<UL><LI><a href="#[56]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;CalChecksumM
-<LI><a href="#[b6]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;SendMeterRTC
+<LI><a href="#[b7]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;SendMeterRTC
 </UL>
 <BR>[Called By]<UL><LI><a href="#[89]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;MeterBoardPolling
 </UL>
@@ -1237,7 +1250,7 @@ Global Symbols
 <BR><BR>[Stack]<UL><LI>Max Depth = 84<LI>Call Chain = SendMeter_GetWaterData &rArr; CalChecksumM &rArr; _SendStringToMETER &rArr; UART_EnableInt &rArr; NVIC_EnableIRQ
 </UL>
 <BR>[Calls]<UL><LI><a href="#[56]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;CalChecksumM
-<LI><a href="#[b6]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;SendMeterRTC
+<LI><a href="#[b7]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;SendMeterRTC
 </UL>
 <BR>[Called By]<UL><LI><a href="#[89]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;MeterBoardPolling
 </UL>
@@ -1246,7 +1259,7 @@ Global Symbols
 <BR><BR>[Stack]<UL><LI>Max Depth = 84<LI>Call Chain = SendMeter_MeterOTACmd &rArr; CalChecksumM &rArr; _SendStringToMETER &rArr; UART_EnableInt &rArr; NVIC_EnableIRQ
 </UL>
 <BR>[Calls]<UL><LI><a href="#[56]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;CalChecksumM
-<LI><a href="#[b6]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;SendMeterRTC
+<LI><a href="#[b7]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;SendMeterRTC
 </UL>
 <BR>[Called By]<UL><LI><a href="#[89]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;MeterBoardPolling
 </UL>
@@ -1255,7 +1268,7 @@ Global Symbols
 <BR><BR>[Stack]<UL><LI>Max Depth = 100<LI>Call Chain = SendMeter_WateringTimeSetup &rArr; CalChecksumM &rArr; _SendStringToMETER &rArr; UART_EnableInt &rArr; NVIC_EnableIRQ
 </UL>
 <BR>[Calls]<UL><LI><a href="#[56]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;CalChecksumM
-<LI><a href="#[b6]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;SendMeterRTC
+<LI><a href="#[b7]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;SendMeterRTC
 </UL>
 <BR>[Called By]<UL><LI><a href="#[89]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;MeterBoardPolling
 </UL>
@@ -1264,10 +1277,24 @@ Global Symbols
 <BR><BR>[Stack]<UL><LI>Max Depth = 44<LI>Call Chain = SetFwFlags
 </UL>
 <BR>[Called By]<UL><LI><a href="#[58]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;FwBankSwitchProcess
-<LI><a href="#[62]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;Update_FwMetadata
+<LI><a href="#[62]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;Set_metaflags
 </UL>
 
-<P><STRONG><a name="[c9]"></a>SoftI2cMasterInit</STRONG> (Thumb, 40 bytes, Stack size 0 bytes, ao_ee24c.o(.text.SoftI2cMasterInit))
+<P><STRONG><a name="[63]"></a>Set_BankStatus</STRONG> (Thumb, 128 bytes, Stack size 8 bytes, ota_manager.o(.text.Set_BankStatus))
+<BR><BR>[Stack]<UL><LI>Max Depth = 8<LI>Call Chain = Set_BankStatus
+</UL>
+<BR>[Called By]<UL><LI><a href="#[5e]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;FwValidator
+</UL>
+
+<P><STRONG><a name="[62]"></a>Set_metaflags</STRONG> (Thumb, 136 bytes, Stack size 24 bytes, ota_manager.o(.text.Set_metaflags))
+<BR><BR>[Stack]<UL><LI>Max Depth = 68<LI>Call Chain = Set_metaflags &rArr; SetFwFlags
+</UL>
+<BR>[Calls]<UL><LI><a href="#[59]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;SetFwFlags
+</UL>
+<BR>[Called By]<UL><LI><a href="#[5e]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;FwValidator
+</UL>
+
+<P><STRONG><a name="[ca]"></a>SoftI2cMasterInit</STRONG> (Thumb, 40 bytes, Stack size 0 bytes, ao_ee24c.o(.text.SoftI2cMasterInit))
 <BR><BR>[Called By]<UL><LI><a href="#[22]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;main
 </UL>
 
@@ -1276,7 +1303,7 @@ Global Symbols
 </UL>
 <BR>[Calls]<UL><LI><a href="#[8a]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;ResetMeterUART
 <LI><a href="#[69]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;ResetHostUART
-<LI><a href="#[ac]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;RecoverSystemMoniter
+<LI><a href="#[ad]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;RecoverSystemMoniter
 </UL>
 <BR>[Address Reference Count : 1]<UL><LI> startup_nuc1261.o(RESET)
 </UL>
@@ -1292,16 +1319,16 @@ Global Symbols
 <P><STRONG><a name="[12]"></a>UART02_IRQHandler</STRONG> (Thumb, 372 bytes, Stack size 24 bytes, main.o(.text.UART02_IRQHandler))
 <BR><BR>[Stack]<UL><LI>Max Depth = 44<LI>Call Chain = UART02_IRQHandler &rArr; UART_EnableInt &rArr; NVIC_EnableIRQ
 </UL>
-<BR>[Calls]<UL><LI><a href="#[ba]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;UART_EnableInt
-<LI><a href="#[b9]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;UART_DisableInt
+<BR>[Calls]<UL><LI><a href="#[bb]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;UART_EnableInt
+<LI><a href="#[ba]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;UART_DisableInt
 </UL>
 <BR>[Address Reference Count : 1]<UL><LI> startup_nuc1261.o(RESET)
 </UL>
-<P><STRONG><a name="[bb]"></a>UART0_Init</STRONG> (Thumb, 236 bytes, Stack size 48 bytes, main.o(.text.UART0_Init))
+<P><STRONG><a name="[bc]"></a>UART0_Init</STRONG> (Thumb, 236 bytes, Stack size 48 bytes, main.o(.text.UART0_Init))
 <BR><BR>[Stack]<UL><LI>Max Depth = 104<LI>Call Chain = UART0_Init &rArr; CLK_GetPLLClockFreq &rArr; __aeabi_uidiv
 </UL>
-<BR>[Calls]<UL><LI><a href="#[bc]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;SYS_ResetModule
-<LI><a href="#[ba]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;UART_EnableInt
+<BR>[Calls]<UL><LI><a href="#[bd]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;SYS_ResetModule
+<LI><a href="#[bb]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;UART_EnableInt
 <LI><a href="#[4c]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;CLK_GetPLLClockFreq
 <LI><a href="#[49]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;__aeabi_uidiv
 </UL>
@@ -1311,76 +1338,62 @@ Global Symbols
 <P><STRONG><a name="[13]"></a>UART1_IRQHandler</STRONG> (Thumb, 384 bytes, Stack size 32 bytes, main.o(.text.UART1_IRQHandler))
 <BR><BR>[Stack]<UL><LI>Max Depth = 52<LI>Call Chain = UART1_IRQHandler &rArr; UART_EnableInt &rArr; NVIC_EnableIRQ
 </UL>
-<BR>[Calls]<UL><LI><a href="#[ba]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;UART_EnableInt
-<LI><a href="#[b9]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;UART_DisableInt
+<BR>[Calls]<UL><LI><a href="#[bb]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;UART_EnableInt
+<LI><a href="#[ba]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;UART_DisableInt
 </UL>
 <BR>[Address Reference Count : 1]<UL><LI> startup_nuc1261.o(RESET)
 </UL>
-<P><STRONG><a name="[bd]"></a>UART1_Init</STRONG> (Thumb, 256 bytes, Stack size 56 bytes, main.o(.text.UART1_Init))
+<P><STRONG><a name="[be]"></a>UART1_Init</STRONG> (Thumb, 256 bytes, Stack size 56 bytes, main.o(.text.UART1_Init))
 <BR><BR>[Stack]<UL><LI>Max Depth = 112<LI>Call Chain = UART1_Init &rArr; CLK_GetPLLClockFreq &rArr; __aeabi_uidiv
 </UL>
-<BR>[Calls]<UL><LI><a href="#[bc]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;SYS_ResetModule
-<LI><a href="#[ba]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;UART_EnableInt
+<BR>[Calls]<UL><LI><a href="#[bd]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;SYS_ResetModule
+<LI><a href="#[bb]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;UART_EnableInt
 <LI><a href="#[4c]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;CLK_GetPLLClockFreq
 <LI><a href="#[49]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;__aeabi_uidiv
 </UL>
 <BR>[Called By]<UL><LI><a href="#[22]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;main
 </UL>
 
-<P><STRONG><a name="[b9]"></a>UART_DisableInt</STRONG> (Thumb, 68 bytes, Stack size 16 bytes, uart.o(.text.UART_DisableInt))
+<P><STRONG><a name="[ba]"></a>UART_DisableInt</STRONG> (Thumb, 68 bytes, Stack size 16 bytes, uart.o(.text.UART_DisableInt))
 <BR><BR>[Stack]<UL><LI>Max Depth = 20<LI>Call Chain = UART_DisableInt &rArr; NVIC_DisableIRQ
 </UL>
-<BR>[Calls]<UL><LI><a href="#[be]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;NVIC_DisableIRQ
+<BR>[Calls]<UL><LI><a href="#[bf]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;NVIC_DisableIRQ
 </UL>
 <BR>[Called By]<UL><LI><a href="#[13]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;UART1_IRQHandler
 <LI><a href="#[12]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;UART02_IRQHandler
 </UL>
 
-<P><STRONG><a name="[ba]"></a>UART_EnableInt</STRONG> (Thumb, 68 bytes, Stack size 16 bytes, uart.o(.text.UART_EnableInt))
+<P><STRONG><a name="[bb]"></a>UART_EnableInt</STRONG> (Thumb, 68 bytes, Stack size 16 bytes, uart.o(.text.UART_EnableInt))
 <BR><BR>[Stack]<UL><LI>Max Depth = 20<LI>Call Chain = UART_EnableInt &rArr; NVIC_EnableIRQ
 </UL>
-<BR>[Calls]<UL><LI><a href="#[bf]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;NVIC_EnableIRQ
+<BR>[Calls]<UL><LI><a href="#[c0]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;NVIC_EnableIRQ
 </UL>
 <BR>[Called By]<UL><LI><a href="#[55]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;_SendStringToHOST
-<LI><a href="#[bd]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;UART1_Init
-<LI><a href="#[bb]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;UART0_Init
+<LI><a href="#[be]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;UART1_Init
+<LI><a href="#[bc]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;UART0_Init
 <LI><a href="#[13]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;UART1_IRQHandler
 <LI><a href="#[12]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;UART02_IRQHandler
 <LI><a href="#[57]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;_SendStringToMETER
 </UL>
 
-<P><STRONG><a name="[63]"></a>Update_BankStatus</STRONG> (Thumb, 128 bytes, Stack size 8 bytes, ota_manager.o(.text.Update_BankStatus))
-<BR><BR>[Stack]<UL><LI>Max Depth = 8<LI>Call Chain = Update_BankStatus
-</UL>
-<BR>[Called By]<UL><LI><a href="#[5e]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;FwValidator
-</UL>
-
-<P><STRONG><a name="[62]"></a>Update_FwMetadata</STRONG> (Thumb, 156 bytes, Stack size 24 bytes, ota_manager.o(.text.Update_FwMetadata))
-<BR><BR>[Stack]<UL><LI>Max Depth = 68<LI>Call Chain = Update_FwMetadata &rArr; SetFwFlags
-</UL>
-<BR>[Calls]<UL><LI><a href="#[59]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;SetFwFlags
-</UL>
-<BR>[Called By]<UL><LI><a href="#[5e]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;FwValidator
-</UL>
-
-<P><STRONG><a name="[7]"></a>WDT_IRQHandler</STRONG> (Thumb, 336 bytes, Stack size 48 bytes, main.o(.text.WDT_IRQHandler))
+<P><STRONG><a name="[7]"></a>WDT_IRQHandler</STRONG> (Thumb, 332 bytes, Stack size 48 bytes, main.o(.text.WDT_IRQHandler))
 <BR><BR>[Stack]<UL><LI>Max Depth = 168<LI>Call Chain = WDT_IRQHandler &rArr; WriteMetadata &rArr; WriteToFlash &rArr; CRC32_Calc &rArr; CRC_Open
 </UL>
 <BR>[Calls]<UL><LI><a href="#[45]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;BlinkStatusLED
 <LI><a href="#[85]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;WDT_Open
 <LI><a href="#[5a]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;WriteMetadata
 <LI><a href="#[86]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;FMC_Open
-<LI><a href="#[c1]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;SYS_LockReg
-<LI><a href="#[c0]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;SYS_UnlockReg
+<LI><a href="#[c2]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;SYS_LockReg
+<LI><a href="#[c1]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;SYS_UnlockReg
 </UL>
 <BR>[Address Reference Count : 1]<UL><LI> startup_nuc1261.o(RESET)
 </UL>
-<P><STRONG><a name="[c2]"></a>WDT_Init</STRONG> (Thumb, 40 bytes, Stack size 16 bytes, main.o(.text.WDT_Init))
+<P><STRONG><a name="[c3]"></a>WDT_Init</STRONG> (Thumb, 40 bytes, Stack size 16 bytes, main.o(.text.WDT_Init))
 <BR><BR>[Stack]<UL><LI>Max Depth = 32<LI>Call Chain = WDT_Init &rArr; WDT_Open
 </UL>
 <BR>[Calls]<UL><LI><a href="#[85]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;WDT_Open
-<LI><a href="#[c4]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;NVIC_EnableIRQ
-<LI><a href="#[c3]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;WDT_EnableInt
+<LI><a href="#[c5]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;NVIC_EnableIRQ
+<LI><a href="#[c4]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;WDT_EnableInt
 </UL>
 <BR>[Called By]<UL><LI><a href="#[22]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;main
 </UL>
@@ -1389,14 +1402,14 @@ Global Symbols
 <BR><BR>[Stack]<UL><LI>Max Depth = 16<LI>Call Chain = WDT_Open
 </UL>
 <BR>[Called By]<UL><LI><a href="#[5c]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;JumpToBootloader
-<LI><a href="#[c2]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;WDT_Init
+<LI><a href="#[c3]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;WDT_Init
 <LI><a href="#[7]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;WDT_IRQHandler
 </UL>
 
 <P><STRONG><a name="[5b]"></a>WriteFwStatus</STRONG> (Thumb, 26 bytes, Stack size 16 bytes, ota_manager.o(.text.WriteFwStatus))
 <BR><BR>[Stack]<UL><LI>Max Depth = 112<LI>Call Chain = WriteFwStatus &rArr; WriteToFlash &rArr; CRC32_Calc &rArr; CRC_Open
 </UL>
-<BR>[Calls]<UL><LI><a href="#[c5]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;WriteToFlash
+<BR>[Calls]<UL><LI><a href="#[c6]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;WriteToFlash
 </UL>
 <BR>[Called By]<UL><LI><a href="#[58]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;FwBankSwitchProcess
 <LI><a href="#[74]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;Host_MeterOTAProcess
@@ -1408,18 +1421,18 @@ Global Symbols
 <P><STRONG><a name="[5a]"></a>WriteMetadata</STRONG> (Thumb, 28 bytes, Stack size 24 bytes, ota_manager.o(.text.WriteMetadata))
 <BR><BR>[Stack]<UL><LI>Max Depth = 120<LI>Call Chain = WriteMetadata &rArr; WriteToFlash &rArr; CRC32_Calc &rArr; CRC_Open
 </UL>
-<BR>[Calls]<UL><LI><a href="#[c5]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;WriteToFlash
+<BR>[Calls]<UL><LI><a href="#[c6]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;WriteToFlash
 </UL>
 <BR>[Called By]<UL><LI><a href="#[58]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;FwBankSwitchProcess
 <LI><a href="#[5e]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;FwValidator
 <LI><a href="#[7]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;WDT_IRQHandler
 </UL>
 
-<P><STRONG><a name="[c5]"></a>WriteToFlash</STRONG> (Thumb, 152 bytes, Stack size 40 bytes, ota_manager.o(.text.WriteToFlash))
+<P><STRONG><a name="[c6]"></a>WriteToFlash</STRONG> (Thumb, 152 bytes, Stack size 40 bytes, ota_manager.o(.text.WriteToFlash))
 <BR><BR>[Stack]<UL><LI>Max Depth = 96<LI>Call Chain = WriteToFlash &rArr; CRC32_Calc &rArr; CRC_Open
 </UL>
 <BR>[Calls]<UL><LI><a href="#[86]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;FMC_Open
-<LI><a href="#[c6]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;FMC_Close
+<LI><a href="#[c7]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;FMC_Close
 <LI><a href="#[50]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;CRC32_Calc
 <LI><a href="#[65]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;FMC_Proc
 </UL>
@@ -1430,7 +1443,7 @@ Global Symbols
 <P><STRONG><a name="[55]"></a>_SendStringToHOST</STRONG> (Thumb, 160 bytes, Stack size 32 bytes, ao_hostprocess.o(.text._SendStringToHOST))
 <BR><BR>[Stack]<UL><LI>Max Depth = 52<LI>Call Chain = _SendStringToHOST &rArr; UART_EnableInt &rArr; NVIC_EnableIRQ
 </UL>
-<BR>[Calls]<UL><LI><a href="#[ba]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;UART_EnableInt
+<BR>[Calls]<UL><LI><a href="#[bb]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;UART_EnableInt
 </UL>
 <BR>[Called By]<UL><LI><a href="#[54]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;CalChecksumH
 </UL>
@@ -1438,7 +1451,7 @@ Global Symbols
 <P><STRONG><a name="[57]"></a>_SendStringToMETER</STRONG> (Thumb, 144 bytes, Stack size 32 bytes, ao_meterprocess.o(.text._SendStringToMETER))
 <BR><BR>[Stack]<UL><LI>Max Depth = 52<LI>Call Chain = _SendStringToMETER &rArr; UART_EnableInt &rArr; NVIC_EnableIRQ
 </UL>
-<BR>[Calls]<UL><LI><a href="#[ba]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;UART_EnableInt
+<BR>[Calls]<UL><LI><a href="#[bb]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;UART_EnableInt
 </UL>
 <BR>[Called By]<UL><LI><a href="#[56]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;CalChecksumM
 </UL>
@@ -1446,40 +1459,41 @@ Global Symbols
 <P><STRONG><a name="[26]"></a>fputc</STRONG> (Thumb, 20 bytes, Stack size 16 bytes, retarget.o(.text.fputc))
 <BR><BR>[Stack]<UL><LI>Max Depth = 36<LI>Call Chain = fputc &rArr; SendChar &rArr; SendChar_ToUART
 </UL>
-<BR>[Calls]<UL><LI><a href="#[b2]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;SendChar
+<BR>[Calls]<UL><LI><a href="#[b3]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;SendChar
 </UL>
 <BR>[Address Reference Count : 1]<UL><LI> printfa.o(i.__0printf)
 </UL>
-<P><STRONG><a name="[22]"></a>main</STRONG> (Thumb, 296 bytes, Stack size 48 bytes, main.o(.text.main))
+<P><STRONG><a name="[22]"></a>main</STRONG> (Thumb, 304 bytes, Stack size 48 bytes, main.o(.text.main))
 <BR><BR>[Stack]<UL><LI>Max Depth = 304<LI>Call Chain = main &rArr; FwValidator &rArr; FwBankSwitchProcess &rArr; WriteMetadata &rArr; WriteToFlash &rArr; CRC32_Calc &rArr; CRC_Open
 </UL>
 <BR>[Calls]<UL><LI><a href="#[89]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;MeterBoardPolling
 <LI><a href="#[9f]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;MeterProcess
 <LI><a href="#[68]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;HostProcess
-<LI><a href="#[b5]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;SendHost_UpdateSuccess_10ms
+<LI><a href="#[b6]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;SendHost_UpdateSuccess_10ms
 <LI><a href="#[5e]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;FwValidator
-<LI><a href="#[c9]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;SoftI2cMasterInit
-<LI><a href="#[c8]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;ReadMyCenterID
+<LI><a href="#[ca]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;SoftI2cMasterInit
+<LI><a href="#[c9]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;ReadMyCenterID
 <LI><a href="#[39]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;AO2022_Center_1261_init
-<LI><a href="#[ca]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;DefaultValue
-<LI><a href="#[c7]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;GPIO_Mode_Init
-<LI><a href="#[c2]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;WDT_Init
-<LI><a href="#[ad]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;SYS_Init
-<LI><a href="#[bd]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;UART1_Init
-<LI><a href="#[bb]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;UART0_Init
+<LI><a href="#[cb]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;DefaultValue
+<LI><a href="#[c8]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;GPIO_Mode_Init
+<LI><a href="#[c3]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;WDT_Init
+<LI><a href="#[ae]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;SYS_Init
+<LI><a href="#[be]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;UART1_Init
+<LI><a href="#[bc]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;UART0_Init
 <LI><a href="#[8a]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;ResetMeterUART
 <LI><a href="#[69]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;ResetHostUART
-<LI><a href="#[ac]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;RecoverSystemMoniter
+<LI><a href="#[ad]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;RecoverSystemMoniter
 <LI><a href="#[86]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;FMC_Open
-<LI><a href="#[b7]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;SysTick_Config
-<LI><a href="#[c4]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;NVIC_EnableIRQ
-<LI><a href="#[c1]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;SYS_LockReg
-<LI><a href="#[c0]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;SYS_UnlockReg
+<LI><a href="#[b8]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;SysTick_Config
+<LI><a href="#[c5]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;NVIC_EnableIRQ
+<LI><a href="#[c2]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;SYS_LockReg
+<LI><a href="#[c1]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;SYS_UnlockReg
+<LI><a href="#[49]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;__aeabi_uidiv
 </UL>
 <BR>[Address Reference Count : 1]<UL><LI> entry9a.o(.ARM.Collect$$$$0000000B)
 </UL>
-<P><STRONG><a name="[cb]"></a>__0printf</STRONG> (Thumb, 24 bytes, Stack size 24 bytes, printfa.o(i.__0printf), UNUSED)
-<BR><BR>[Calls]<UL><LI><a href="#[cc]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;_printf_core
+<P><STRONG><a name="[cc]"></a>__0printf</STRONG> (Thumb, 24 bytes, Stack size 24 bytes, printfa.o(i.__0printf), UNUSED)
+<BR><BR>[Calls]<UL><LI><a href="#[cd]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;_printf_core
 </UL>
 
 <P><STRONG><a name="[df]"></a>__1printf</STRONG> (Thumb, 0 bytes, Stack size 24 bytes, printfa.o(i.__0printf), UNUSED)
@@ -1488,7 +1502,7 @@ Global Symbols
 
 <P><STRONG><a name="[e1]"></a>__c89printf</STRONG> (Thumb, 0 bytes, Stack size 24 bytes, printfa.o(i.__0printf), UNUSED)
 
-<P><STRONG><a name="[ab]"></a>printf</STRONG> (Thumb, 0 bytes, Stack size 24 bytes, printfa.o(i.__0printf))
+<P><STRONG><a name="[ac]"></a>printf</STRONG> (Thumb, 0 bytes, Stack size 24 bytes, printfa.o(i.__0printf))
 <BR><BR>[Stack]<UL><LI>Max Depth = 24<LI>Call Chain = printf
 </UL>
 <BR>[Called By]<UL><LI><a href="#[24]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;ProcessHardFault
@@ -1522,14 +1536,14 @@ Local Symbols
 </UL>
 <BR>[Address Reference Count : 1]<UL><LI> startup_nuc1261.o(RESET)
 </UL>
-<P><STRONG><a name="[c0]"></a>SYS_UnlockReg</STRONG> (Thumb, 52 bytes, Stack size 4 bytes, main.o(.text.SYS_UnlockReg))
+<P><STRONG><a name="[c1]"></a>SYS_UnlockReg</STRONG> (Thumb, 52 bytes, Stack size 4 bytes, main.o(.text.SYS_UnlockReg))
 <BR><BR>[Stack]<UL><LI>Max Depth = 4<LI>Call Chain = SYS_UnlockReg
 </UL>
 <BR>[Called By]<UL><LI><a href="#[22]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;main
 <LI><a href="#[7]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;WDT_IRQHandler
 </UL>
 
-<P><STRONG><a name="[c1]"></a>SYS_LockReg</STRONG> (Thumb, 8 bytes, Stack size 0 bytes, main.o(.text.SYS_LockReg))
+<P><STRONG><a name="[c2]"></a>SYS_LockReg</STRONG> (Thumb, 8 bytes, Stack size 0 bytes, main.o(.text.SYS_LockReg))
 <BR><BR>[Called By]<UL><LI><a href="#[22]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;main
 <LI><a href="#[7]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;WDT_IRQHandler
 </UL>
@@ -1539,35 +1553,35 @@ Local Symbols
 </UL>
 <BR>[Calls]<UL><LI><a href="#[49]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;__aeabi_uidiv
 </UL>
-<BR>[Called By]<UL><LI><a href="#[bd]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;UART1_Init
-<LI><a href="#[bb]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;UART0_Init
+<BR>[Called By]<UL><LI><a href="#[be]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;UART1_Init
+<LI><a href="#[bc]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;UART0_Init
 </UL>
 
-<P><STRONG><a name="[c3]"></a>WDT_EnableInt</STRONG> (Thumb, 52 bytes, Stack size 4 bytes, main.o(.text.WDT_EnableInt))
+<P><STRONG><a name="[c4]"></a>WDT_EnableInt</STRONG> (Thumb, 52 bytes, Stack size 4 bytes, main.o(.text.WDT_EnableInt))
 <BR><BR>[Stack]<UL><LI>Max Depth = 4<LI>Call Chain = WDT_EnableInt
 </UL>
-<BR>[Called By]<UL><LI><a href="#[c2]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;WDT_Init
+<BR>[Called By]<UL><LI><a href="#[c3]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;WDT_Init
 </UL>
 
-<P><STRONG><a name="[c4]"></a>NVIC_EnableIRQ</STRONG> (Thumb, 28 bytes, Stack size 4 bytes, main.o(.text.NVIC_EnableIRQ))
+<P><STRONG><a name="[c5]"></a>NVIC_EnableIRQ</STRONG> (Thumb, 28 bytes, Stack size 4 bytes, main.o(.text.NVIC_EnableIRQ))
 <BR><BR>[Stack]<UL><LI>Max Depth = 4<LI>Call Chain = NVIC_EnableIRQ
 </UL>
 <BR>[Called By]<UL><LI><a href="#[22]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;main
-<LI><a href="#[c2]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;WDT_Init
+<LI><a href="#[c3]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;WDT_Init
 </UL>
 
-<P><STRONG><a name="[b7]"></a>SysTick_Config</STRONG> (Thumb, 68 bytes, Stack size 24 bytes, main.o(.text.SysTick_Config))
+<P><STRONG><a name="[b8]"></a>SysTick_Config</STRONG> (Thumb, 68 bytes, Stack size 24 bytes, main.o(.text.SysTick_Config))
 <BR><BR>[Stack]<UL><LI>Max Depth = 48<LI>Call Chain = SysTick_Config &rArr; NVIC_SetPriority
 </UL>
-<BR>[Calls]<UL><LI><a href="#[b8]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;NVIC_SetPriority
+<BR>[Calls]<UL><LI><a href="#[b9]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;NVIC_SetPriority
 </UL>
 <BR>[Called By]<UL><LI><a href="#[22]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;main
 </UL>
 
-<P><STRONG><a name="[b8]"></a>NVIC_SetPriority</STRONG> (Thumb, 124 bytes, Stack size 24 bytes, main.o(.text.NVIC_SetPriority))
+<P><STRONG><a name="[b9]"></a>NVIC_SetPriority</STRONG> (Thumb, 124 bytes, Stack size 24 bytes, main.o(.text.NVIC_SetPriority))
 <BR><BR>[Stack]<UL><LI>Max Depth = 24<LI>Call Chain = NVIC_SetPriority
 </UL>
-<BR>[Called By]<UL><LI><a href="#[b7]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;SysTick_Config
+<BR>[Called By]<UL><LI><a href="#[b8]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;SysTick_Config
 </UL>
 
 <P><STRONG><a name="[80]"></a>SYS_UnlockReg</STRONG> (Thumb, 52 bytes, Stack size 4 bytes, ao_hostprocess.o(.text.SYS_UnlockReg))
@@ -1592,16 +1606,12 @@ Local Symbols
 <BR><BR>[Stack]<UL><LI>Max Depth = 4<LI>Call Chain = SYS_UnlockReg
 </UL>
 <BR>[Called By]<UL><LI><a href="#[89]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;MeterBoardPolling
-<LI><a href="#[9c]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;SendMeterBootloader_GetPackNo
-<LI><a href="#[9b]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;SendMeterBootloader_UpdateBuff
+<LI><a href="#[9d]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;SendMeterBootloader_ResentUpdatePack
+<LI><a href="#[9b]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;SendMeterBootloader_UpdatePack
 <LI><a href="#[9a]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;SendMeterBootloader_CmdEraseAPROM
 </UL>
 
-<P><STRONG><a name="[9d]"></a>SYS_LockReg</STRONG> (Thumb, 8 bytes, Stack size 0 bytes, ao_meterprocess.o(.text.SYS_LockReg))
-<BR><BR>[Called By]<UL><LI><a href="#[89]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;MeterBoardPolling
-</UL>
-
-<P><STRONG><a name="[9e]"></a>NVIC_SystemReset</STRONG> (Thumb, 20 bytes, Stack size 0 bytes, ao_meterprocess.o(.text.NVIC_SystemReset))
+<P><STRONG><a name="[9e]"></a>SYS_LockReg</STRONG> (Thumb, 8 bytes, Stack size 0 bytes, ao_meterprocess.o(.text.SYS_LockReg))
 <BR><BR>[Called By]<UL><LI><a href="#[89]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;MeterBoardPolling
 </UL>
 
@@ -1640,45 +1650,45 @@ Local Symbols
 <BR>[Called By]<UL><LI><a href="#[47]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;CLK_EnablePLL
 </UL>
 
-<P><STRONG><a name="[be]"></a>NVIC_DisableIRQ</STRONG> (Thumb, 28 bytes, Stack size 4 bytes, uart.o(.text.NVIC_DisableIRQ))
+<P><STRONG><a name="[bf]"></a>NVIC_DisableIRQ</STRONG> (Thumb, 28 bytes, Stack size 4 bytes, uart.o(.text.NVIC_DisableIRQ))
 <BR><BR>[Stack]<UL><LI>Max Depth = 4<LI>Call Chain = NVIC_DisableIRQ
 </UL>
-<BR>[Called By]<UL><LI><a href="#[b9]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;UART_DisableInt
+<BR>[Called By]<UL><LI><a href="#[ba]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;UART_DisableInt
 </UL>
 
-<P><STRONG><a name="[bf]"></a>NVIC_EnableIRQ</STRONG> (Thumb, 28 bytes, Stack size 4 bytes, uart.o(.text.NVIC_EnableIRQ))
+<P><STRONG><a name="[c0]"></a>NVIC_EnableIRQ</STRONG> (Thumb, 28 bytes, Stack size 4 bytes, uart.o(.text.NVIC_EnableIRQ))
 <BR><BR>[Stack]<UL><LI>Max Depth = 4<LI>Call Chain = NVIC_EnableIRQ
 </UL>
-<BR>[Called By]<UL><LI><a href="#[ba]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;UART_EnableInt
+<BR>[Called By]<UL><LI><a href="#[bb]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;UART_EnableInt
 </UL>
 
-<P><STRONG><a name="[cd]"></a>_fp_digits</STRONG> (Thumb, 344 bytes, Stack size 64 bytes, printfa.o(i._fp_digits), UNUSED)
+<P><STRONG><a name="[ce]"></a>_fp_digits</STRONG> (Thumb, 344 bytes, Stack size 64 bytes, printfa.o(i._fp_digits), UNUSED)
 <BR><BR>[Calls]<UL><LI><a href="#[2b]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;__aeabi_uldivmod
 <LI><a href="#[34]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;__aeabi_dmul
 <LI><a href="#[35]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;__aeabi_ddiv
 <LI><a href="#[2e]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;__aeabi_dadd
 <LI><a href="#[36]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;__aeabi_d2ulz
-<LI><a href="#[ce]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;__aeabi_cdrcmple
+<LI><a href="#[cf]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;__aeabi_cdrcmple
 </UL>
-<BR>[Called By]<UL><LI><a href="#[cc]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;_printf_core
+<BR>[Called By]<UL><LI><a href="#[cd]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;_printf_core
 </UL>
 
-<P><STRONG><a name="[cc]"></a>_printf_core</STRONG> (Thumb, 1754 bytes, Stack size 128 bytes, printfa.o(i._printf_core), UNUSED)
+<P><STRONG><a name="[cd]"></a>_printf_core</STRONG> (Thumb, 1754 bytes, Stack size 128 bytes, printfa.o(i._printf_core), UNUSED)
 <BR><BR>[Calls]<UL><LI><a href="#[2b]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;__aeabi_uldivmod
-<LI><a href="#[d1]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;__aeabi_uidivmod
-<LI><a href="#[cf]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;_printf_pre_padding
-<LI><a href="#[d0]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;_printf_post_padding
-<LI><a href="#[cd]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;_fp_digits
+<LI><a href="#[9c]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;__aeabi_uidivmod
+<LI><a href="#[d0]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;_printf_pre_padding
+<LI><a href="#[d1]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;_printf_post_padding
+<LI><a href="#[ce]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;_fp_digits
 </UL>
-<BR>[Called By]<UL><LI><a href="#[cb]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;__0printf
-</UL>
-
-<P><STRONG><a name="[d0]"></a>_printf_post_padding</STRONG> (Thumb, 32 bytes, Stack size 24 bytes, printfa.o(i._printf_post_padding), UNUSED)
-<BR><BR>[Called By]<UL><LI><a href="#[cc]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;_printf_core
+<BR>[Called By]<UL><LI><a href="#[cc]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;__0printf
 </UL>
 
-<P><STRONG><a name="[cf]"></a>_printf_pre_padding</STRONG> (Thumb, 44 bytes, Stack size 40 bytes, printfa.o(i._printf_pre_padding), UNUSED)
-<BR><BR>[Called By]<UL><LI><a href="#[cc]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;_printf_core
+<P><STRONG><a name="[d1]"></a>_printf_post_padding</STRONG> (Thumb, 32 bytes, Stack size 24 bytes, printfa.o(i._printf_post_padding), UNUSED)
+<BR><BR>[Called By]<UL><LI><a href="#[cd]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;_printf_core
+</UL>
+
+<P><STRONG><a name="[d0]"></a>_printf_pre_padding</STRONG> (Thumb, 44 bytes, Stack size 40 bytes, printfa.o(i._printf_pre_padding), UNUSED)
+<BR><BR>[Called By]<UL><LI><a href="#[cd]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;_printf_core
 </UL>
 <P>
 <H3>
